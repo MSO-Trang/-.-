@@ -112,29 +112,34 @@ export default function BookingForm({
   };
 
   const parseToISODateTime = (dateThaiBE: string, time24: string): string => {
-    const dateParts = dateThaiBE.trim().split('/');
-    if (dateParts.length !== 3) return '';
-    const d = parseInt(dateParts[0], 10);
-    const m = parseInt(dateParts[1], 10) - 1; // 0-indexed month
-    const yBE = parseInt(dateParts[2], 10);
-    if (isNaN(d) || isNaN(m) || isNaN(yBE)) return '';
-    const yAD = yBE - 543;
+    try {
+      const dateParts = dateThaiBE.trim().split('/');
+      if (dateParts.length !== 3) return '';
+      const d = parseInt(dateParts[0], 10);
+      const m = parseInt(dateParts[1], 10) - 1; // 0-indexed month
+      const yBE = parseInt(dateParts[2], 10);
+      if (isNaN(d) || isNaN(m) || isNaN(yBE)) return '';
+      if (dateParts[2].trim().length < 4) return ''; // Do not parse until the year is fully 4 digits BE
+      const yAD = yBE - 543;
 
-    // parsing time24: "HH.MM" or "HH:MM"
-    const timeParts = time24.trim().split(/[:\.]/);
-    const h = timeParts[0] ? parseInt(timeParts[0], 10) : 0;
-    const min = timeParts[1] ? parseInt(timeParts[1], 10) : 0;
-    if (isNaN(h) || isNaN(min)) return '';
+      // parsing time24: "HH.MM" or "HH:MM"
+      const timeParts = time24.trim().split(/[:\.]/);
+      const h = timeParts[0] ? parseInt(timeParts[0], 10) : 0;
+      const min = timeParts[1] ? parseInt(timeParts[1], 10) : 0;
+      if (isNaN(h) || isNaN(min)) return '';
 
-    const dateObj = new Date(yAD, m, d, h, min, 0);
-    if (isNaN(dateObj.getTime())) return '';
+      const dateObj = new Date(yAD, m, d, h, min, 0);
+      if (isNaN(dateObj.getTime())) return '';
 
-    const yearStr = String(dateObj.getFullYear()).padStart(4, '0');
-    const monthStr = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const dayStr = String(dateObj.getDate()).padStart(2, '0');
-    const hourStr = String(dateObj.getHours()).padStart(2, '0');
-    const minStr = String(dateObj.getMinutes()).padStart(2, '0');
-    return `${yearStr}-${monthStr}-${dayStr}T${hourStr}:${minStr}`;
+      const yearStr = String(dateObj.getFullYear()).padStart(4, '0');
+      const monthStr = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dayStr = String(dateObj.getDate()).padStart(2, '0');
+      const hourStr = String(dateObj.getHours()).padStart(2, '0');
+      const minStr = String(dateObj.getMinutes()).padStart(2, '0');
+      return `${yearStr}-${monthStr}-${dayStr}T${hourStr}:${minStr}`;
+    } catch {
+      return '';
+    }
   };
 
   // Helper formatting for live input typing
@@ -482,12 +487,14 @@ export default function BookingForm({
           newErrors.startDate = 'กรุณาระบุวัน-เวลาไปราชการให้ครบถ้วนถูกต้อง';
         }
       }
-      if (!formData.endDate) {
-        const validEndFormat = /^\d{2}\/\d{2}\/\d{4}$/.test(endThaiDate);
-        if (endThaiDate && !validEndFormat) {
-          newErrors.endDate = 'กรุณาระบุวันที่กลับในรูปแบบ วว/ดด/ปปปป (พ.ศ.) เช่น 28/05/2569';
-        } else {
-          newErrors.endDate = 'กรุณาระบุวัน-เวลาเดินทางกลับให้ครบถ้วนถูกต้อง';
+      if (endThaiDate || end24Time) {
+        if (!formData.endDate) {
+          const validEndFormat = /^\d{2}\/\d{2}\/\d{4}$/.test(endThaiDate);
+          if (endThaiDate && !validEndFormat) {
+            newErrors.endDate = 'กรุณาระบุวันที่กลับในรูปแบบ วว/ดด/ปปปป (พ.ศ.) เช่น 28/05/2569';
+          } else {
+            newErrors.endDate = 'กรุณาระบุวัน-เวลาเดินทางกลับให้ครบถ้วนถูกต้อง';
+          }
         }
       }
       if (formData.startDate && formData.endDate) {
@@ -550,7 +557,11 @@ export default function BookingForm({
     if (!formData.destination.trim()) newErrors.destination = 'กรุณาระบุสถานที่ไปราชการ';
     if (!formData.purpose.trim()) newErrors.purpose = 'กรุณาระบุวัตถุประสงค์การเดินทาง';
     if (!formData.startDate) newErrors.startDate = 'กรุณาระบุวัน-เวลาไป';
-    if (!formData.endDate) newErrors.endDate = 'กรุณาระบุวัน-เวลากลับ';
+    if (endThaiDate || end24Time) {
+      if (!formData.endDate) {
+        newErrors.endDate = 'กรุณาระบุวัน-เวลากลับให้ครบถ้วนถูกต้อง';
+      }
+    }
     
     if (formData.startDate && formData.endDate) {
       if (new Date(formData.startDate).getTime() >= new Date(formData.endDate).getTime()) {
@@ -603,7 +614,7 @@ export default function BookingForm({
       purpose: formData.purpose,
       passengersCount: formData.passengersCount,
       startDate: new Date(formData.startDate).toISOString(),
-      endDate: new Date(formData.endDate).toISOString(),
+      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : '',
       vehicleId: formData.vehicleId,
       driverId: formData.driverId,
       status: formData.status,
@@ -759,12 +770,7 @@ export default function BookingForm({
                     </div>
                   </div>
                 </div>
-                {formData.startDate && (
-                  <div className="mt-1.5 bg-[#a22055]/5 border border-[#a22055]/10 rounded-lg p-2 flex items-center gap-1.5 text-[11px] font-extrabold text-[#a22055] font-sans leading-none animate-fade-in shadow-2xs">
-                    <span>🕒 ยืนยันออกเดินทาง:</span>
-                    <span>{formatThaiDate(new Date(formData.startDate).toISOString())}</span>
-                  </div>
-                )}
+
                 {errors.startDate && <p className="text-xs text-rose-500 font-semibold">{errors.startDate}</p>}
                 <p className="text-[10px] text-slate-400">ป้อน วัน/เดือน/ปีพ.ศ. (เช่น 28/05/2569) และเวลา (เช่น 08:30) หรือกดรูปไอคอนเพื่อแสดงปฏิทิน</p>
               </div>
@@ -831,12 +837,7 @@ export default function BookingForm({
                     </div>
                   </div>
                 </div>
-                {formData.endDate && (
-                  <div className="mt-1.5 bg-[#a22055]/5 border border-[#a22055]/10 rounded-lg p-2 flex items-center gap-1.5 text-[11px] font-extrabold text-[#a22055] font-sans leading-none animate-fade-in shadow-2xs">
-                    <span>🕒 ยืนยันเดินทางกลับ:</span>
-                    <span>{formatThaiDate(new Date(formData.endDate).toISOString())}</span>
-                  </div>
-                )}
+
                 {errors.endDate && <p className="text-xs text-rose-500 font-semibold">{errors.endDate}</p>}
                 <p className="text-[10px] text-slate-400">ป้อน วัน/เดือน/ปีพ.ศ. (เช่น 28/05/2569) และเวลา (เช่น 16:30) หรือกดรูปไอคอนเพื่อแสดงปฏิทิน</p>
               </div>
@@ -911,7 +912,7 @@ export default function BookingForm({
                     name="requesterName"
                     value={formData.requesterName}
                     onChange={handleChange}
-                    placeholder="เช่น นายอับดุลเลาะ มะแก้ว"
+                    placeholder="เช่น นายมัง คุดคัด"
                     className={`w-full px-4 py-2.5 border rounded-xl text-sm text-slate-700 ${
                       errors.requesterName ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-indigo-100 focus:border-[#a22055]'
                     } outline-none focus:ring-2`}
@@ -1021,20 +1022,29 @@ export default function BookingForm({
               <div className="h-6 w-1 rounded-full bg-[#a22055]" />
               <div className="flex items-center gap-2">
                 <Car size={18} className="text-[#a22055]" />
-                <h3 className="text-base font-extrabold text-slate-800">
+                <h3 className="text-base font-extrabold text-slate-800 font-sans">
                   ส่วนที่ 3 : จัดสรรยานพาหนะและระบุพนักงานประจำรถราชการ
                 </h3>
               </div>
             </div>
 
             {/* Visual Vehicle Cards Selection Grid */}
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                 <label className="text-xs font-black text-slate-700 uppercase tracking-widest block flex items-center gap-1.5">
-                  <Car size={13} className="text-slate-400" />
-                  <span>1. เลือกคลิกแผ่นภาพรถยนต์ราชการ (6 คันในคลังส่วนกลาง)</span>
+                  <span className="inline-flex items-center justify-center bg-[#a22055]/10 text-[#a22055] text-[10px] w-5 h-5 rounded-full font-black">
+                    1
+                  </span>
+                  <span>เลือกยานพาหนะราชการ (6 คันในคลังส่วนกลาง)</span>
                 </label>
-                <p className="text-[10px] text-slate-400 font-semibold hidden sm:block">คลิกภาพเพื่อเปลี่ยนรถคันที่สว่าง</p>
+                <div className="flex items-center gap-4 text-[10px] text-slate-400 font-semibold pl-6 sm:pl-0">
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> ว่างพร้อมใช้
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> มีภารกิจทับ
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1062,54 +1072,63 @@ export default function BookingForm({
                           });
                         }
                       }}
-                      className={`text-left p-4 rounded-2xl border-2 transition-all relative flex flex-col justify-between h-34 cursor-pointer outline-none select-none ${
+                      className={`text-left p-4.5 rounded-2xl border-2 transition-all relative flex flex-col justify-between min-h-[145px] hover:shadow-xs active:scale-[0.98] cursor-pointer outline-none select-none ${
                         isSelected 
-                          ? 'border-[#a22055] bg-[#a22055]/5 shadow-md ring-2 ring-[#a22055]/15' 
+                          ? 'border-[#a22055] bg-[#a22055]/5 shadow-sm ring-1 ring-[#a22055]/20 border-l-4' 
                           : isConflict 
-                            ? 'border-rose-100 bg-rose-50/20 opacity-70 hover:opacity-100 hover:border-rose-300' 
-                            : 'border-slate-100 hover:border-slate-300 bg-white shadow-xs'
+                            ? 'border-slate-100 bg-slate-50/50 opacity-80 hover:opacity-100 hover:border-rose-300' 
+                            : 'border-slate-100 hover:border-[#a22055]/30 bg-white shadow-2xs'
                       }`}
                     >
                       <div className="flex justify-between items-start w-full gap-2">
-                        <div>
-                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md leading-none mb-1.5 block w-fit ${
+                        <div className="space-y-1">
+                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md leading-none block w-fit ${
                             isSelected 
                               ? 'bg-[#a22055] text-white' 
                               : 'bg-slate-100 text-slate-500'
                           }`}>
                             {translateVehicleType(v.type)}
                           </span>
-                          <h4 className="text-xs sm:text-sm font-black text-slate-800 leading-tight">
+                          <h4 className="text-xs sm:text-[13px] font-extrabold text-slate-800 leading-snug">
                             {v.name}
                           </h4>
                         </div>
-                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-xs" style={{ backgroundColor: v.imagePlaceholderColor || '#f1f5f9' }}>
-                          <Car size={16} className="text-white" />
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-2xs border border-white" style={{ backgroundColor: v.imagePlaceholderColor || '#f1f5f9' }}>
+                          <Car size={14} className="text-white" />
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between w-full mt-3 pt-2.5 border-t border-slate-100/70">
-                        <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 border border-slate-250/60 px-2 py-0.5 rounded-md">
-                          {v.plateNumber}
-                        </span>
-                        <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5">
-                          <Users size={12} />
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="inline-flex bg-white border border-slate-300 rounded-md px-2 py-0.5 shadow-3xs">
+                          <span className="text-[10px] font-black text-slate-800 font-sans tracking-tight">
+                            {v.plateNumber}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+                          <Users size={11} className="text-slate-400" />
                           {v.capacity} ที่นั่ง
                         </span>
                       </div>
-
-                      {isConflict && (
-                        <div className="absolute top-2 right-2 bg-rose-600 text-white rounded-md px-1.5 py-0.5 text-[9px] font-extrabold flex items-center gap-0.5 shadow-sm animate-pulse">
-                          <AlertTriangle size={9} />
-                          ชนตารางภารกิจอื่น
-                        </div>
-                      )}
                       
-                      {isSelected && (
-                        <div className="absolute -top-1.5 -right-1.5 bg-[#a22055] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md border-2 border-white font-extrabold">
-                          ✓
-                        </div>
-                      )}
+                      <div className="mt-3 pt-2 border-t border-slate-100/70 flex items-center justify-between">
+                        {isConflict ? (
+                          <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-rose-50 text-rose-600 border border-rose-100/60 flex items-center gap-1 leading-none">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                            ติดภารกิจอื่น
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100/60 flex items-center gap-1 leading-none">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-550" />
+                            ว่างพร้อมใช้
+                          </span>
+                        )}
+                        
+                        {isSelected && (
+                          <span className="text-[10px] font-extrabold text-[#a22055] flex items-center gap-1">
+                            ✓ เลือกอยู่
+                          </span>
+                        )}
+                      </div>
                     </button>
                   );
                 })}
@@ -1138,12 +1157,22 @@ export default function BookingForm({
             </div>
 
             {/* Visual Drivers Selection Grid */}
-            <div className="space-y-3 pt-4 border-t border-slate-100/70">
-              <div className="flex justify-between items-center">
+            <div className="space-y-4 pt-6 border-t border-slate-100/70">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                 <label className="text-xs font-black text-slate-700 uppercase tracking-widest block flex items-center gap-1.5">
-                  <User size={13} className="text-slate-400" />
-                  <span>2. เลือกแผ่นข้อมูลพลขับ (พนักงานขับรถ 5 ท่าน หรือ ประเด็นขับขี่ด้วยตนเอง)</span>
+                  <span className="inline-flex items-center justify-center bg-[#a22055]/10 text-[#a22055] text-[10px] w-5 h-5 rounded-full font-black">
+                    2
+                  </span>
+                  <span>เลือกผู้ปฏิบัติงานขับรถยนต์ (พลขับ หรือเลือกขับขี่ตนเอง)</span>
                 </label>
+                <div className="flex items-center gap-4 text-[10px] text-slate-400 font-semibold pl-6 sm:pl-0">
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> ว่างพร้อมขับ
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> คิวไม่ว่าง
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1161,10 +1190,10 @@ export default function BookingForm({
                       });
                     }
                   }}
-                  className={`text-left p-4 rounded-2xl border-2 transition-all relative flex flex-col justify-between h-34 cursor-pointer outline-none select-none ${
+                  className={`text-left p-4.5 rounded-2xl border-2 transition-all relative flex flex-col justify-between min-h-[145px] hover:shadow-xs active:scale-[0.98] cursor-pointer outline-none select-none ${
                     formData.driverId === 'self-drive'
-                      ? 'border-[#a22055] bg-[#a22055]/5 shadow-md ring-2 ring-[#a22055]/15'
-                      : 'border-slate-100 hover:border-slate-300 bg-white shadow-xs'
+                      ? 'border-[#a22055] bg-[#a22055]/5 shadow-sm ring-1 ring-[#a22055]/20 border-l-4'
+                      : 'border-slate-100 hover:border-[#a22055]/30 bg-white shadow-2xs'
                   }`}
                 >
                   <div className="flex justify-between items-start w-full">
@@ -1172,20 +1201,29 @@ export default function BookingForm({
                       <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 block w-fit mb-1.5 leading-none">
                         อนุญาตส่วนกลาง
                       </span>
-                      <h4 className="text-xs sm:text-sm font-black text-slate-800">🚙 ขับขี่ภารกิจด้วยตนเอง</h4>
+                      <h4 className="text-xs sm:text-[13px] font-extrabold text-slate-800">
+                        🚙 ขับขี่ภารกิจด้วยตนเอง
+                      </h4>
                     </div>
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 bg-purple-50">
-                      <User size={16} className="text-purple-600" />
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-purple-50 border border-purple-150">
+                      <User size={14} className="text-purple-600" />
                     </div>
                   </div>
-                  <p className="text-[10px] text-slate-400 mt-2 leading-tight font-medium">
-                    ผู้ขออนุญาตใช้บริการเป็นผู้มีใบขับขี่ที่ถูกต้องและทำภารกิจขับขี่รถยนต์ด้วยตนเอง โดยไม่ต้องจัดสรรหาพลคนขับ
+                  <p className="text-[10px] text-slate-400 mt-1 leading-tight font-medium">
+                    ผู้ขออนุญาตใช้บริการทำหน้าที่ขับขี่ด้วยตนเองโดยไม่ต้องจัดสรรพลขับของหน่วยงาน
                   </p>
-                  {formData.driverId === 'self-drive' && (
-                    <div className="absolute -top-1.5 -right-1.5 bg-[#a22055] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md border-2 border-white font-extrabold">
-                      ✓
-                    </div>
-                  )}
+                  
+                  <div className="mt-3 pt-2 border-t border-slate-100/70 flex items-center justify-between">
+                    <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-purple-50/70 text-purple-700 border border-purple-100/50 flex items-center gap-1 leading-none">
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                      พร้อมขับขี่เอง
+                    </span>
+                    {formData.driverId === 'self-drive' && (
+                      <span className="text-[10px] font-extrabold text-[#a22055] flex items-center gap-1">
+                        ✓ เลือกอยู่
+                      </span>
+                    )}
+                  </div>
                 </button>
 
                 {drivers.map((d) => {
@@ -1207,54 +1245,56 @@ export default function BookingForm({
                           });
                         }
                       }}
-                      className={`text-left p-4 rounded-2xl border-2 transition-all relative flex flex-col justify-between h-34 cursor-pointer outline-none select-none ${
+                      className={`text-left p-4.5 rounded-2xl border-2 transition-all relative flex flex-col justify-between min-h-[145px] hover:shadow-xs active:scale-[0.98] cursor-pointer outline-none select-none ${
                         isSelected 
-                          ? 'border-[#a22055] bg-[#a22055]/5 shadow-md ring-2 ring-[#a22055]/15' 
+                          ? 'border-[#a22055] bg-[#a22055]/5 shadow-sm ring-1 ring-[#a22055]/20 border-l-4' 
                           : isConflict 
-                            ? 'border-rose-100 bg-rose-50/20 opacity-70 hover:opacity-100 hover:border-rose-300' 
-                            : 'border-slate-100 hover:border-slate-300 bg-white shadow-xs'
+                            ? 'border-slate-100 bg-slate-50/50 opacity-80 hover:opacity-100 hover:border-rose-300' 
+                            : 'border-slate-100 hover:border-[#a22055]/30 bg-white shadow-2xs'
                       }`}
                     >
                       <div className="flex justify-between items-start w-full gap-2">
-                        <div>
-                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md leading-none mb-1.5 block w-fit ${
+                        <div className="space-y-1">
+                          <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md leading-none block w-fit ${
                             isSelected 
                               ? 'bg-[#a22055] text-white' 
                               : 'bg-slate-100 text-slate-500'
                           }`}>
                             พลขับเวรส่วนกลาง
                           </span>
-                          <h4 className="text-xs sm:text-sm font-black text-slate-800">🎯 {d.name}</h4>
+                          <h4 className="text-xs sm:text-[13px] font-extrabold text-slate-800 leading-snug">
+                            🎯 {d.name}
+                          </h4>
                         </div>
-                        <div className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-xs" style={{ backgroundColor: d.avatarColor || '#e2e8f0' }}>
-                          <span className="text-xs font-black text-slate-700">{d.name.substring(0, 2)}</span>
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-2xs border border-white" style={{ backgroundColor: d.avatarColor || '#e2e8f0' }}>
+                          <span className="text-[10px] font-black text-slate-700">{d.name.substring(0, 2)}</span>
                         </div>
                       </div>
                       
-                      <div className="flex items-center justify-between w-full mt-3 pt-2.5 border-t border-slate-100/70">
-                        <span className="text-[11px] font-mono leading-none text-slate-500 flex items-center gap-1">
-                          <Phone size={10} />
-                          {d.phone}
-                        </span>
-                        {isConflict && (
-                          <span className="text-[9px] font-bold text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded-md">
-                            ติดปฏิทินอื่น
+                      <div className="flex items-center gap-1.5 mt-2 text-[10px] font-mono text-slate-500">
+                        <Phone size={11} className="text-slate-400" />
+                        <span>{d.phone}</span>
+                      </div>
+                      
+                      <div className="mt-3 pt-2 border-t border-slate-100/70 flex items-center justify-between">
+                        {isConflict ? (
+                          <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-rose-50 text-rose-600 border border-rose-100/60 flex items-center gap-1 leading-none">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                            ติดงานเวรอื่น
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100/60 flex items-center gap-1 leading-none">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-550" />
+                            คิวว่างพร้อมขับ
+                          </span>
+                        )}
+                        
+                        {isSelected && (
+                          <span className="text-[10px] font-extrabold text-[#a22055] flex items-center gap-1">
+                            ✓ เลือกอยู่
                           </span>
                         )}
                       </div>
-
-                      {isConflict && (
-                        <div className="absolute top-2 right-2 bg-rose-600 text-white rounded-md px-1.5 py-0.5 text-[9px] font-extrabold flex items-center gap-0.5 shadow-sm animate-pulse">
-                          <AlertTriangle size={9} />
-                          ตารางซ้อนทับ
-                        </div>
-                      )}
-                      
-                      {isSelected && (
-                        <div className="absolute -top-1.5 -right-1.5 bg-[#a22055] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md border-2 border-white font-extrabold">
-                          ✓
-                        </div>
-                      )}
                     </button>
                   );
                 })}
@@ -1280,8 +1320,9 @@ export default function BookingForm({
                   </div>
                 </div>
               )}
+            </div>
 
-              {/* Mileage Registration Segment */}
+            {/* Mileage Registration Segment */}
               <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 md:p-5 mt-6 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
@@ -1368,8 +1409,7 @@ export default function BookingForm({
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
         {/* =======================================
             STEP 4: caretakers and approvers 
@@ -1507,8 +1547,18 @@ export default function BookingForm({
                 <div className="space-y-1">
                   <span className="text-slate-400 font-semibold block">วันและเวลาปฏิบัติหน้าที่:</span>
                   <p className="text-slate-800 font-black">
-                    {formData.startDate ? formatThaiDate(new Date(formData.startDate).toISOString()) : 'ยังไม่ระบุ'} <br /> 
-                    ถึง {formData.endDate ? formatThaiDate(new Date(formData.endDate).toISOString()) : 'ยังไม่ระบุ'}
+                    {formData.startDate ? (
+                      formData.endDate ? (
+                        <>
+                          {formatThaiDate(formData.startDate)} <br />
+                          ถึง {formatThaiDate(formData.endDate)}
+                        </>
+                      ) : (
+                        `${formatThaiDate(formData.startDate)} เป็นต้นไป`
+                      )
+                    ) : (
+                      'ยังไม่ระบุ'
+                    )}
                   </p>
                 </div>
                 <div className="space-y-1">

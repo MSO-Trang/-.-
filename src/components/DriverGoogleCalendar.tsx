@@ -206,7 +206,7 @@ export default function DriverGoogleCalendar({
       if (selectedDriverId !== 'ALL' && b.driverId !== selectedDriverId) return false;
 
       const bStart = new Date(b.startDate).getTime();
-      const bEnd = new Date(b.endDate).getTime();
+      const bEnd = b.endDate ? new Date(b.endDate).getTime() : new Date(b.startDate).getTime() + (4 * 60 * 60 * 1000);
 
       return (bStart <= dayEnd && bEnd >= dayStart);
     }).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
@@ -369,11 +369,11 @@ export default function DriverGoogleCalendar({
           {/* Thai date header display */}
           <h3 className="text-sm font-bold text-slate-800 ml-2">
             {viewMode === 'month' && (
-              <span>เดือน{THAI_MONTHS_LONG[currentDate.getMonth()]} พ.ศ. {currentDate.getFullYear() + 543}</span>
+              <span>เดือน{THAI_MONTHS_LONG[currentDate.getMonth()]} {currentDate.getFullYear() + 543}</span>
             )}
             {viewMode === 'week' && (
               <span>
-                {weekDays[0].dayNum} {THAI_MONTHS_SHORT[weekDays[0].date.getMonth()]} - {weekDays[6].dayNum} {THAI_MONTHS_LONG[weekDays[6].date.getMonth()]} พ.ศ. {weekDays[6].date.getFullYear() + 543}
+                {weekDays[0].dayNum} {THAI_MONTHS_SHORT[weekDays[0].date.getMonth()]} - {weekDays[6].dayNum} {THAI_MONTHS_LONG[weekDays[6].date.getMonth()]} {weekDays[6].date.getFullYear() + 543}
               </span>
             )}
             {viewMode === 'list' && (
@@ -562,7 +562,7 @@ export default function DriverGoogleCalendar({
                             <div className="space-y-0.5">
                               <div className="flex items-center gap-1 text-[10px] font-extrabold font-mono">
                                 <Clock size={11} className="shrink-0" />
-                                <span>{formatTime(b.startDate)} - {formatTime(b.endDate)}</span>
+                                <span>{b.endDate ? `${formatTime(b.startDate)} - ${formatTime(b.endDate)}` : `${formatTime(b.startDate)} น. เป็นต้นไป`}</span>
                               </div>
                               <h4 className="font-extrabold text-slate-850 line-clamp-2 leading-tight" title={b.destination}>
                                 {b.destination}
@@ -678,7 +678,7 @@ export default function DriverGoogleCalendar({
                   <div>
                     <h5 className="font-extrabold text-slate-400 text-[10px] uppercase tracking-wider">วันเวลาออกเดินทาง (กำหนดการ)</h5>
                     <p className="mt-0.5 text-slate-800 font-extrabold text-xs">{formatThaiDate(selectedEvent.startDate)}</p>
-                    <p className="text-slate-450 text-[10.5px]">ถึง {formatThaiDate(selectedEvent.endDate)}</p>
+                    <p className="text-slate-450 text-[10.5px]">{selectedEvent.endDate ? `ถึง ${formatThaiDate(selectedEvent.endDate)}` : 'เป็นต้นไป'}</p>
                   </div>
                 </div>
 
@@ -936,7 +936,8 @@ export default function DriverGoogleCalendar({
                 <button
                   type="button"
                   onClick={() => {
-                    const gUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('จองรถราชการ: ' + selectedEvent.destination)}&details=${encodeURIComponent(selectedEvent.purpose + ' - ขอโดย ' + selectedEvent.requesterName)}&dates=${encodeURIComponent(selectedEvent.startDate.replace(/[-:]/g, ''))}/${encodeURIComponent(selectedEvent.endDate.replace(/[-:]/g, ''))}`;
+                    const calcEndDate = selectedEvent.endDate || new Date(new Date(selectedEvent.startDate).getTime() + (4 * 60 * 60 * 1000)).toISOString();
+                    const gUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('จองรถราชการ: ' + selectedEvent.destination)}&details=${encodeURIComponent(selectedEvent.purpose + ' - ขอโดย ' + selectedEvent.requesterName)}&dates=${encodeURIComponent(selectedEvent.startDate.replace(/[-:]/g, ''))}/${encodeURIComponent(calcEndDate.replace(/[-:]/g, ''))}`;
                     window.open(gUrl, '_blank');
                   }}
                   className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-[10px] font-bold rounded-xl text-slate-600 transition flex items-center gap-1 cursor-pointer"

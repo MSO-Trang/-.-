@@ -77,7 +77,7 @@ export default function Schedules({
       if (b.status === 'cancelled' || b.status === 'rejected') return false;
       
       const bStart = new Date(b.startDate).getTime();
-      const bEnd = new Date(b.endDate).getTime();
+      const bEnd = b.endDate ? new Date(b.endDate).getTime() : new Date(b.startDate).getTime() + (4 * 60 * 60 * 1000);
       const dayStart = dayBounds.start.getTime();
       const dayEnd = dayBounds.end.getTime();
       
@@ -132,7 +132,7 @@ export default function Schedules({
     const monthName = months[selectedDate.getMonth()];
     const yearBe = selectedDate.getFullYear() + 543;
     
-    return `วัน${dayName}ที่ ${dateNum} ${monthName} พ.ศ. ${yearBe}`;
+    return `วัน${dayName}ที่ ${dateNum} ${monthName} ${yearBe}`;
   }, [selectedDate]);
 
   return (
@@ -297,7 +297,7 @@ export default function Schedules({
                             {/* Mission timeline */}
                             <div className="flex items-center gap-1 font-semibold text-slate-700 mb-1">
                               <Clock size={10} className="text-slate-400 shrink-0" />
-                              <span>{formatTime(b.startDate)} - {formatTime(b.endDate)} น.</span>
+                              <span>{b.endDate ? `${formatTime(b.startDate)} - ${formatTime(b.endDate)} น.` : `${formatTime(b.startDate)} น. เป็นต้นไป`}</span>
                             </div>
 
                             {/* Destination */}
@@ -395,7 +395,7 @@ export default function Schedules({
                             
                             <div className="flex items-center gap-1 font-semibold text-slate-700 mb-1">
                               <Clock size={10} className="text-slate-400 shrink-0" />
-                              <span>{formatTime(b.startDate)} - {formatTime(b.endDate)} น.</span>
+                              <span>{b.endDate ? `${formatTime(b.startDate)} - ${formatTime(b.endDate)} น.` : `${formatTime(b.startDate)} น. เป็นต้นไป`}</span>
                             </div>
 
                             <div className="flex items-start gap-1 font-bold text-slate-800 mb-0.5">

@@ -147,7 +147,7 @@ export default function PrintPermit({
           {/* Form Core Contents with tight spaces */}
           <div className="space-y-3" style={{ fontSize: '12pt' }}>
             
-            <p className="font-bold">เรียน พัฒนาสังคมและความมั่นคงของมนุษย์จังหวัดตรัง</p>
+            <p className="font-bold">เรียน ผู้ว่าราชการจังหวัดตรังรัง</p>
             
             <p className="indent-12 text-justify">
               ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-black px-2">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-black px-2">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-black px-2">{booking.department}</span> มีความประสงค์จะใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติหน้าที่ราชการ ดังมีตารางกำหนดการดังนี้:-
@@ -174,7 +174,16 @@ export default function PrintPermit({
             </p>
 
             <p className="indent-12 text-justify">
-              โดยมีช่วงระยะเวลากำหนดการเดินทาง นับตั้งแต่ <span className="font-bold border-b border-dotted border-black px-1.5">{startDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-black px-1.5">{formatTime(booking.startDate)} น.</span> และเดินทางกลับถึงวันที่ <span className="font-bold border-b border-dotted border-black px-1.5">{endDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-black px-1.5">{formatTime(booking.endDate)} น.</span>
+              โดยมีช่วงระยะเวลากำหนดการเดินทาง นับตั้งแต่ <span className="font-bold border-b border-dotted border-black px-1.5">{startDateThaiOnly}</span> เวลา{' '}
+              {booking.endDate ? (
+                <>
+                  <span className="font-bold border-b border-dotted border-black px-1.5">{formatTime(booking.startDate)} น.</span> และเดินทางกลับถึงวันที่{' '}
+                  <span className="font-bold border-b border-dotted border-black px-1.5">{endDateThaiOnly}</span> เวลา{' '}
+                  <span className="font-bold border-b border-dotted border-black px-1.5">{formatTime(booking.endDate)} น.</span>
+                </>
+              ) : (
+                <span className="font-bold border-b border-dotted border-black px-1.5">{formatTime(booking.startDate)} น. เป็นต้นไป</span>
+              )}
             </p>
 
             <p className="indent-12 text-justify leading-relaxed">
@@ -216,11 +225,11 @@ export default function PrintPermit({
                   </div>
                   
                   <div className="pt-2.5 text-center leading-normal">
-                    <p>ลงชื่อ ......................................................... นายทะเบียนรถสำนักงาน</p>
-                    <p className="font-bold mt-1">
+                    <p>ลงชื่อ ......................................................... ผู้ควบคุมการใช้รถ</p>
+                    <p className="font-bold mt-1 mx-auto" style={{ width: '241.812px', height: '22px' }}>
                       ( {booking.caretakerName || '...................................................'} )
                     </p>
-                    <p className="text-[9.5pt] text-slate-500">
+                    <p className="text-[9.5pt] text-slate-500 mx-auto" style={{ width: '243.797px' }}>
                       {booking.caretakerPosition || 'นักวิชาการจัดดูแลยานพาหนะ'}
                     </p>
                   </div>
@@ -236,21 +245,21 @@ export default function PrintPermit({
                     <span className={`w-3 h-3 border border-black rounded-sm flex items-center justify-center shrink-0 ${booking.status === 'approved' || booking.status === 'completed' ? 'bg-black text-white' : ''}`}>
                       {(booking.status === 'approved' || booking.status === 'completed') ? '✓' : ''}
                     </span>
-                    <span>อนุญาต และควบคุมความปลอดภัย</span>
+                    <span>อนุญาต </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className={`w-3 h-3 border border-black rounded-sm flex items-center justify-center shrink-0 ${booking.status === 'rejected' ? 'bg-black text-white' : ''}`}>
                       {booking.status === 'rejected' ? '✗' : ''}
                     </span>
-                    <span>ไม่อนุมัติและชี้แจงความเห็นจำเป็น</span>
+                    <span>ไม่อนุมัติ เนื่องจาก.......................................................</span>
                   </div>
 
                   <div className="pt-2.5 text-center leading-normal">
-                    <p>ลงชื่อ ......................................................... ผู้อนุมัติโครงการ</p>
-                    <p className="font-bold mt-1">
+                    <p>ลงชื่อ ......................................................... ผู้มีอำนาจสั่งใช้รถ</p>
+                    <p className="font-bold mt-1 mx-auto" style={{ width: '278.812px' }}>
                       ( {booking.approvedBy} )
                     </p>
-                    <p className="text-[9.5pt] text-slate-500">
+                    <p className="text-[9.5pt] text-slate-500 mx-auto" style={{ width: '288.812px' }}>
                       {booking.approvedByPosition}
                     </p>
                   </div>
@@ -261,9 +270,9 @@ export default function PrintPermit({
 
             {/* Bottom-most footer metadata */}
             <div className="pt-4 mt-2 text-center text-[10pt] text-slate-400 font-mono border-t border-slate-100 flex justify-between items-center print:pt-3">
-              <span>ไอทีถอดรหัส: SHA-{booking.id.toUpperCase().substring(0, 8)}</span>
-              <span>พิมพ์ระบบ พมจ.ตรัง</span>
-              <span>สถานะจอง: {booking.status === 'approved' || booking.status === 'completed' ? 'อนุมัติผ่านคลังใบราชการแล้ว' : 'อยู่ระหว่างรอการประเมินสิทธิ์'}</span>
+              <span style={{ fontSize: '9.3333px' }}>ไอทีถอดรหัส: SHA-{booking.id.toUpperCase().substring(0, 8)}</span>
+              <span style={{ fontSize: '9.3333px' }}>พิมพ์ระบบ พมจ.ตรัง</span>
+              <span style={{ fontSize: '9.3333px' }}>สถานะจอง: {booking.status === 'approved' || booking.status === 'completed' ? 'อนุมัติผ่านคลังใบราชการแล้ว' : 'อยู่ระหว่างรอการประเมินสิทธิ์'}</span>
             </div>
 
           </div>

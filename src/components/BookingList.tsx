@@ -547,7 +547,7 @@ export default function BookingList({
                       {/* Departure and returns */}
                       <td className="py-2 px-2.5 whitespace-nowrap text-[11px]">
                         <div className="font-semibold text-slate-700">{formatThaiDateCompact(b.startDate)}</div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">ถึง {formatThaiDateCompact(b.endDate)}</div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{b.endDate ? `ถึง ${formatThaiDateCompact(b.endDate)}` : 'เป็นต้นไป'}</div>
                       </td>
 
                       {/* Car & driver */}

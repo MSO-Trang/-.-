@@ -131,7 +131,7 @@ export const formatThaiDate = (dateStr: string, includeTime = true): string => {
   const month = thaiMonths[date.getMonth()];
   const year = date.getFullYear() + 543; // Thai BE Year
   
-  let formatted = `${day} ${month} พ.ศ. ${year}`;
+  let formatted = `${day} ${month} ${year}`;
   
   if (includeTime) {
     const hours = String(date.getHours()).padStart(2, '0');
