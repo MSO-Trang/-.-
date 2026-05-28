@@ -86,8 +86,8 @@ export default function BookingForm({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
   // Custom states for wizard / presentation
-  const [formMode, setFormMode] = useState<'stepped' | 'all'>('stepped');
-  const [currentStep, setCurrentStep] = useState(1);
+  const [formMode] = useState<'all'>('all');
+  const [currentStep] = useState(1);
 
   // Helper to find the last recorded mileage of a vehicle
   const getLastVehicleMileage = (vId: string): number => {
@@ -347,23 +347,9 @@ export default function BookingForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
-      // Find the first error and switch to its step if in stepped mode
       const errorKeys = Object.keys(errors);
       if (errorKeys.length > 0) {
         const firstErrorKey = errorKeys[0];
-        
-        if (formMode === 'stepped') {
-          if (['startDate', 'endDate', 'destination', 'purpose'].includes(firstErrorKey)) {
-            setCurrentStep(1);
-          } else if (['requesterName', 'requesterPosition', 'passengersCount'].includes(firstErrorKey)) {
-            setCurrentStep(2);
-          } else if (['vehicleId', 'driverId'].includes(firstErrorKey)) {
-            setCurrentStep(3);
-          } else {
-            setCurrentStep(4);
-          }
-        }
-        
         setTimeout(() => {
           const el = document.getElementsByName(firstErrorKey)[0];
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -399,35 +385,6 @@ export default function BookingForm({
     onSave(payload);
   };
 
-  const steps = [
-    { number: 1, title: 'วันเวลา & แผนเดินทาง', icon: Calendar, desc: 'กำหนดและสถานที่ปลายทาง' },
-    { number: 2, title: 'ผู้ขออนุมัติ & คณะเดินทาง', icon: User, desc: 'ระบุผู้ใช้งานและคณะเดินทาง' },
-    { number: 3, title: 'เลือกพาหนะ & พลขับ', icon: Car, desc: 'จับคู่รถยนต์ราชการและลบลานชนทับ' },
-    { number: 4, title: 'ลงนามผู้ตรวจงาน & บันทึก', icon: ShieldCheck, desc: 'ผู้อนุมัติเอกสารของจังหวัด' }
-  ];
-
-  const handleNextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(steps.length, prev + 1));
-      setTimeout(scrollToTop, 50);
-    }
-  };
-
-  const handlePrevStep = () => {
-    setCurrentStep(prev => Math.max(1, prev - 1));
-    setTimeout(scrollToTop, 50);
-  };
-
-  const handleStepClick = (stepNum: number) => {
-    // Jump freely but run step valid check
-    if (stepNum > currentStep) {
-      // Validate step before letting them jump far ahead
-      if (!validateStep(currentStep)) return;
-    }
-    setCurrentStep(stepNum);
-    setTimeout(scrollToTop, 50);
-  };
-
   return (
     <div 
       ref={formRef}
@@ -454,35 +411,6 @@ export default function BookingForm({
 
         {/* Presentation Toggle & Action Row */}
         <div className="flex flex-wrap items-center gap-3 sm:self-end lg:self-center">
-          {/* Display Mode Segmented Control */}
-          <div className="bg-slate-100/80 p-1 rounded-xl flex items-center text-xs font-semibold text-slate-600 shadow-inner">
-            <button
-              type="button"
-              onClick={() => setFormMode('stepped')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                formMode === 'stepped' 
-                  ? 'bg-white text-[#a22055] shadow-xs font-bold' 
-                  : 'hover:text-slate-900'
-              }`}
-            >
-              📝 เขียนทีละขั้นตอน
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setFormMode('all');
-                setTimeout(scrollToTop, 50);
-              }}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                formMode === 'all' 
-                  ? 'bg-white text-[#a22055] shadow-xs font-bold' 
-                  : 'hover:text-slate-900'
-              }`}
-            >
-              📜 เปิดทีเดียวทุกส่วน
-            </button>
-          </div>
-
           <button
             type="button"
             onClick={onCancel}
@@ -516,53 +444,6 @@ export default function BookingForm({
         )}
       </div>
 
-      {/* Wizard Progress Tabs Dashboard (Only rendered when stepped or as navigation guide) */}
-      <div className="w-full">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-          {steps.map((s) => {
-            const Icon = s.icon;
-            const isCurrent = currentStep === s.number;
-            const isCompleted = currentStep > s.number;
-            
-            return (
-              <button
-                key={s.number}
-                type="button"
-                onClick={() => handleStepClick(s.number)}
-                className={`p-3 rounded-2xl border text-left transition-all relative flex flex-col justify-between ${
-                  formMode === 'all'
-                    ? 'border-slate-100 bg-white opacity-80 cursor-default'
-                    : isCurrent
-                      ? 'border-[#a22055] bg-pink-50/10 ring-1 ring-[#a22055] shadow-xs'
-                      : isCompleted
-                        ? 'border-emerald-100 bg-emerald-50/20 text-slate-600 hover:border-emerald-200'
-                        : 'border-slate-100 bg-white text-slate-400 hover:border-slate-200'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
-                    isCurrent
-                      ? 'bg-[#a22055] text-white'
-                      : isCompleted
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {isCompleted ? <Check size={14} strokeWidth={3} /> : s.number}
-                  </div>
-                  <Icon size={16} className={isCurrent ? 'text-[#a22055]' : isCompleted ? 'text-emerald-500' : 'text-slate-400'} />
-                </div>
-                <div className="mt-2">
-                  <p className={`text-xs font-extrabold ${isCurrent ? 'text-slate-900 border-b-2 border-[#a22055] pb-0.5 inline-block' : 'text-slate-700'}`}>
-                    {s.title}
-                  </p>
-                  <p className="text-[10px] text-slate-400 leading-tight truncate mt-0.5">{s.desc}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-8">
         
         {/* =======================================
@@ -575,7 +456,7 @@ export default function BookingForm({
               <div className="flex items-center gap-2">
                 <Calendar size={18} className="text-[#a22055]" />
                 <h3 className="text-base font-extrabold text-slate-800">
-                  ขั้นตอนที่ 1 : วันเวลาเดินทางปฏิบัติราชการ & ปลายทางหลัก
+                  ส่วนที่ 1 : วันเวลาเดินทางปฏิบัติราชการ & ปลายทางหลัก
                 </h3>
               </div>
             </div>
@@ -690,7 +571,7 @@ export default function BookingForm({
               <div className="flex items-center gap-2">
                 <User size={18} className="text-[#a22055]" />
                 <h3 className="text-base font-extrabold text-slate-800">
-                  ขั้นตอนที่ 2 : ข้อมูลผู้ขออนุญาตใช้รถยนต์ & คณะเดินทางปฏิบัติงาน
+                  ส่วนที่ 2 : ข้อมูลผู้ขออนุญาตใช้รถยนต์ & คณะเดินทางปฏิบัติงาน
                 </h3>
               </div>
             </div>
@@ -817,7 +698,7 @@ export default function BookingForm({
               <div className="flex items-center gap-2">
                 <Car size={18} className="text-[#a22055]" />
                 <h3 className="text-base font-extrabold text-slate-800">
-                  ขั้นตอนที่ 3 : จัดสรรยานพาหนะและระบุพนักงานประจำรถราชการ
+                  ส่วนที่ 3 : จัดสรรยานพาหนะและระบุพนักงานประจำรถราชการ
                 </h3>
               </div>
             </div>
@@ -974,7 +855,7 @@ export default function BookingForm({
                     </div>
                   </div>
                   <p className="text-[10px] text-slate-400 mt-2 leading-tight font-medium">
-                    ผู้ขออนุญาตใช้บริการเป็นผู้มีใบขับขี่ที่ถูกต้องและทำภารกิจขับขี่รถยนต์หลวงด้วยตนเอง โดยไม่ต้องจัดสรรหาพลคนขับประจำกองเสริม
+                    ผู้ขออนุญาตใช้บริการเป็นผู้มีใบขับขี่ที่ถูกต้องและทำภารกิจขับขี่รถยนต์ด้วยตนเอง โดยไม่ต้องจัดสรรหาพลคนขับ
                   </p>
                   {formData.driverId === 'self-drive' && (
                     <div className="absolute -top-1.5 -right-1.5 bg-[#a22055] text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-md border-2 border-white font-extrabold">
@@ -1176,7 +1057,7 @@ export default function BookingForm({
               <div className="flex items-center gap-2">
                 <ShieldCheck size={18} className="text-[#a22055]" />
                 <h3 className="text-base font-extrabold text-slate-800">
-                  ขั้นตอนที่ 4 : นายคลังจัดดูแลยานพาหนะ & ตำแหน่งผู้อนุมัติเดินทาง
+                  ส่วนที่ 4 : นายคลังจัดดูแลยานพาหนะ & ตำแหน่งผู้อนุมัติเดินทาง
                 </h3>
               </div>
             </div>
@@ -1343,26 +1224,9 @@ export default function BookingForm({
         {/* Action button controls */}
         <div className="pt-6 border-t border-slate-100/70 flex flex-wrap items-center justify-between gap-4">
           
-          {/* Stepped Back control button */}
-          {formMode === 'stepped' ? (
-            <button
-              type="button"
-              onClick={handlePrevStep}
-              disabled={currentStep === 1}
-              className={`px-4 py-2.5 border rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
-                currentStep === 1 
-                  ? 'opacity-35 cursor-not-allowed border-slate-100 text-slate-300' 
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-800'
-              }`}
-            >
-              <ChevronLeft size={16} />
-              ย้อนขั้นตอนก่อนหน้า
-            </button>
-          ) : (
-            <div />
-          )}
+          <div />
 
-          {/* Stepped Next / Save control buttons */}
+          {/* Save / Cancel buttons */}
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
@@ -1372,25 +1236,14 @@ export default function BookingForm({
               ปิดยกเลิกไม่บันทึก
             </button>
             
-            {formMode === 'stepped' && currentStep < steps.length ? (
-              <button
-                type="button"
-                onClick={handleNextStep}
-                className="px-5 py-2.5 bg-[#a22055] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-sm shadow-[#a22055]/10 flex items-center gap-1.5 cursor-pointer"
-              >
-                ถัดไป : กรอกขั้นตอน {currentStep + 1}
-                <ChevronRight size={16} />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-[#a22055] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md shadow-[#a22055]/15 flex items-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
-                id="btn-save-booking"
-              >
-                <Save size={15} />
-                {isEditMode ? 'บันทึกการปรับปรุงใบใช้รถ' : 'ส่งบันทึกขอใช้รถราชการ'}
-              </button>
-            )}
+            <button
+              type="submit"
+              className="px-6 py-2.5 bg-[#a22055] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md shadow-[#a22055]/15 flex items-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
+              id="btn-save-booking"
+            >
+              <Save size={15} />
+              {isEditMode ? 'บันทึกการปรับปรุงใบใช้รถ' : 'ส่งบันทึกขอใช้รถราชการ'}
+            </button>
           </div>
 
         </div>
