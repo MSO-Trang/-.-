@@ -85,6 +85,227 @@ export default function BookingForm({
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
+  const [startThaiDate, setStartThaiDate] = useState('');
+  const [start24Time, setStart24Time] = useState('');
+  const [endThaiDate, setEndThaiDate] = useState('');
+  const [end24Time, setEnd24Time] = useState('');
+  const [activeField, setActiveField] = useState<string | null>(null);
+
+  // Helper converters
+  const toThaiBEDate = (dateStr: string): string => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const y = date.getFullYear() + 543;
+    return `${d}/${m}/${y}`;
+  };
+
+  const toTimeStr = (dateStr: string): string => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+    const h = String(date.getHours()).padStart(2, '0');
+    const m = String(date.getMinutes()).padStart(2, '0');
+    return `${h}.${m}`;
+  };
+
+  const parseToISODateTime = (dateThaiBE: string, time24: string): string => {
+    const dateParts = dateThaiBE.trim().split('/');
+    if (dateParts.length !== 3) return '';
+    const d = parseInt(dateParts[0], 10);
+    const m = parseInt(dateParts[1], 10) - 1; // 0-indexed month
+    const yBE = parseInt(dateParts[2], 10);
+    if (isNaN(d) || isNaN(m) || isNaN(yBE)) return '';
+    const yAD = yBE - 543;
+
+    // parsing time24: "HH.MM" or "HH:MM"
+    const timeParts = time24.trim().split(/[:\.]/);
+    const h = timeParts[0] ? parseInt(timeParts[0], 10) : 0;
+    const min = timeParts[1] ? parseInt(timeParts[1], 10) : 0;
+    if (isNaN(h) || isNaN(min)) return '';
+
+    const dateObj = new Date(yAD, m, d, h, min, 0);
+    if (isNaN(dateObj.getTime())) return '';
+
+    const yearStr = String(dateObj.getFullYear()).padStart(4, '0');
+    const monthStr = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(dateObj.getDate()).padStart(2, '0');
+    const hourStr = String(dateObj.getHours()).padStart(2, '0');
+    const minStr = String(dateObj.getMinutes()).padStart(2, '0');
+    return `${yearStr}-${monthStr}-${dayStr}T${hourStr}:${minStr}`;
+  };
+
+  // Helper formatting for live input typing
+  const formatThaiDateInput = (val: string, prevVal: string): string => {
+    if (val.length < prevVal.length) {
+      return val; // Allow deletion/backspace
+    }
+    
+    // Clean all non-digit and non-slash characters first
+    let clean = val.replace(/[^0-9/]/g, '');
+    
+    // Split by slash
+    const parts = clean.split('/');
+    if (parts.length > 3) parts.splice(3); // maximum 3 parts
+    
+    // Limit first part (Day) to 2 digits
+    if (parts[0] && parts[0].length > 2) {
+      const extra = parts[0].slice(2);
+      parts[0] = parts[0].slice(0, 2);
+      if (!parts[1]) parts[1] = extra;
+      else parts[1] = extra + parts[1];
+    }
+    // Limit second part (Month) to 2 digits
+    if (parts[1] && parts[1].length > 2) {
+      const extra = parts[1].slice(2);
+      parts[1] = parts[1].slice(0, 2);
+      if (!parts[2]) parts[2] = extra;
+      else parts[2] = extra + parts[2];
+    }
+    // Limit third part (Year) to 4 digits
+    if (parts[2] && parts[2].length > 4) {
+      parts[2] = parts[2].slice(0, 4);
+    }
+
+    // Auto-insert slash when user finishes typing a section
+    if (parts[0] && parts[0].length === 2 && parts.length === 1) {
+      return parts[0] + '/';
+    }
+    if (parts[1] && parts[1].length === 2 && parts.length === 2) {
+      return parts[0] + '/' + parts[1] + '/';
+    }
+
+    // Otherwise reconstruct the string
+    return parts.join('/');
+  };
+
+  const formatTimeInput = (val: string, prevVal: string): string => {
+    if (val.length < prevVal.length) {
+      return val; // Allow deletion/backspace
+    }
+    
+    // Clean all non-digit and non-dot/non-colon characters
+    // Convert colons ":" to dots "." so it's uniform
+    let clean = val.replace(/:/g, '.').replace(/[^0-9.]/g, '');
+    
+    // Split by dot
+    const parts = clean.split('.');
+    if (parts.length > 2) parts.splice(2); // maximum 2 parts
+    
+    // Limit first part (Hour) to 2 digits
+    if (parts[0] && parts[0].length > 2) {
+      const extra = parts[0].slice(2);
+      parts[0] = parts[0].slice(0, 2);
+      if (!parts[1]) parts[1] = extra;
+      else parts[1] = extra + parts[1];
+    }
+    // Limit second part (Minutes) to 2 digits
+    if (parts[1] && parts[1].length > 2) {
+      parts[1] = parts[1].slice(0, 2);
+    }
+
+    // Auto-insert dot when user finishes typing Hour
+    if (parts[0] && parts[0].length === 2 && parts.length === 1) {
+      return parts[0] + '.';
+    }
+
+    // Otherwise reconstruct
+    return parts.join('.');
+  };
+
+  // Sync to local states when formData changes from outside/initial
+  useEffect(() => {
+    if (formData.startDate) {
+      if (activeField !== 'startDate' && activeField !== 'startTime') {
+        setStartThaiDate(toThaiBEDate(formData.startDate));
+        setStart24Time(toTimeStr(formData.startDate));
+      }
+    }
+  }, [formData.startDate, activeField]);
+
+  useEffect(() => {
+    if (formData.endDate) {
+      if (activeField !== 'endDate' && activeField !== 'endTime') {
+        setEndThaiDate(toThaiBEDate(formData.endDate));
+        setEnd24Time(toTimeStr(formData.endDate));
+      }
+    }
+  }, [formData.endDate, activeField]);
+
+  const handleStartThaiDateChange = (val: string) => {
+    const formattedDate = formatThaiDateInput(val, startThaiDate);
+    setStartThaiDate(formattedDate);
+    const isoStr = parseToISODateTime(formattedDate, start24Time);
+    if (isoStr) {
+      setFormData(prev => ({ ...prev, startDate: isoStr }));
+      if (errors.startDate) {
+        setErrors(prev => {
+          const copy = { ...prev };
+          delete copy.startDate;
+          return copy;
+        });
+      }
+    } else {
+      setFormData(prev => ({ ...prev, startDate: '' }));
+    }
+  };
+
+  const handleStart24TimeChange = (val: string) => {
+    const formattedTime = formatTimeInput(val, start24Time);
+    setStart24Time(formattedTime);
+    const isoStr = parseToISODateTime(startThaiDate, formattedTime);
+    if (isoStr) {
+      setFormData(prev => ({ ...prev, startDate: isoStr }));
+      if (errors.startDate) {
+        setErrors(prev => {
+          const copy = { ...prev };
+          delete copy.startDate;
+          return copy;
+        });
+      }
+    } else {
+      setFormData(prev => ({ ...prev, startDate: '' }));
+    }
+  };
+
+  const handleEndThaiDateChange = (val: string) => {
+    const formattedDate = formatThaiDateInput(val, endThaiDate);
+    setEndThaiDate(formattedDate);
+    const isoStr = parseToISODateTime(formattedDate, end24Time);
+    if (isoStr) {
+      setFormData(prev => ({ ...prev, endDate: isoStr }));
+      if (errors.endDate) {
+        setErrors(prev => {
+          const copy = { ...prev };
+          delete copy.endDate;
+          return copy;
+        });
+      }
+    } else {
+      setFormData(prev => ({ ...prev, endDate: '' }));
+    }
+  };
+
+  const handleEnd24TimeChange = (val: string) => {
+    const formattedTime = formatTimeInput(val, end24Time);
+    setEnd24Time(formattedTime);
+    const isoStr = parseToISODateTime(endThaiDate, formattedTime);
+    if (isoStr) {
+      setFormData(prev => ({ ...prev, endDate: isoStr }));
+      if (errors.endDate) {
+        setErrors(prev => {
+          const copy = { ...prev };
+          delete copy.endDate;
+          return copy;
+        });
+      }
+    } else {
+      setFormData(prev => ({ ...prev, endDate: '' }));
+    }
+  };
+  
   // Custom states for wizard / presentation
   const [formMode] = useState<'all'>('all');
   const [currentStep] = useState(1);
@@ -253,8 +474,22 @@ export default function BookingForm({
     const newErrors: { [key: string]: string } = {};
 
     if (step === 1) {
-      if (!formData.startDate) newErrors.startDate = 'กรุณาระบุวัน-เวลาไป';
-      if (!formData.endDate) newErrors.endDate = 'กรุณาระบุวัน-เวลากลับ';
+      if (!formData.startDate) {
+        const validStartFormat = /^\d{2}\/\d{2}\/\d{4}$/.test(startThaiDate);
+        if (startThaiDate && !validStartFormat) {
+          newErrors.startDate = 'กรุณาระบุวันที่ไปราชการในรูปแบบ วว/ดด/ปปปป (พ.ศ.) เช่น 28/05/2569';
+        } else {
+          newErrors.startDate = 'กรุณาระบุวัน-เวลาไปราชการให้ครบถ้วนถูกต้อง';
+        }
+      }
+      if (!formData.endDate) {
+        const validEndFormat = /^\d{2}\/\d{2}\/\d{4}$/.test(endThaiDate);
+        if (endThaiDate && !validEndFormat) {
+          newErrors.endDate = 'กรุณาระบุวันที่กลับในรูปแบบ วว/ดด/ปปปป (พ.ศ.) เช่น 28/05/2569';
+        } else {
+          newErrors.endDate = 'กรุณาระบุวัน-เวลาเดินทางกลับให้ครบถ้วนถูกต้อง';
+        }
+      }
       if (formData.startDate && formData.endDate) {
         if (new Date(formData.startDate).getTime() >= new Date(formData.endDate).getTime()) {
           newErrors.endDate = 'วันเวลากลับต้องอยู่หลังวันเวลาเดินทางไป';
@@ -463,57 +698,147 @@ export default function BookingForm({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Departure */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 animate-fade-in">
                 <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Clock size={13} className="text-slate-400" />
-                  <span>วัน-เวลาเดินทางไปราชการ (Departure Date)</span>
+                  <Clock size={13} className="text-[#a22055]" />
+                  <span>วัน-เวลาเดินทางไปราชการ (วว/ดด/ปปปป(พ.ศ.) เวลา 24 น.)</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="datetime-local"
-                    name="startDate"
-                    value={formData.startDate}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2.5 border rounded-xl text-sm font-semibold text-slate-700 bg-slate-50/50 ${
-                      errors.startDate ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-500' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
-                    } outline-none focus:ring-2`}
-                  />
-                  {formData.startDate && (
-                    <div className="mt-1.5 bg-[#a22055]/5 border border-[#a22055]/10 rounded-lg p-2 flex items-center gap-1.5 text-[11px] font-extrabold text-[#a22055] font-mono leading-none animate-fade-in shadow-2xs">
-                      <span>🕒 ออกเดินทาง:</span>
-                      <span>{formatThaiDate(new Date(formData.startDate).toISOString())}</span>
+                <div className="grid grid-cols-5 gap-2">
+                  {/* Date format input */}
+                  <div className="col-span-3 relative flex items-center">
+                    <input
+                      type="text"
+                      placeholder="วว/ดด/ปปปป (พ.ศ.)"
+                      value={startThaiDate}
+                      onFocus={() => setActiveField('startDate')}
+                      onBlur={() => setActiveField(null)}
+                      onChange={(e) => handleStartThaiDateChange(e.target.value)}
+                      className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
+                        errors.startDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                      } outline-none focus:ring-2`}
+                    />
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                      <Calendar size={13} className="text-slate-450 pointer-events-none" />
+                      <input
+                        type="date"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            const [y, m, d] = e.target.value.split('-');
+                            const yBE = parseInt(y, 10) + 543;
+                            handleStartThaiDateChange(`${d}/${m}/${yBE}`);
+                          }
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
                     </div>
-                  )}
+                  </div>
+                  {/* Time 24 hr format input */}
+                  <div className="col-span-2 relative flex items-center">
+                    <input
+                      type="text"
+                      placeholder="เวลา (24 น.)"
+                      value={start24Time}
+                      onFocus={() => setActiveField('startTime')}
+                      onBlur={() => setActiveField(null)}
+                      onChange={(e) => handleStart24TimeChange(e.target.value)}
+                      className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
+                        errors.startDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                      } outline-none focus:ring-2`}
+                    />
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                      <Clock size={13} className="text-slate-450 pointer-events-none" />
+                      <input
+                        type="time"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleStart24TimeChange(e.target.value);
+                          }
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
+                    </div>
+                  </div>
                 </div>
+                {formData.startDate && (
+                  <div className="mt-1.5 bg-[#a22055]/5 border border-[#a22055]/10 rounded-lg p-2 flex items-center gap-1.5 text-[11px] font-extrabold text-[#a22055] font-sans leading-none animate-fade-in shadow-2xs">
+                    <span>🕒 ยืนยันออกเดินทาง:</span>
+                    <span>{formatThaiDate(new Date(formData.startDate).toISOString())}</span>
+                  </div>
+                )}
                 {errors.startDate && <p className="text-xs text-rose-500 font-semibold">{errors.startDate}</p>}
-                <p className="text-[10px] text-slate-400">ระบุวันและเวลาเริ่มออกเดินทางจากจุดรวมพลแรก</p>
+                <p className="text-[10px] text-slate-400">ป้อน วัน/เดือน/ปีพ.ศ. (เช่น 28/05/2569) และเวลา (เช่น 08:30) หรือกดรูปไอคอนเพื่อแสดงปฏิทิน</p>
               </div>
 
               {/* Arrival */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 animate-fade-in">
                 <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Clock size={13} className="text-slate-400" />
-                  <span>วัน-เวลาเดินทางกลับ (Return Date)</span>
+                  <Clock size={13} className="text-[#a22055]" />
+                  <span>วัน-เวลาเดินทางกลับ (วว/ดด/ปปปป(พ.ศ.) เวลา 24 น.)</span>
                 </label>
-                <div className="relative">
-                  <input
-                    type="datetime-local"
-                    name="endDate"
-                    value={formData.endDate}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2.5 border rounded-xl text-sm font-semibold text-slate-700 bg-slate-50/50 ${
-                      errors.endDate ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-500' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
-                    } outline-none focus:ring-2`}
-                  />
-                  {formData.endDate && (
-                    <div className="mt-1.5 bg-[#a22055]/5 border border-[#a22055]/10 rounded-lg p-2 flex items-center gap-1.5 text-[11px] font-extrabold text-[#a22055] font-mono leading-none animate-fade-in shadow-2xs">
-                      <span>🕒 เดินทางกลับ:</span>
-                      <span>{formatThaiDate(new Date(formData.endDate).toISOString())}</span>
+                <div className="grid grid-cols-5 gap-2">
+                  {/* Date format input */}
+                  <div className="col-span-3 relative flex items-center">
+                    <input
+                      type="text"
+                      placeholder="วว/ดด/ปปปป (พ.ศ.)"
+                      value={endThaiDate}
+                      onFocus={() => setActiveField('endDate')}
+                      onBlur={() => setActiveField(null)}
+                      onChange={(e) => handleEndThaiDateChange(e.target.value)}
+                      className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
+                        errors.endDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                      } outline-none focus:ring-2`}
+                    />
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                      <Calendar size={13} className="text-slate-450 pointer-events-none" />
+                      <input
+                        type="date"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            const [y, m, d] = e.target.value.split('-');
+                            const yBE = parseInt(y, 10) + 543;
+                            handleEndThaiDateChange(`${d}/${m}/${yBE}`);
+                          }
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
                     </div>
-                  )}
+                  </div>
+                  {/* Time 24 hr format input */}
+                  <div className="col-span-2 relative flex items-center">
+                    <input
+                      type="text"
+                      placeholder="เวลา (24 น.)"
+                      value={end24Time}
+                      onFocus={() => setActiveField('endTime')}
+                      onBlur={() => setActiveField(null)}
+                      onChange={(e) => handleEnd24TimeChange(e.target.value)}
+                      className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
+                        errors.endDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                      } outline-none focus:ring-2`}
+                    />
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                      <Clock size={13} className="text-slate-450 pointer-events-none" />
+                      <input
+                        type="time"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleEnd24TimeChange(e.target.value);
+                          }
+                        }}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
+                    </div>
+                  </div>
                 </div>
+                {formData.endDate && (
+                  <div className="mt-1.5 bg-[#a22055]/5 border border-[#a22055]/10 rounded-lg p-2 flex items-center gap-1.5 text-[11px] font-extrabold text-[#a22055] font-sans leading-none animate-fade-in shadow-2xs">
+                    <span>🕒 ยืนยันเดินทางกลับ:</span>
+                    <span>{formatThaiDate(new Date(formData.endDate).toISOString())}</span>
+                  </div>
+                )}
                 {errors.endDate && <p className="text-xs text-rose-500 font-semibold">{errors.endDate}</p>}
-                <p className="text-[10px] text-slate-400">ระบุวันและเวลาที่รถยนต์ราชการจอดเก็บเสร็จสิ้นภารกิจ</p>
+                <p className="text-[10px] text-slate-400">ป้อน วัน/เดือน/ปีพ.ศ. (เช่น 28/05/2569) และเวลา (เช่น 16:30) หรือกดรูปไอคอนเพื่อแสดงปฏิทิน</p>
               </div>
             </div>
 
