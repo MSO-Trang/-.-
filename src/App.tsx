@@ -717,6 +717,7 @@ export default function App() {
                 drivers={drivers}
                 approvers={approvers}
                 caretakers={caretakers}
+                bookings={bookings}
                 onSaveVehicle={handleSaveVehicle}
                 onDeleteVehicle={handleDeleteVehicle}
                 onSaveDriver={handleSaveDriver}

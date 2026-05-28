@@ -28,9 +28,18 @@ export default function Schedules({
   onSelectBooking
 }: SchedulesProps) {
   
-  // Date selection state (Defaults to "Today" based on current local date 2026-05-22)
-  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date('2026-05-22T00:00:00'));
+  // Date selection state (Defaults to Today's date dynamically)
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   const [viewType, setViewType] = useState<'vehicles' | 'drivers'>('drivers');
+
+  const todayLabel = useMemo(() => {
+    const today = new Date();
+    const thaiMonthsShort = [
+      'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+      'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+    ];
+    return `${today.getDate()} ${thaiMonthsShort[today.getMonth()]} ${today.getFullYear() + 543}`;
+  }, []);
 
   // Change date helpers
   const handlePrevDay = () => {
@@ -50,7 +59,7 @@ export default function Schedules({
   };
 
   const handleResetToToday = () => {
-    setSelectedDate(new Date('2026-05-22T00:00:00'));
+    setSelectedDate(new Date());
   };
 
   // Get start and end timestamp of selected day
@@ -195,7 +204,7 @@ export default function Schedules({
           onClick={handleResetToToday}
           className="text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-1.5 rounded-lg border border-slate-700/60 transition cursor-pointer"
         >
-          กลับสู่วันนี้ (22 พ.ค. 2569)
+          กลับสู่วันนี้ ({todayLabel})
         </button>  
       </div>
 

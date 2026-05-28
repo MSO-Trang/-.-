@@ -17,9 +17,12 @@ import {
   AlertTriangle,
   UserPlus,
   Award,
-  FileSignature
+  FileSignature,
+  MapPin,
+  Route,
+  History
 } from 'lucide-react';
-import { Vehicle, Driver, Approver, Caretaker } from '../types';
+import { Vehicle, Driver, Approver, Caretaker, Booking } from '../types';
 import ConfirmModal from './ConfirmModal';
 
 interface AdminPanelProps {
@@ -27,6 +30,7 @@ interface AdminPanelProps {
   drivers: Driver[];
   approvers: Approver[];
   caretakers: Caretaker[];
+  bookings: Booking[];
   onSaveVehicle: (vehicle: Vehicle) => void;
   onDeleteVehicle: (id: string) => void;
   onSaveDriver: (driver: Driver) => void;
@@ -43,6 +47,7 @@ export default function AdminPanel({
   drivers,
   approvers,
   caretakers,
+  bookings = [],
   onSaveVehicle,
   onDeleteVehicle,
   onSaveDriver,
@@ -53,7 +58,10 @@ export default function AdminPanel({
   onDeleteCaretaker,
   onLogout
 }: AdminPanelProps) {
-  const [activeSubTab, setActiveSubTab] = useState<'vehicles' | 'drivers' | 'approvers' | 'caretakers'>('vehicles');
+  const [activeSubTab, setActiveSubTab] = useState<'vehicles' | 'drivers' | 'approvers' | 'caretakers' | 'trips'>('vehicles');
+  const [tripVehicleFilter, setTripVehicleFilter] = useState<string>('all');
+  const [tripSearch, setTripSearch] = useState<string>('');
+  const [tripStatusFilter, setTripStatusFilter] = useState<string>('all');
 
   // Confirmation State
   const [confirmState, setConfirmState] = useState<{
@@ -96,6 +104,62 @@ export default function AdminPanel({
     setApproverErrors({});
     setCaretakerErrors({});
   };
+
+  // Get all bookings with assigned vehicles for Trip Records (Completed Only)
+  const vehicleTripsGroup = React.useMemo(() => {
+    return bookings
+      .filter(b => b.vehicleId && b.status === 'completed') // ensure completed trips only with vehicle
+      .filter(b => {
+        // filter by vehicle
+        if (tripVehicleFilter !== 'all' && b.vehicleId !== tripVehicleFilter) {
+          return false;
+        }
+        // filter by search term (destination, requester, etc)
+        if (tripSearch.trim() !== '') {
+          const lower = tripSearch.toLowerCase();
+          const pMatched = b.destination?.toLowerCase().includes(lower) || 
+                          b.purpose?.toLowerCase().includes(lower) || 
+                          b.requesterName?.toLowerCase().includes(lower) ||
+                          b.permitNumber?.toLowerCase().includes(lower) ||
+                          b.department?.toLowerCase().includes(lower);
+          if (!pMatched) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+  }, [bookings, tripVehicleFilter, tripSearch]);
+
+  const tripStats = React.useMemo(() => {
+    let totalKm = 0;
+    let completedCount = 0;
+    let maxKm = 0;
+    let maxKmVehicleName = '';
+
+    bookings.forEach(b => {
+      if (b.status === 'completed' && b.startMileage !== undefined && b.endMileage !== undefined) {
+        const diff = b.endMileage - b.startMileage;
+        if (diff > 0) {
+          totalKm += diff;
+          completedCount++;
+          if (diff > maxKm) {
+            maxKm = diff;
+            const veh = vehicles.find(v => v.id === b.vehicleId);
+            maxKmVehicleName = veh ? veh.plateNumber : '';
+          }
+        }
+      }
+    });
+
+    return {
+      totalTrips: bookings.filter(b => b.vehicleId).length,
+      filteredTripsCount: vehicleTripsGroup.length,
+      totalKm,
+      completedCount,
+      averageKm: completedCount > 0 ? Math.round(totalKm / completedCount) : 0,
+      maxKm,
+      maxKmVehicleName
+    };
+  }, [bookings, vehicleTripsGroup, vehicles]);
 
   // Help translate status for Display
   const translateVehicleType = (type: 'van' | 'pickup' | 'suv' | 'sedan') => {
@@ -328,6 +392,20 @@ export default function AdminPanel({
             >
               <FileSignature size={14} />
               เจ้าหน้าที่จัดดูแลฯ ({caretakers.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveSubTab('trips');
+                resetAllForms();
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+                activeSubTab === 'trips' 
+                  ? 'bg-white text-pink-600 shadow-sm border border-pink-150' 
+                  : 'text-slate-600 hover:text-pink-700'
+              }`}
+            >
+              <Route size={14} />
+              สถิติวิ่งงานเสร็จสิ้น ({bookings.filter(b => b.vehicleId && b.status === 'completed').length})
             </button>
           </div>
 
@@ -1148,6 +1226,286 @@ export default function AdminPanel({
             )}
           </div>
 
+        </div>
+      )}
+
+      {activeSubTab === 'trips' && (
+        <div className="space-y-6">
+          {/* Quick Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <div className="bg-gradient-to-br from-pink-50 to-pink-100/50 border border-pink-100 rounded-xl p-4 shadow-xs">
+              <p className="text-[10px] text-pink-700 font-extrabold uppercase tracking-wider font-sans">จำนวนภารกิจเดินทางทั้งหมด</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl font-black text-slate-900 font-mono">{tripStats.totalTrips}</span>
+                <span className="text-xs text-slate-500 font-bold font-sans">เที่ยว</span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-1 font-sans">รวมจองสิทธิ์ คิวใช้งาน และสถานะสัญจร</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100/40 border border-emerald-100 rounded-xl p-4 shadow-xs">
+              <p className="text-[10px] text-emerald-700 font-extrabold uppercase tracking-wider font-sans">ระยะทางสะสมรวมทุกคัน (กม.)</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl font-black text-slate-900 font-mono">{tripStats.totalKm.toLocaleString()}</span>
+                <span className="text-xs text-slate-500 font-bold font-sans">กิโลเมตร</span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-1 font-sans">เฉพาะเที่ยวที่ทำภารกิจเสร็จสิ้นสะสม</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100/40 border border-blue-105 rounded-xl p-4 shadow-xs">
+              <p className="text-[10px] text-blue-700 font-extrabold uppercase tracking-wider font-sans">ระยะเฉลี่ยต่อเที่ยว (กม.)</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl font-black text-slate-900 font-mono">{tripStats.averageKm.toLocaleString()}</span>
+                <span className="text-xs text-slate-500 font-bold font-sans">กม. / เที่ยว</span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-1 font-sans">คำนวณจากเที่ยวสัญจรที่มีบันทึกเลขไมล์</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-50 to-amber-100/40 border border-amber-100 rounded-xl p-4 shadow-xs">
+              <p className="text-[10px] text-amber-700 font-extrabold uppercase tracking-wider font-sans">ทริปที่ระยะสัญจรสูงสุด</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl font-black text-slate-900 font-mono">{tripStats.maxKm.toLocaleString()}</span>
+                <span className="text-xs text-slate-500 font-bold font-sans">กิโลเมตร</span>
+              </div>
+              <p className="text-[10px] text-slate-500 mt-1 font-sans">โดยรถทะเบียน: <span className="font-extrabold font-mono text-slate-705">{tripStats.maxKmVehicleName || 'ไม่มีข้อมูล'}</span></p>
+            </div>
+
+          </div>
+
+          {/* Filtering row */}
+          <div className="bg-white border border-pink-100 rounded-xl p-4 shadow-xs">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              
+              {/* Vehicle selector */}
+              <div className="space-y-1.5 text-xs text-slate-700">
+                <label className="block font-bold text-slate-700">เลือกกรองตามยานพาหนะ</label>
+                <select
+                  value={tripVehicleFilter}
+                  onChange={(e) => setTripVehicleFilter(e.target.value)}
+                  className="w-full bg-slate-50 border border-pink-100 hover:border-pink-300 rounded-lg p-2 focus:bg-white outline-none font-sans font-semibold text-slate-700 h-9"
+                >
+                  <option value="all">🚙 แสดงรถรถยนต์ราชการทุกคัน</option>
+                  {vehicles.map(v => (
+                    <option key={v.id} value={v.id}>
+                      {v.plateNumber} - {v.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Search text input */}
+              <div className="md:col-span-3 space-y-1.5 text-xs text-slate-700">
+                <label className="block font-bold text-slate-700">ค้นหาคำสำคัญ</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={tripSearch}
+                    onChange={(e) => setTripSearch(e.target.value)}
+                    placeholder="ค้นหาจุดหมายปลายทาง, เลขใบขอใช้รถ, ผู้เดินทาง, วัตถุประสงค์..."
+                    className="w-full bg-slate-50 border border-pink-100 hover:border-pink-300 rounded-lg p-2 pr-9 focus:bg-white outline-none font-sans font-semibold text-slate-700 h-9"
+                  />
+                  {tripSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setTripSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 cursor-pointer"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Table display */}
+          <div className="bg-white border border-pink-100 rounded-xl p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-bold text-slate-950 flex items-center gap-2 font-sans">
+                <History size={18} className="text-pink-600" />
+                ประวัติเฉพาะยานพาหนะที่เสร็จสิ้นการเดินทางแล้ว ({vehicleTripsGroup.length} งานที่พบ)
+              </h3>
+              { (tripVehicleFilter !== 'all' || tripSearch) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTripVehicleFilter('all');
+                    setTripSearch('');
+                  }}
+                  className="text-pink-600 hover:underline font-extrabold text-xs cursor-pointer font-sans"
+                >
+                  ล้างตัวกรองทั้งหมด
+                </button>
+              )}
+            </div>
+
+            {vehicleTripsGroup.length === 0 ? (
+              <div className="p-12 text-center bg-slate-50/50 border border-dashed border-slate-200 rounded-xl space-y-2">
+                <Route className="text-slate-300 mx-auto" size={36} />
+                <p className="text-xs font-bold text-slate-600 font-sans">ไม่พบประวัติการเดินทางตามข้อมูลการกรองนี้</p>
+                <p className="text-[11px] text-slate-400 font-sans">ลองเปลี่ยนทะเบียนรถยนต์ ปรับสถานะ หรือแก้ไขคำค้นหาของคุณป้อนใหม่</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto border border-pink-100 rounded-xl">
+                <table className="w-full text-[12px] text-left border-collapse font-sans">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-slate-55 to-pink-50/20 text-slate-700 border-b border-pink-100">
+                      <th className="p-3 font-extrabold text-xs whitespace-nowrap">วันที่ / เลขประเมิน</th>
+                      <th className="p-3 font-extrabold text-xs whitespace-nowrap">ยานพาหนะ</th>
+                      <th className="p-3 font-extrabold text-xs">จุดหมายปลายทาง / วัตถุประสงค์</th>
+                      <th className="p-3 font-extrabold text-xs whitespace-nowrap">รายละเอียดเลขไมล์ (กม.)</th>
+                      <th className="p-3 font-extrabold text-xs whitespace-nowrap">พนักงานขับรถ (คนขับหลังสุด)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-105 bg-white">
+                    {vehicleTripsGroup.map((b) => {
+                      const matchedVehicle = vehicles.find(v => v.id === b.vehicleId);
+                      const matchedDriver = drivers.find(d => d.id === b.driverId);
+                      
+                      // Calculate distance
+                      const hasMileage = b.startMileage !== undefined && b.endMileage !== undefined && b.startMileage > 0 && b.endMileage > 0;
+                      const distance = hasMileage ? (b.endMileage! - b.startMileage!) : 0;
+                      
+                      // Status formatting
+                      let statusBadgeStyle = '';
+                      let statusText = '';
+                      if (b.status === 'completed') {
+                        statusBadgeStyle = 'bg-emerald-50 text-emerald-700 border-emerald-100';
+                        statusText = 'เสร็จภารกิจ 🏁';
+                      } else if (b.status === 'approved') {
+                        statusBadgeStyle = 'bg-blue-50 text-blue-700 border-blue-105';
+                        statusText = 'อนุมัติ/รอวิ่ง 🟢';
+                      } else if (b.status === 'pending') {
+                        statusBadgeStyle = 'bg-amber-50 text-amber-700 border-amber-100';
+                        statusText = 'รออนุมัติ 🟡';
+                      } else if (b.status === 'cancelled') {
+                        statusBadgeStyle = 'bg-rose-50 text-rose-700 border-rose-100';
+                        statusText = 'ยกเลิก 🛑';
+                      } else if (b.status === 'rejected') {
+                        statusBadgeStyle = 'bg-slate-50 text-slate-600 border-slate-205';
+                        statusText = 'ไม่อนุมัติ ❌';
+                      }
+
+                      const tripDateFormatted = b.startDate ? new Date(b.startDate).toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      }) : 'ไม่ได้ระบุวันที่';
+
+                      return (
+                        <tr key={b.id} className="hover:bg-pink-50/10 transition-colors">
+                          {/* วันที่ และ เลขใบอนุญาต */}
+                          <td className="p-3 align-middle font-sans whitespace-nowrap">
+                            <div className="space-y-1">
+                              <span className="text-[11px] text-slate-400 font-bold block">
+                                📅 {tripDateFormatted}
+                              </span>
+                              <span className="font-mono text-[10px] font-bold bg-slate-50 border border-slate-200 text-slate-650 px-1.5 py-0.5 rounded block w-fit">
+                                {b.permitNumber}
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* ยานพาหนะ */}
+                          <td className="p-3 align-middle font-sans whitespace-nowrap">
+                            {matchedVehicle ? (
+                              <div className="space-y-0.5">
+                                <span className="font-extrabold text-[#a22055] block">
+                                  {matchedVehicle.plateNumber}
+                                </span>
+                                <span className="text-[11px] text-slate-500 font-medium">
+                                  {matchedVehicle.name}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 text-xs font-semibold">
+                                ไม่พบข้อมูลรถ (ID: {b.vehicleId})
+                              </span>
+                            )}
+                          </td>
+
+                          {/* จุดหมายปลายทาง / วัตถุประสงค์ */}
+                          <td className="p-3 align-middle font-sans">
+                            <div className="space-y-0.5 max-w-sm">
+                              <span className="font-extrabold text-slate-900 block flex items-center gap-1">
+                                <MapPin size={12} className="text-pink-600 shrink-0" />
+                                <span className="line-clamp-2">{b.destination}</span>
+                              </span>
+                              {b.purpose && (
+                                <span className="text-[11px] text-slate-500 font-medium block truncate max-w-[280px]">
+                                  {b.purpose}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-slate-400 font-medium block">
+                                👤 จองโดย: {b.requesterName} ({b.department})
+                              </span>
+                            </div>
+                          </td>
+
+                          {/* เลขไมล์ / ระยะทาง */}
+                          <td className="p-3 align-middle font-sans whitespace-nowrap">
+                            {b.status === 'completed' ? (
+                              hasMileage ? (
+                                <div className="space-y-1">
+                                  <div className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded px-1.5 py-0.5 text-xs font-extrabold">
+                                    <Route size={12} className="text-emerald-500" />
+                                    <span>{distance.toLocaleString()} กม.</span>
+                                  </div>
+                                  <div className="text-[10px] text-slate-400 font-mono font-medium block leading-none">
+                                    ({(b.startMileage || 0).toLocaleString()} → {(b.endMileage || 0).toLocaleString()} กม.)
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-amber-600 text-[11px] font-bold bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded inline-block">
+                                  ⚠️ เสร็จงาน (ยังไม่ระบุไมล์)
+                                </span>
+                              )
+                            ) : b.status === 'cancelled' || b.status === 'rejected' ? (
+                              <span className="text-slate-400 text-[11px] bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded inline-block">
+                                - ยกเลิกเดินทาง -
+                              </span>
+                            ) : (
+                              <div className="space-y-1">
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 border rounded-full inline-block ${statusBadgeStyle}`}>
+                                  {statusText}
+                                </span>
+                                {b.startMileage ? (
+                                  <div className="text-[10px] text-slate-400 font-mono font-medium block">
+                                    ไมล์เริ่ม: {b.startMileage.toLocaleString()} กม.
+                                  </div>
+                                ) : null}
+                              </div>
+                            )}
+                          </td>
+
+                          {/* คนขับหลังสุด */}
+                          <td className="p-3 align-middle font-sans whitespace-nowrap">
+                            <div className="space-y-1">
+                              <span className="font-bold text-slate-700 block">
+                                {matchedDriver ? (
+                                  matchedDriver.name
+                                ) : b.driverId === 'self' ? (
+                                  'ผู้มีสิทธิ์ขับเอง'
+                                ) : (
+                                  'ไม่พบข้อมูลคนขับ'
+                                )}
+                              </span>
+                              {matchedDriver?.phone && (
+                                <span className="text-[11px] text-slate-400 font-mono block">
+                                  📞 {matchedDriver.phone}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
