@@ -49,6 +49,51 @@ export default function Dashboard({
   
   const currentTime = useMemo(() => new Date(), []);
 
+  // Date filter states for statistics
+  const [startDateFilter, setStartDateFilter] = useState<string>('');
+  const [endDateFilter, setEndDateFilter] = useState<string>('');
+  const [activeQuickFilter, setActiveQuickFilter] = useState<string>('all');
+
+  const formatLocalYYYYMMDD = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const date = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${date}`;
+  };
+
+  const handleQuickDateFilter = (filterType: string) => {
+    setActiveQuickFilter(filterType);
+    const today = new Date();
+    
+    if (filterType === 'all') {
+      setStartDateFilter('');
+      setEndDateFilter('');
+    } else if (filterType === '7days') {
+      const pastDate = new Date();
+      pastDate.setDate(today.getDate() - 7);
+      setStartDateFilter(formatLocalYYYYMMDD(pastDate));
+      setEndDateFilter(formatLocalYYYYMMDD(today));
+    } else if (filterType === 'thisMonth') {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      setStartDateFilter(formatLocalYYYYMMDD(startOfMonth));
+      setEndDateFilter(formatLocalYYYYMMDD(today));
+    } else if (filterType === 'thisYear') {
+      const startOfYear = new Date(today.getFullYear(), 0, 1);
+      setStartDateFilter(formatLocalYYYYMMDD(startOfYear));
+      setEndDateFilter(formatLocalYYYYMMDD(today));
+    }
+  };
+
+  // Filtered bookings copy specifically for statistics
+  const filteredBookingsForStats = useMemo(() => {
+    return bookings.filter(b => {
+      const bDate = b.startDate ? b.startDate.slice(0, 10) : '';
+      if (startDateFilter && bDate < startDateFilter) return false;
+      if (endDateFilter && bDate > endDateFilter) return false;
+      return true;
+    });
+  }, [bookings, startDateFilter, endDateFilter]);
+
   // Quick state toggler in Dashboard for admin approval
   const [pendingApproveId, setPendingApproveId] = useState<string | null>(null);
   const [passcode, setPasscode] = useState('');
@@ -134,7 +179,7 @@ export default function Dashboard({
   // Group bookings by Department for the analytics chart
   const departmentStats = useMemo(() => {
     const counts: { [key: string]: number } = {};
-    bookings.forEach(b => {
+    filteredBookingsForStats.forEach(b => {
       if (b.status !== 'cancelled' && b.status !== 'rejected') {
         counts[b.department] = (counts[b.department] || 0) + 1;
       }
@@ -146,12 +191,12 @@ export default function Dashboard({
       const percentage = totalValid > 0 ? Math.round((value / totalValid) * 100) : 0;
       return { name: dept, value, percentage };
     }).sort((a, b) => b.value - a.value);
-  }, [bookings]);
+  }, [filteredBookingsForStats]);
 
   // Vehicle utilization (Count of bookings for each vehicle)
   const vehicleStats = useMemo(() => {
     const counts: { [key: string]: number } = {};
-    bookings.forEach(b => {
+    filteredBookingsForStats.forEach(b => {
       if (b.status === 'approved' || b.status === 'completed') {
         counts[b.vehicleId] = (counts[b.vehicleId] || 0) + 1;
       }
@@ -164,7 +209,7 @@ export default function Dashboard({
         bookingCount: count
       };
     }).sort((a, b) => b.bookingCount - a.bookingCount);
-  }, [bookings, vehicles]);
+  }, [filteredBookingsForStats, vehicles]);
 
   // Vehicle total travel distance (using start and end mileages of completed bookings)
   const vehicleMileageStats = useMemo(() => {
@@ -175,7 +220,7 @@ export default function Dashboard({
       distances[v.id] = 0;
     });
 
-    bookings.forEach(b => {
+    filteredBookingsForStats.forEach(b => {
       if (b.status === 'completed' && b.startMileage !== undefined && b.startMileage !== null && b.endMileage !== undefined && b.endMileage !== null) {
         const dist = b.endMileage - b.startMileage;
         if (dist > 0) {
@@ -193,7 +238,7 @@ export default function Dashboard({
         totalDistance: distances[v.id] || 0
       };
     }).sort((a, b) => b.totalDistance - a.totalDistance);
-  }, [bookings, vehicles]);
+  }, [filteredBookingsForStats, vehicles]);
 
   // Helper summary calculations for Mileage Dashboard
   const mileageSummaryGroup = useMemo(() => {
@@ -700,6 +745,87 @@ export default function Dashboard({
           </div>
         </div>
 
+      </div>
+
+      {/* Date Range Control Card for Analytics */}
+      <div className="bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs font-sans" id="analytics-date-filter-card">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Calendar size={16} className="text-[#a22055]" />
+              ช่องการควบคุมช่วงวันที่สำหรับรายงานและสถิติวินิจฉัย
+            </h3>
+            <p className="text-xs text-slate-500 font-sans leading-normal">
+              เลือกช่วงวันที่เพื่อกรองแผนภูมิ ปริมาณจอง, ความถี่สัญจรสะสม, ระยะการสัญจรรวม, ยานยนต์สถิติสูงสุด และระยะเฉลี่ยต่อคัน
+            </p>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Quick Filters */}
+            <div className="flex items-center bg-slate-100 rounded-xl p-1" id="quick-date-filters">
+              {[
+                { label: 'ทั้งหมด', value: 'all' },
+                { label: '7 วันล่าสุด', value: '7days' },
+                { label: 'เดือนนี้', value: 'thisMonth' },
+                { label: 'ปีนี้', value: 'thisYear' }
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => handleQuickDateFilter(opt.value)}
+                  className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
+                    activeQuickFilter === opt.value
+                      ? 'bg-[#a22055] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Manual Date Input */}
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-slate-400">เริ่มต้น</span>
+                <input
+                  type="date"
+                  value={startDateFilter}
+                  onChange={(e) => {
+                    setStartDateFilter(e.target.value);
+                    setActiveQuickFilter('custom');
+                  }}
+                  className="bg-slate-50 border border-slate-200 hover:border-[#a22055]/30 rounded-xl px-2.5 py-1.5 focus:border-[#a22055] focus:bg-white outline-none font-sans font-bold text-slate-700"
+                  id="filter-start-date"
+                />
+              </div>
+              <span className="font-bold text-slate-400">ถึง</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-slate-400">สิ้นสุด</span>
+                <input
+                  type="date"
+                  value={endDateFilter}
+                  onChange={(e) => {
+                    setEndDateFilter(e.target.value);
+                    setActiveQuickFilter('custom');
+                  }}
+                  className="bg-slate-50 border border-slate-200 hover:border-[#a22055]/30 rounded-xl px-2.5 py-1.5 focus:border-[#a22055] focus:bg-white outline-none font-sans font-bold text-slate-700"
+                  id="filter-end-date"
+                />
+              </div>
+              
+              {(startDateFilter || endDateFilter) && (
+                <button
+                  type="button"
+                  onClick={() => handleQuickDateFilter('all')}
+                  className="text-[#a22055] hover:underline font-bold text-xs shrink-0 cursor-pointer ml-1"
+                >
+                  ล้างค่า
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Analytics Breakdown & Recent Travel Lists */}
