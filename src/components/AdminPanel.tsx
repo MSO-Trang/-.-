@@ -329,75 +329,79 @@ export default function AdminPanel({
     <div className="space-y-6" id="admin-panel-view">
       
       {/* Date Navigation Bar and View Select */}
-      <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2.5">
-          <Settings className="text-pink-600 animate-spin-slow" size={24} />
+      <div className="bg-gradient-to-r from-white via-pink-55/10 to-white border border-pink-100 rounded-2xl p-6 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="p-3 bg-pink-50 border border-pink-100 rounded-2xl shrink-0">
+            <Settings className="text-[#a22055]" size={22} />
+          </div>
           <div className="space-y-1">
-            <h2 className="text-lg font-bold text-slate-950 font-sans flex items-center gap-2">
-              แผงผู้ดูแลระบบ: สนง.พมจ.ตรัง
-              <span className="px-2 py-0.5 text-[10px] bg-pink-100 text-pink-700 border border-pink-200 font-extrabold rounded">สิทธิ์แอดมิน</span>
+            <h2 className="text-base font-black text-slate-900 font-sans flex flex-wrap items-center gap-2">
+              <span>แผงควบคุมหลักผู้ดูแลระบบ</span>
+              <span className="px-2.5 py-0.5 text-[9px] bg-gradient-to-r from-[#a22055] to-pink-600 text-white font-extrabold rounded-full tracking-wider whitespace-nowrap font-mono">สนง.พมจ.ตรัง</span>
             </h2>
-            <p className="text-xs text-slate-500">จัดการคลังยานพาหนะและทะเบียนรายชื่อพนักงานขับรถส่วนกลาง เพื่อความแม่นยำในการจองใช้สิทธิ์</p>
+            <p className="text-[11.5px] text-slate-500 leading-relaxed font-sans">
+              ระบบศูนย์ข้อสั่งราชการ คุมทะเบียนคลังรถยนต์ ทะเบียนรายชื่อพนักงานขับ และสรุปยอดรายงานระยะทางสถิติสะสม
+            </p>
           </div>
         </div>
         
         {/* Subtab switcher */}
-        <div className="flex flex-wrap md:flex-nowrap items-center gap-3 shrink-0">
-          <div className="flex flex-wrap bg-pink-50/40 p-1 rounded-lg border border-pink-100 shadow-inner gap-1 md:gap-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0 w-full xl:w-auto">
+          <div className="flex flex-wrap bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/60 w-full lg:w-auto justify-stretch">
             <button
               onClick={() => {
                 setActiveSubTab('vehicles');
                 resetAllForms();
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
                 activeSubTab === 'vehicles' 
-                  ? 'bg-white text-pink-600 shadow-sm border border-pink-150' 
-                  : 'text-slate-600 hover:text-pink-700'
+                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Car size={14} />
-              คลังรถยนต์ราชการ ({vehicles.length})
+              <Car size={13} />
+              คลังรถราชการ ({vehicles.length})
             </button>
             <button
               onClick={() => {
                 setActiveSubTab('drivers');
                 resetAllForms();
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
                 activeSubTab === 'drivers' 
-                  ? 'bg-white text-pink-600 shadow-sm border border-pink-150' 
-                  : 'text-slate-600 hover:text-pink-700'
+                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Users size={14} />
-              ทะเบียนคนขับ ({drivers.length})
+              <Users size={13} />
+              คนขับประจำกอง ({drivers.length})
             </button>
             <button
               onClick={() => {
                 setActiveSubTab('approvers');
                 resetAllForms();
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
                 activeSubTab === 'approvers' 
-                  ? 'bg-white text-pink-600 shadow-sm border border-pink-150' 
-                  : 'text-slate-600 hover:text-pink-700'
+                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Award size={14} />
-              ผู้อนุมัติโครงการ ({approvers.length})
+              <Award size={13} />
+              ผู้ลงนาม ({approvers.length})
             </button>
             <button
               onClick={() => {
                 setActiveSubTab('caretakers');
                 resetAllForms();
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
                 activeSubTab === 'caretakers' 
-                  ? 'bg-white text-pink-600 shadow-sm border border-pink-150' 
-                  : 'text-slate-600 hover:text-pink-700'
+                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <FileSignature size={14} />
+              <FileSignature size={13} />
               เจ้าหน้าที่จัดดูแลฯ ({caretakers.length})
             </button>
             <button
@@ -405,14 +409,14 @@ export default function AdminPanel({
                 setActiveSubTab('trips');
                 resetAllForms();
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
                 activeSubTab === 'trips' 
-                  ? 'bg-white text-pink-600 shadow-sm border border-pink-150' 
-                  : 'text-slate-600 hover:text-pink-700'
+                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Route size={14} />
-              สถิติวิ่งงานเสร็จสิ้น ({bookings.filter(b => b.vehicleId && b.status === 'completed').length})
+              <Route size={13} />
+              สถิติวิ่งรถ ({bookings.filter(b => b.vehicleId && b.status === 'completed').length})
             </button>
           </div>
 
