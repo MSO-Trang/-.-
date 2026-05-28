@@ -109,7 +109,7 @@ export default function App() {
   };
 
   // Status message state
-  const [toastMsg, setToastMsg] = useState<{ text: string; type: 'success' | 'info' } | null>(null);
+  const [toastMsg, setToastMsg] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
 
   // Admin login states
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
@@ -222,7 +222,7 @@ export default function App() {
   }, [activeTab]);
 
   // Show Toast Helper
-  const triggerToast = (text: string, type: 'success' | 'info' = 'success') => {
+  const triggerToast = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
     setToastMsg({ text, type });
     setTimeout(() => {
       setToastMsg(null);
@@ -230,34 +230,43 @@ export default function App() {
   };
 
   // Save Booking Callback
-  const handleSaveBooking = (booking: Booking) => {
+  const handleSaveBooking = async (booking: Booking) => {
     const isEdit = bookings.some(b => b.id === booking.id);
-    saveBookingToFirestore(booking);
-    if (isEdit) {
-      triggerToast(`ทำการบันทึกและรันใบจองเลขที่ ${booking.permitNumber} เรียบร้อยแล้ว`, 'success');
-    } else {
-      triggerToast(`สร้างคำขอจองคิวรถยนต์สำเร็จ! เลขนำส่งเอกสารคือ ${booking.permitNumber}`, 'success');
+    try {
+      await saveBookingToFirestore(booking);
+      if (isEdit) {
+        triggerToast(`ทำการบันทึกและรันใบจองเลขที่ ${booking.permitNumber} เรียบร้อยแล้ว`, 'success');
+      } else {
+        triggerToast(`สร้างคำขอจองคิวรถยนต์สำเร็จ! เลขนำส่งเอกสารคือ ${booking.permitNumber}`, 'success');
+      }
+      setEditingBooking(undefined);
+      setActiveTab('bookings');
+    } catch (err: any) {
+      console.error(err);
+      triggerToast(`ไม่สามารถบันทึกคิวจองรถได้: ${err.message || err}`, 'error');
     }
-    setEditingBooking(undefined);
-    setActiveTab('bookings');
   };
 
   // Quick State Toggler Callback
-  const handleUpdateStatus = (bookingId: string, status: 'pending' | 'approved' | 'completed' | 'cancelled' | 'rejected') => {
+  const handleUpdateStatus = async (bookingId: string, status: 'pending' | 'approved' | 'completed' | 'cancelled' | 'rejected') => {
     const b = bookings.find(b => b.id === bookingId);
     if (!b) return;
     const updated = { ...b, status };
-    saveBookingToFirestore(updated);
-    
-    let ThaiStatus = 'ยกเลิกการเดินทาง';
-    if (status === 'approved') ThaiStatus = 'อนุมัติการใช้ยานพาหนะ';
-    if (status === 'pending') ThaiStatus = 'ตั้งสถานะกลับเป็นรออนุมัติ';
-    if (status === 'completed') ThaiStatus = 'เสร็จสิ้นภารกิจ';
-    
-    triggerToast(`ปรับสถานะเอกสาร ${b.permitNumber} เป็น "${ThaiStatus}" สำเร็จ`, 'info');
+    try {
+      await saveBookingToFirestore(updated);
+      let ThaiStatus = 'ยกเลิกการเดินทาง';
+      if (status === 'approved') ThaiStatus = 'อนุมัติการใช้ยานพาหนะ';
+      if (status === 'pending') ThaiStatus = 'ตั้งสถานะกลับเป็นรออนุมัติ';
+      if (status === 'completed') ThaiStatus = 'เสร็จสิ้นภารกิจ';
+      
+      triggerToast(`ปรับสถานะเอกสาร ${b.permitNumber} เป็น "${ThaiStatus}" สำเร็จ`, 'info');
+    } catch (err: any) {
+      console.error(err);
+      triggerToast(`ปรับสถานะล้มเหลว: ${err.message || err}`, 'error');
+    }
   };
 
-  const handleCompleteBookingWithMileage = (bookingId: string, startMil: number, endMil: number) => {
+  const handleCompleteBookingWithMileage = async (bookingId: string, startMil: number, endMil: number) => {
     const b = bookings.find(b => b.id === bookingId);
     if (!b) return;
     const updated = { 
@@ -266,16 +275,21 @@ export default function App() {
       startMileage: startMil, 
       endMileage: endMil 
     };
-    saveBookingToFirestore(updated);
+    try {
+      await saveBookingToFirestore(updated);
 
-    if (b.vehicleId && endMil) {
-      const v = vehicles.find(v => v.id === b.vehicleId);
-      if (v) {
-        saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, endMil) });
+      if (b.vehicleId && endMil) {
+        const v = vehicles.find(v => v.id === b.vehicleId);
+        if (v) {
+          await saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, endMil) });
+        }
       }
+      
+      triggerToast(`บันทึกเลขไมล์เดินทางเสร็จสิ้น (${startMil.toLocaleString()} → ${endMil.toLocaleString()} กม.) ของเอกสารสลักหลัง ${b.permitNumber} เรียบร้อยแล้ว`, 'success');
+    } catch (err: any) {
+      console.error(err);
+      triggerToast(`บันทึกเลขไมล์ล้มเหลว: ${err.message || err}`, 'error');
     }
-    
-    triggerToast(`บันทึกเลขไมล์เดินทางเสร็จสิ้น (${startMil.toLocaleString()} → ${endMil.toLocaleString()} กม.) ของเอกสารสลักหลัง ${b.permitNumber} เรียบร้อยแล้ว`, 'success');
   };
 
   // Triggering Print
@@ -298,82 +312,114 @@ export default function App() {
   };
 
   // Save Vehicle
-  const handleSaveVehicle = (vehicle: Vehicle) => {
+  const handleSaveVehicle = async (vehicle: Vehicle) => {
     const isEdit = vehicles.some(v => v.id === vehicle.id);
-    saveVehicleToFirestore(vehicle);
-    if (isEdit) {
-      triggerToast(`อัปเดตข้อมูลรถยนต์ทะเบียน ${vehicle.plateNumber} สำเร็จ`, 'success');
-    } else {
-      triggerToast(`เพิ่มรถยนต์ใหม่ทะเบียน ${vehicle.plateNumber} เข้าระบบสำเร็จ`, 'success');
+    try {
+      await saveVehicleToFirestore(vehicle);
+      if (isEdit) {
+        triggerToast(`อัปเดตข้อมูลรถยนต์ทะเบียน ${vehicle.plateNumber} สำเร็จ`, 'success');
+      } else {
+        triggerToast(`เพิ่มรถยนต์ใหม่ทะเบียน ${vehicle.plateNumber} เข้าระบบสำเร็จ`, 'success');
+      }
+    } catch (err: any) {
+      triggerToast(`บันทึกข้อมูลรถยนต์ล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
   // Delete Vehicle
-  const handleDeleteVehicle = (id: string) => {
+  const handleDeleteVehicle = async (id: string) => {
     const target = vehicles.find(v => v.id === id);
-    deleteVehicleFromFirestore(id);
-    if (target) {
-      triggerToast(`ลบรถยนต์ทะเบียน ${target.plateNumber} เรียบร้อยแล้ว`, 'info');
+    try {
+      await deleteVehicleFromFirestore(id);
+      if (target) {
+        triggerToast(`ลบรถยนต์ทะเบียน ${target.plateNumber} เรียบร้อยแล้ว`, 'info');
+      }
+    } catch (err: any) {
+      triggerToast(`ลบรถยนต์ล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
   // Save Driver
-  const handleSaveDriver = (driver: Driver) => {
+  const handleSaveDriver = async (driver: Driver) => {
     const isEdit = drivers.some(d => d.id === driver.id);
-    saveDriverToFirestore(driver);
-    if (isEdit) {
-      triggerToast(`อัปเดตข้อมูลคนขับ ${driver.name} สำเร็จ`, 'success');
-    } else {
-      triggerToast(`เพิ่มคนขับ ${driver.name} เข้าระบบสำเร็จ`, 'success');
+    try {
+      await saveDriverToFirestore(driver);
+      if (isEdit) {
+        triggerToast(`อัปเดตข้อมูลคนขับ ${driver.name} สำเร็จ`, 'success');
+      } else {
+        triggerToast(`เพิ่มคนขับ ${driver.name} เข้าระบบสำเร็จ`, 'success');
+      }
+    } catch (err: any) {
+      triggerToast(`บันทึกข้อมูลคูขับล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
   // Delete Driver
-  const handleDeleteDriver = (id: string) => {
+  const handleDeleteDriver = async (id: string) => {
     const target = drivers.find(d => d.id === id);
-    deleteDriverFromFirestore(id);
-    if (target) {
-      triggerToast(`ลบคนขับ ${target.name} เรียบร้อยแล้ว`, 'info');
+    try {
+      await deleteDriverFromFirestore(id);
+      if (target) {
+        triggerToast(`ลบคนขับ ${target.name} เรียบร้อยแล้ว`, 'info');
+      }
+    } catch (err: any) {
+      triggerToast(`ลบคนขับล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
   // Save Approver
-  const handleSaveApprover = (approver: Approver) => {
+  const handleSaveApprover = async (approver: Approver) => {
     const isEdit = approvers.some(a => a.id === approver.id);
-    saveApproverToFirestore(approver);
-    if (isEdit) {
-      triggerToast(`อัปเดตข้อมูลผู้อนุมัติ ${approver.name} สำเร็จ`, 'success');
-    } else {
-      triggerToast(`เพิ่มผู้อนุมัติ ${approver.name} สำเร็จ`, 'success');
+    try {
+      await saveApproverToFirestore(approver);
+      if (isEdit) {
+        triggerToast(`อัปเดตข้อมูลผู้อนุมัติ ${approver.name} สำเร็จ`, 'success');
+      } else {
+        triggerToast(`เพิ่มผู้อนุมัติ ${approver.name} สำเร็จ`, 'success');
+      }
+    } catch (err: any) {
+      triggerToast(`บันทึกข้อมูลล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
   // Delete Approver
-  const handleDeleteApprover = (id: string) => {
+  const handleDeleteApprover = async (id: string) => {
     const target = approvers.find(a => a.id === id);
-    deleteApproverFromFirestore(id);
-    if (target) {
-      triggerToast(`ลบผู้อนุมัติ ${target.name} เรียบร้อยแล้ว`, 'info');
+    try {
+      await deleteApproverFromFirestore(id);
+      if (target) {
+        triggerToast(`ลบผู้อนุมัติ ${target.name} เรียบร้อยแล้ว`, 'info');
+      }
+    } catch (err: any) {
+      triggerToast(`ลบผู้อนุมัติล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
   // Save Caretaker
-  const handleSaveCaretaker = (caretaker: Caretaker) => {
+  const handleSaveCaretaker = async (caretaker: Caretaker) => {
     const isEdit = caretakers.some(c => c.id === caretaker.id);
-    saveCaretakerToFirestore(caretaker);
-    if (isEdit) {
-      triggerToast(`อัปเดตข้อมูลเจ้าหน้าที่จัดดูแลยานพาหนะ ${caretaker.name} สำเร็จ`, 'success');
-    } else {
-      triggerToast(`เพิ่มเจ้าหน้าที่จัดดูแลยานพาหนะ ${caretaker.name} สำเร็จ`, 'success');
+    try {
+      await saveCaretakerToFirestore(caretaker);
+      if (isEdit) {
+        triggerToast(`อัปเดตข้อมูลเจ้าหน้าที่จัดดูแลยานพาหนะ ${caretaker.name} สำเร็จ`, 'success');
+      } else {
+        triggerToast(`เพิ่มเจ้าหน้าที่จัดดูแลยานพาหนะ ${caretaker.name} สำเร็จ`, 'success');
+      }
+    } catch (err: any) {
+      triggerToast(`บันทึกข้อมูลล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
   // Delete Caretaker
-  const handleDeleteCaretaker = (id: string) => {
+  const handleDeleteCaretaker = async (id: string) => {
     const target = caretakers.find(c => c.id === id);
-    deleteCaretakerFromFirestore(id);
-    if (target) {
-      triggerToast(`ลบเจ้าหน้าที่จัดดูแลยานพาหนะ ${target.name} เรียบร้อยแล้ว`, 'info');
+    try {
+      await deleteCaretakerFromFirestore(id);
+      if (target) {
+        triggerToast(`ลบเจ้าหน้าที่จัดดูแลยานพาหนะ ${target.name} เรียบร้อยแล้ว`, 'info');
+      }
+    } catch (err: any) {
+      triggerToast(`ลบข้อมูลล้มเหลว: ${err.message || err}`, 'error');
     }
   };
 
@@ -562,14 +608,24 @@ export default function App() {
         {/* Global Floating Toast for successful submissions */}
         {toastMsg && (
           <div 
-            className="fixed bottom-6 right-6 z-50 p-4 bg-slate-900 text-white rounded-xl shadow-lg flex items-center gap-3 max-w-sm border border-slate-800 animate-slide-up print:hidden"
+            className={`fixed bottom-6 right-6 z-50 p-4 rounded-xl shadow-lg flex items-center gap-3 max-w-sm border animate-slide-up print:hidden ${
+              toastMsg.type === 'error'
+                ? 'bg-[#3b0712] border-[#9f1239] text-rose-100'
+                : 'bg-slate-900 border-slate-800 text-white'
+            }`}
             id="toast-notification"
           >
-            <div className="p-2 bg-emerald-500/15 text-emerald-400 rounded-xl">
-              <FileCheck size={18} />
+            <div className={`p-2 rounded-xl ${
+              toastMsg.type === 'error'
+                ? 'bg-rose-500/20 text-rose-400'
+                : 'bg-emerald-500/15 text-emerald-400'
+            }`}>
+              {toastMsg.type === 'error' ? <AlertCircle size={18} /> : <FileCheck size={18} />}
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-400">แจ้งเตือนจากระบบ พมจ.</p>
+              <p className="text-xs font-bold text-slate-400">
+                {toastMsg.type === 'error' ? 'แจ้งพพบข้อผิดพลาด' : 'แจ้งเตือนจากระบบ พมจ.'}
+              </p>
               <p className="text-xs font-medium text-slate-200 leading-normal mt-0.5">{toastMsg.text}</p>
             </div>
           </div>

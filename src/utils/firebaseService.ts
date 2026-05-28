@@ -77,12 +77,31 @@ export async function testConnection() {
   }
 }
 
+// Clean fields with undefined values to prevent Firestore serialization crashes
+export function cleanForFirestore<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(cleanForFirestore) as any;
+  }
+  if (typeof obj === 'object') {
+    const cleaned: any = {};
+    for (const key of Object.keys(obj as object)) {
+      const val = (obj as any)[key];
+      if (val !== undefined) {
+        cleaned[key] = cleanForFirestore(val);
+      }
+    }
+    return cleaned;
+  }
+  return obj;
+}
+
 // Firestore operations standard helpers
 
 export async function saveVehicleToFirestore(vehicle: Vehicle) {
   const path = `vehicles/${vehicle.id}`;
   try {
-    await setDoc(doc(db, 'vehicles', vehicle.id), vehicle);
+    await setDoc(doc(db, 'vehicles', vehicle.id), cleanForFirestore(vehicle));
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -100,7 +119,7 @@ export async function deleteVehicleFromFirestore(id: string) {
 export async function saveDriverToFirestore(driver: Driver) {
   const path = `drivers/${driver.id}`;
   try {
-    await setDoc(doc(db, 'drivers', driver.id), driver);
+    await setDoc(doc(db, 'drivers', driver.id), cleanForFirestore(driver));
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -118,7 +137,7 @@ export async function deleteDriverFromFirestore(id: string) {
 export async function saveBookingToFirestore(booking: Booking) {
   const path = `bookings/${booking.id}`;
   try {
-    await setDoc(doc(db, 'bookings', booking.id), booking);
+    await setDoc(doc(db, 'bookings', booking.id), cleanForFirestore(booking));
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -136,7 +155,7 @@ export async function deleteBookingFromFirestore(id: string) {
 export async function saveApproverToFirestore(approver: Approver) {
   const path = `approvers/${approver.id}`;
   try {
-    await setDoc(doc(db, 'approvers', approver.id), approver);
+    await setDoc(doc(db, 'approvers', approver.id), cleanForFirestore(approver));
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
@@ -154,7 +173,7 @@ export async function deleteApproverFromFirestore(id: string) {
 export async function saveCaretakerToFirestore(caretaker: Caretaker) {
   const path = `caretakers/${caretaker.id}`;
   try {
-    await setDoc(doc(db, 'caretakers', caretaker.id), caretaker);
+    await setDoc(doc(db, 'caretakers', caretaker.id), cleanForFirestore(caretaker));
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
