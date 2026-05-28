@@ -53,7 +53,7 @@ export default function AdminPanel({
   onDeleteCaretaker,
   onLogout
 }: AdminPanelProps) {
-  const [activeSubTab, setActiveSubTab] = useState<'vehicles' | 'drivers' | 'approvers' | 'caretakers' | 'data_sync'>('vehicles');
+  const [activeSubTab, setActiveSubTab] = useState<'vehicles' | 'drivers' | 'approvers' | 'caretakers'>('vehicles');
 
   // Confirmation State
   const [confirmState, setConfirmState] = useState<{
@@ -328,20 +328,6 @@ export default function AdminPanel({
             >
               <FileSignature size={14} />
               เจ้าหน้าที่จัดดูแลฯ ({caretakers.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubTab('data_sync');
-                resetAllForms();
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
-                activeSubTab === 'data_sync' 
-                  ? 'bg-white text-pink-600 shadow-sm border border-pink-150' 
-                  : 'text-slate-600 hover:text-pink-700'
-              }`}
-            >
-              <Truck size={14} />
-              ย้ายซิงค์ข้อมูลไปเวอร์ชันจริง (Sync Data) 🔄
             </button>
           </div>
 
@@ -1162,130 +1148,6 @@ export default function AdminPanel({
             )}
           </div>
 
-        </div>
-      )}
-
-      {activeSubTab === 'data_sync' && (
-        <div className="space-y-6">
-          <div className="bg-white border border-pink-100 rounded-lg p-6 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-950 flex items-center gap-2">
-              <Truck size={18} className="text-pink-600" />
-              เครื่องมือย้ายคลังข้อมูลไปรอบติดตั้งจริง (Data Porting & Sync Tool)
-            </h3>
-            <p className="text-sm text-slate-600 leading-relaxed font-sans">
-              เนื่องจากการจัดเก็บข้อมูลของ <strong className="text-pink-700 font-black">คนขับรถ, ยานพาหนะ, ผู้อนุมัติพัสดุ, และประวัติการจอง</strong> จะจัดทำไว้ในเครื่องคอมพิวเตอร์หรือโทรศัพท์ที่ป้อนข้อมูลโดยเฉพาะ (LocalStorage ของแต่ละจดโดเมนเว็บบราวเซอร์) 
-              เพื่อให้เวลาท่านเผยแพร่ (Publish) แล้วรายชื่อคนขับที่ท่านสร้างในหน้าทดสอบโคลนตามยอดใช้งานจริง แอดมินขอแนะนำให้ทำตามขั้นตอนนี้:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-              
-              {/* Export Panel */}
-              <div className="border border-pink-100 rounded-xl p-5 bg-pink-50/10 space-y-3 shadow-xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-pink-800 uppercase tracking-wider block">
-                    📥 ขั้นแรก: ดึงข้อมูลจากระบบตรงนี้ (Export Data)
-                  </span>
-                  <button
-                    onClick={() => {
-                      const data = {
-                        bookings: localStorage.getItem('pmj_trang_bookings') ? JSON.parse(localStorage.getItem('pmj_trang_bookings')!) : [],
-                        vehicles: localStorage.getItem('pmj_trang_vehicles') ? JSON.parse(localStorage.getItem('pmj_trang_vehicles')!) : [],
-                        drivers: localStorage.getItem('pmj_trang_drivers') ? JSON.parse(localStorage.getItem('pmj_trang_drivers')!) : [],
-                        approvers: localStorage.getItem('pmj_trang_approvers') ? JSON.parse(localStorage.getItem('pmj_trang_approvers')!) : [],
-                        caretakers: localStorage.getItem('pmj_trang_caretakers') ? JSON.parse(localStorage.getItem('pmj_trang_caretakers')!) : []
-                      };
-                      const jsonStr = JSON.stringify(data, null, 2);
-                      navigator.clipboard.writeText(jsonStr);
-                      alert('คัดลอกรหัสข้อมูลแล้ว! 🎉 คุณสามารถนำโค้ดนี้ส่งในหน้าเว็บจริง หรือส่งข้อความโค้ดนี้เข้ามาในหน้าแชทคุยกับ AI เพื่อให้ป้อนเข้าโปรแกรมให้เรียบร้อยครับ');
-                    }}
-                    className="px-3 py-1.5 bg-pink-600 hover:bg-pink-500 text-white text-xs font-extrabold rounded-lg transition border border-pink-550 shadow-xs cursor-pointer"
-                  >
-                    📋 คัดลอกรหัสข้อมูลทั้งหมด
-                  </button>
-                </div>
-                
-                <p className="text-xs text-slate-500">นี่คือโค้ดสำรองรายชื่อคนขับ รถยนต์ และประวัติความต้องการจากโปรแกรมในเครื่องของคุณ:</p>
-                
-                <textarea
-                  readOnly
-                  rows={8}
-                  value={(() => {
-                    const data = {
-                      bookings: localStorage.getItem('pmj_trang_bookings') ? JSON.parse(localStorage.getItem('pmj_trang_bookings')!) : [],
-                      vehicles: localStorage.getItem('pmj_trang_vehicles') ? JSON.parse(localStorage.getItem('pmj_trang_vehicles')!) : [],
-                      drivers: localStorage.getItem('pmj_trang_drivers') ? JSON.parse(localStorage.getItem('pmj_trang_drivers')!) : [],
-                      approvers: localStorage.getItem('pmj_trang_approvers') ? JSON.parse(localStorage.getItem('pmj_trang_approvers')!) : [],
-                      caretakers: localStorage.getItem('pmj_trang_caretakers') ? JSON.parse(localStorage.getItem('pmj_trang_caretakers')!) : []
-                    };
-                    return JSON.stringify(data, null, 2);
-                  })()}
-                  className="w-full bg-slate-900 border border-slate-950 p-2.5 rounded text-[10px] font-mono text-emerald-400 focus:outline-none"
-                  onClick={(e) => (e.target as HTMLTextAreaElement).select()}
-                />
-                
-                <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-lg text-xs leading-normal">
-                  💡 <strong>อยากให้ฝังเป็นค่าเริ่มต้นเลยไหม?</strong> คัดลอกตัวอักษรก้อนนี้ทั้งหมด แล้วเข้ามาในช่องแชทป้อนส่งบอก AI ว่า <strong>"ช่วยบันทึกโค้ดนี้ลงเป็นข้อมูล Default ของระบบที"</strong> ระบบจะรันการบันทึกประวัติให้ทุกคนที่เปิดลิงก์เห็นข้อมูลตรงกันตลอดไปครับ!
-                </div>
-              </div>
-
-              {/* Import Panel */}
-              <div className="border border-slate-200 rounded-xl p-5 bg-slate-50/50 space-y-3 shadow-xs">
-                <span className="text-xs font-black text-slate-700 uppercase tracking-wider block">
-                  📤 ขั้นสอง: เขียนบันทึกข้อมูลเครื่องอื่น (Import Sync)
-                </span>
-                
-                <p className="text-xs text-slate-500">สำหรับทำบนลิงก์ระบบจริง (หรือเบราว์เซอร์เครื่องอื่นๆ) นำรหัสที่คัดลอกมาวางในช่องด้านล่างเพื่ออัปเดต:</p>
-                
-                <textarea
-                  id="import-text"
-                  rows={8}
-                  placeholder='วางรหัสข้อมูลที่มีตัวปีกกาที่คัดลอกมาลงตรงนี้...'
-                  className="w-full bg-white border border-slate-300 p-2.5 rounded text-[10px] font-mono text-slate-800 outline-none focus:ring-1 focus:ring-pink-500"
-                />
-                
-                <button
-                  onClick={() => {
-                    const textEl = document.getElementById('import-text') as HTMLTextAreaElement | null;
-                    if (!textEl || !textEl.value.trim()) {
-                      alert('กรุณาป้อนรหัสสำรองข้อมูลที่คัดลอกมาก่อนการกดปุ่มนี้ครับ');
-                      return;
-                    }
-                    try {
-                      const data = JSON.parse(textEl.value.trim());
-                      if (!data || typeof data !== 'object') {
-                        throw new Error('รูปแบบของข้อมูลด้านในไม่ตรงตามาตรฐานพัสดุ');
-                      }
-                      
-                      const confirmed = window.confirm(
-                        'แจ้งเตือนฉุกเฉิน! การกดปุ่มนี้จะล้างข้อมูลและเขียนข้อมูลคนขับ รถยนต์ ผู้อนุมัติ ทับข้อมูลเดิมบนหน่วยความจำของบราวเซอร์นี้ทั้งหมด และระบุทิศทางใหม่ ยืนยันการดำเนินการและรีเซ็ตหน้าระบบ?'
-                      );
-                      
-                      if (confirmed) {
-                        if (data.bookings) localStorage.setItem('pmj_trang_bookings', JSON.stringify(data.bookings));
-                        if (data.vehicles) localStorage.setItem('pmj_trang_vehicles', JSON.stringify(data.vehicles));
-                        if (data.drivers) localStorage.setItem('pmj_trang_drivers', JSON.stringify(data.drivers));
-                        if (data.approvers) localStorage.setItem('pmj_trang_approvers', JSON.stringify(data.approvers));
-                        if (data.caretakers) localStorage.setItem('pmj_trang_caretakers', JSON.stringify(data.caretakers));
-                        
-                        alert('อัปเดตข้อมูลสารบัญสำเร็จระบบเรียบร้อยแล้ว! หน้าเว็บจะรีเซ็ตตัวในพริบตา 🎉');
-                        window.location.reload();
-                      }
-                    } catch (err: any) {
-                      alert('การอิมพอร์ตล้มเหลว: ' + (err.message || 'รูปแบบไม่ถูกต้อง กรุณาเคาะลอกข้อมูลมาทั้งก้อนใหม่อีกครั้ง'));
-                    }
-                  }}
-                  className="w-full py-2.5 bg-slate-800 hover:bg-slate-950 text-white rounded-lg font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm border border-slate-900"
-                >
-                  📥 เขียนข้อมูลทับสารเก่าและบันทึกลงเครื่องนี้ (Overwrite & Sync Host)
-                </button>
-                
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  * ข้อมูลเก่าบนบราวเซอร์ลิ้งก์ที่เปิดนี้จะถูกแทนที่ และรีโหลดคลังทั้งหมดไปสู่งานชุดเดียวกันทันที
-                </p>
-              </div>
-
-            </div>
-          </div>
         </div>
       )}
 
