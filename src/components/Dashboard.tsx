@@ -349,7 +349,7 @@ export default function Dashboard({
           </h1>
           <p className="text-slate-300 text-sm md:text-sm leading-relaxed max-w-2xl">
             ยกระดับประสิทธิภาพและความสะดวกในการจัดสัญจร ยานพาหนะ พนักงานขับรถยนต์ 
-            พร้อมทั้งพิมพ์ใบอนุญาตใช้รถยนต์ส่วนกลางราชการด้วยเทคโนโลยีแบบยืดหยุ่นและอัฉริยะ
+            พร้อมทั้งพิมพ์ใบอนุญาตใช้รถยนต์ส่วนกลางราชการด้วยเทคโนโลยี
           </p>
           <div className="pt-2 flex flex-wrap gap-2.5">
             <button
