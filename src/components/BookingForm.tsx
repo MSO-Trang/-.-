@@ -628,7 +628,6 @@ export default function BookingForm({
                     ))}
                   </select>
                 </div>
-                <p className="text-[10px] text-slate-400">เลือกกลุ่มงานที่สังกัดจริงเพื่อคุมงบเบิกงบเดินทางและสถิติยอดความถี่การใช้ยานพาหนะจังหวัด</p>
               </div>
 
               {/* Passengers Count Widget with +/- Controls */}

@@ -129,6 +129,13 @@ export default function AdminPanel({
       .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
   }, [bookings, tripVehicleFilter, tripSearch]);
 
+  const filteredTotalKm = React.useMemo(() => {
+    return vehicleTripsGroup.reduce((sum, b) => {
+      const hasMileage = b.startMileage !== undefined && b.endMileage !== undefined && b.startMileage > 0 && b.endMileage > 0;
+      return sum + (hasMileage ? (b.endMileage! - b.startMileage!) : 0);
+    }, 0);
+  }, [vehicleTripsGroup]);
+
   const tripStats = React.useMemo(() => {
     let totalKm = 0;
     let completedCount = 0;
@@ -1502,6 +1509,20 @@ export default function AdminPanel({
                       );
                     })}
                   </tbody>
+                  <tfoot className="bg-slate-50 border-t border-pink-100 font-sans">
+                    <tr className="bg-gradient-to-r from-slate-50 to-pink-50/10 font-bold text-slate-900 border-t border-pink-100">
+                      <td colSpan={3} className="p-3 text-right text-xs font-black text-slate-600">
+                        🏁 ยอดรวมระยะทางรถที่เดินทางเสร็จสิ้นแล้วทั้งหมด:
+                      </td>
+                      <td className="p-3 text-sm font-black text-[#a22055] whitespace-nowrap bg-pink-50/20">
+                        <div className="inline-flex items-center gap-1.5 bg-[#a22055]/5 border border-[#a22055]/15 px-2.5 py-1 rounded-lg text-[#a22055]">
+                          <Route size={14} className="text-[#a22055]" />
+                          <span>{filteredTotalKm.toLocaleString()} กม.</span>
+                        </div>
+                      </td>
+                      <td className="p-3"></td>
+                    </tr>
+                  </tfoot>
                 </table>
               </div>
             )}
