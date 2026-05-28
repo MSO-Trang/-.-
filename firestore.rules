@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common helper functions
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    
+    function incoming() { 
+      return request.resource.data; 
+    }
+    
+    function existing() { 
+      return resource.data; 
+    }
+
+    // Validation helpers
+    function isValidVehicle(data) {
+      return data.id is string && data.id.size() <= 100
+        && data.name is string && data.name.size() <= 200
+        && data.plateNumber is string && data.plateNumber.size() <= 100
+        && data.capacity is int && data.capacity >= 1 && data.capacity <= 200
+        && data.status is string && data.status.size() <= 50;
+    }
+
+    function isValidDriver(data) {
+      return data.id is string && data.id.size() <= 100
+        && data.name is string && data.name.size() <= 200
+        && data.phone is string && data.phone.size() <= 100
+        && data.status is string && data.status.size() <= 50;
+    }
+
+    function isValidBooking(data) {
+      return data.id is string && data.id.size() <= 100
+        && data.permitNumber is string && data.permitNumber.size() <= 100
+        && data.requesterName is string && data.requesterName.size() <= 200
+        && data.destination is string && data.destination.size() <= 1000
+        && data.purpose is string && data.purpose.size() <= 2000
+        && data.passengersCount is int && data.passengersCount >= 1
+        && data.vehicleId is string && data.vehicleId.size() <= 100
+        && data.driverId is string && data.driverId.size() <= 100
+        && data.status is string && data.status.size() <= 50;
+    }
+
+    function isValidApprover(data) {
+      return data.id is string && data.id.size() <= 100
+        && data.name is string && data.name.size() <= 200
+        && data.position is string && data.position.size() <= 200;
+    }
+
+    function isValidCaretaker(data) {
+      return data.id is string && data.id.size() <= 100
+        && data.name is string && data.name.size() <= 200
+        && data.position is string && data.position.size() <= 200;
+    }
+
+    // Collections matches
+    match /vehicles/{vehicleId} {
+      allow read: if true;
+      allow create, update: if isValidId(vehicleId) && isValidVehicle(incoming());
+      allow delete: if isValidId(vehicleId);
+    }
+
+    match /drivers/{driverId} {
+      allow read: if true;
+      allow create, update: if isValidId(driverId) && isValidDriver(incoming());
+      allow delete: if isValidId(driverId);
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if true;
+      allow create, update: if isValidId(bookingId) && isValidBooking(incoming());
+      allow delete: if isValidId(bookingId);
+    }
+
+    match /approvers/{approverId} {
+      allow read: if true;
+      allow create, update: if isValidId(approverId) && isValidApprover(incoming());
+      allow delete: if isValidId(approverId);
+    }
+
+    match /caretakers/{caretakerId} {
+      allow read: if true;
+      allow create, update: if isValidId(caretakerId) && isValidCaretaker(incoming());
+      allow delete: if isValidId(caretakerId);
+    }
+  }
+}

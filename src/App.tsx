@@ -23,6 +23,25 @@ import PrintPermit from './components/PrintPermit';
 import AdminPanel from './components/AdminPanel';
 import AdminLogin from './components/AdminLogin';
 import { initAuth, googleSignIn as loginGoogle, googleSignOut as logoutGoogle } from './utils/googleCalendarService';
+import { 
+  testConnection, 
+  bootstrapFirestoreIfEmpty, 
+  saveBookingToFirestore, 
+  deleteBookingFromFirestore, 
+  saveVehicleToFirestore, 
+  deleteVehicleFromFirestore, 
+  saveDriverToFirestore, 
+  deleteDriverFromFirestore, 
+  saveApproverToFirestore, 
+  deleteApproverFromFirestore, 
+  saveCaretakerToFirestore, 
+  deleteCaretakerFromFirestore, 
+  watchBookings, 
+  watchVehicles, 
+  watchDrivers, 
+  watchApprovers, 
+  watchCaretakers 
+} from './utils/firebaseService';
 
 export default function App() {
   
@@ -113,20 +132,62 @@ export default function App() {
   const handleDeleteBooking = (bookingId: string) => {
     const target = bookings.find(b => b.id === bookingId);
     if (!target) return;
-    const updated = bookings.filter(b => b.id !== bookingId);
-    setBookings(updated);
-    saveStoredData(updated, vehicles, drivers, approvers, caretakers);
+    deleteBookingFromFirestore(bookingId);
     triggerToast(`ลบข้อมูลการจองคำขอใช้รถเลขที่ ${target.permitNumber} ออกจากสารระบบเรียบร้อยแล้ว`, 'info');
   };
 
-  // Load data on component mount and handle url deep print link for iframe printing
+  // Real-time synchronization with Firestore
   useEffect(() => {
+    // 1. Warm-up Firestore connection
+    testConnection();
+
+    // 2. Load immediate cached backup from LocalStorage
     const { bookings: savedB, vehicles: savedV, drivers: savedD, approvers: savedA, caretakers: savedC } = getStoredData();
     setBookings(savedB);
     setVehicles(savedV);
     setDrivers(savedD);
     setApprovers(savedA || []);
     setCaretakers(savedC || []);
+
+    // 3. Setup real-time listeners for all 5 entities
+    const unsubBookings = watchBookings((updatedBookings) => {
+      const sorted = [...updatedBookings].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setBookings(sorted);
+      localStorage.setItem('pmj_trang_bookings', JSON.stringify(sorted));
+    });
+
+    const unsubVehicles = watchVehicles((updatedVehicles) => {
+      setVehicles(updatedVehicles);
+      localStorage.setItem('pmj_trang_vehicles', JSON.stringify(updatedVehicles));
+    });
+
+    const unsubDrivers = watchDrivers((updatedDrivers) => {
+      setDrivers(updatedDrivers);
+      localStorage.setItem('pmj_trang_drivers', JSON.stringify(updatedDrivers));
+    });
+
+    const unsubApprovers = watchApprovers((updatedApprovers) => {
+      setApprovers(updatedApprovers);
+      localStorage.setItem('pmj_trang_approvers', JSON.stringify(updatedApprovers));
+    });
+
+    const unsubCaretakers = watchCaretakers((updatedCaretakers) => {
+      setCaretakers(updatedCaretakers);
+      localStorage.setItem('pmj_trang_caretakers', JSON.stringify(updatedCaretakers));
+    });
+
+    // 4. Bootstrap Firestore on first-ever load if it's currently empty
+    bootstrapFirestoreIfEmpty(savedB, savedV, savedD, savedA || [], savedC || []);
+
+    return () => {
+      unsubBookings();
+      unsubVehicles();
+      unsubDrivers();
+      unsubApprovers();
+      unsubCaretakers();
+    };
   }, []);
 
   // Sync tab with URL hash for print preview stability
@@ -170,74 +231,51 @@ export default function App() {
 
   // Save Booking Callback
   const handleSaveBooking = (booking: Booking) => {
-    let updatedBookings: Booking[] = [];
     const isEdit = bookings.some(b => b.id === booking.id);
-
+    saveBookingToFirestore(booking);
     if (isEdit) {
-      updatedBookings = bookings.map(b => b.id === booking.id ? booking : b);
       triggerToast(`ทำการบันทึกและรันใบจองเลขที่ ${booking.permitNumber} เรียบร้อยแล้ว`, 'success');
     } else {
-      updatedBookings = [booking, ...bookings];
       triggerToast(`สร้างคำขอจองคิวรถยนต์สำเร็จ! เลขนำส่งเอกสารคือ ${booking.permitNumber}`, 'success');
     }
-
-    setBookings(updatedBookings);
-    saveStoredData(updatedBookings, vehicles, drivers, approvers, caretakers);
     setEditingBooking(undefined);
     setActiveTab('bookings');
   };
 
   // Quick State Toggler Callback
   const handleUpdateStatus = (bookingId: string, status: 'pending' | 'approved' | 'completed' | 'cancelled' | 'rejected') => {
-    const updated = bookings.map(b => {
-      if (b.id === bookingId) {
-        return { ...b, status };
-      }
-      return b;
-    });
-    setBookings(updated);
-    saveStoredData(updated, vehicles, drivers, approvers, caretakers);
+    const b = bookings.find(b => b.id === bookingId);
+    if (!b) return;
+    const updated = { ...b, status };
+    saveBookingToFirestore(updated);
     
-    const relevant = updated.find(b => b.id === bookingId);
     let ThaiStatus = 'ยกเลิกการเดินทาง';
     if (status === 'approved') ThaiStatus = 'อนุมัติการใช้ยานพาหนะ';
     if (status === 'pending') ThaiStatus = 'ตั้งสถานะกลับเป็นรออนุมัติ';
     if (status === 'completed') ThaiStatus = 'เสร็จสิ้นภารกิจ';
     
-    triggerToast(`ปรับสถานะเอกสาร ${relevant?.permitNumber || ''} เป็น "${ThaiStatus}" สำเร็จ`, 'info');
+    triggerToast(`ปรับสถานะเอกสาร ${b.permitNumber} เป็น "${ThaiStatus}" สำเร็จ`, 'info');
   };
 
   const handleCompleteBookingWithMileage = (bookingId: string, startMil: number, endMil: number) => {
-    let targetVehicleId = '';
-    const updated = bookings.map(b => {
-      if (b.id === bookingId) {
-        targetVehicleId = b.vehicleId;
-        return { 
-          ...b, 
-          status: 'completed' as const, 
-          startMileage: startMil, 
-          endMileage: endMil 
-        };
+    const b = bookings.find(b => b.id === bookingId);
+    if (!b) return;
+    const updated = { 
+      ...b, 
+      status: 'completed' as const, 
+      startMileage: startMil, 
+      endMileage: endMil 
+    };
+    saveBookingToFirestore(updated);
+
+    if (b.vehicleId && endMil) {
+      const v = vehicles.find(v => v.id === b.vehicleId);
+      if (v) {
+        saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, endMil) });
       }
-      return b;
-    });
-
-    let updatedVehicles = vehicles;
-    if (targetVehicleId && endMil) {
-      updatedVehicles = vehicles.map(v => {
-        if (v.id === targetVehicleId) {
-          return { ...v, mileage: Math.max(v.mileage || 0, endMil) };
-        }
-        return v;
-      });
-      setVehicles(updatedVehicles);
     }
-
-    setBookings(updated);
-    saveStoredData(updated, updatedVehicles, drivers, approvers, caretakers);
     
-    const relevant = updated.find(b => b.id === bookingId);
-    triggerToast(`บันทึกเลขไมล์เดินทางเสร็จสิ้น (${startMil.toLocaleString()} → ${endMil.toLocaleString()} กม.) ของเอกสารสลักหลัง ${relevant?.permitNumber || ''} เรียบร้อยแล้ว`, 'success');
+    triggerToast(`บันทึกเลขไมล์เดินทางเสร็จสิ้น (${startMil.toLocaleString()} → ${endMil.toLocaleString()} กม.) ของเอกสารสลักหลัง ${b.permitNumber} เรียบร้อยแล้ว`, 'success');
   };
 
   // Triggering Print
@@ -261,25 +299,19 @@ export default function App() {
 
   // Save Vehicle
   const handleSaveVehicle = (vehicle: Vehicle) => {
-    let updatedVehicles: Vehicle[] = [];
     const isEdit = vehicles.some(v => v.id === vehicle.id);
+    saveVehicleToFirestore(vehicle);
     if (isEdit) {
-      updatedVehicles = vehicles.map(v => v.id === vehicle.id ? vehicle : v);
       triggerToast(`อัปเดตข้อมูลรถยนต์ทะเบียน ${vehicle.plateNumber} สำเร็จ`, 'success');
     } else {
-      updatedVehicles = [...vehicles, vehicle];
       triggerToast(`เพิ่มรถยนต์ใหม่ทะเบียน ${vehicle.plateNumber} เข้าระบบสำเร็จ`, 'success');
     }
-    setVehicles(updatedVehicles);
-    saveStoredData(bookings, updatedVehicles, drivers, approvers, caretakers);
   };
 
   // Delete Vehicle
   const handleDeleteVehicle = (id: string) => {
     const target = vehicles.find(v => v.id === id);
-    const updatedVehicles = vehicles.filter(v => v.id !== id);
-    setVehicles(updatedVehicles);
-    saveStoredData(bookings, updatedVehicles, drivers, approvers, caretakers);
+    deleteVehicleFromFirestore(id);
     if (target) {
       triggerToast(`ลบรถยนต์ทะเบียน ${target.plateNumber} เรียบร้อยแล้ว`, 'info');
     }
@@ -287,25 +319,19 @@ export default function App() {
 
   // Save Driver
   const handleSaveDriver = (driver: Driver) => {
-    let updatedDrivers: Driver[] = [];
     const isEdit = drivers.some(d => d.id === driver.id);
+    saveDriverToFirestore(driver);
     if (isEdit) {
-      updatedDrivers = drivers.map(d => d.id === driver.id ? driver : d);
       triggerToast(`อัปเดตข้อมูลคนขับ ${driver.name} สำเร็จ`, 'success');
     } else {
-      updatedDrivers = [...drivers, driver];
       triggerToast(`เพิ่มคนขับ ${driver.name} เข้าระบบสำเร็จ`, 'success');
     }
-    setDrivers(updatedDrivers);
-    saveStoredData(bookings, vehicles, updatedDrivers, approvers, caretakers);
   };
 
   // Delete Driver
   const handleDeleteDriver = (id: string) => {
     const target = drivers.find(d => d.id === id);
-    const updatedDrivers = drivers.filter(d => d.id !== id);
-    setDrivers(updatedDrivers);
-    saveStoredData(bookings, vehicles, updatedDrivers, approvers, caretakers);
+    deleteDriverFromFirestore(id);
     if (target) {
       triggerToast(`ลบคนขับ ${target.name} เรียบร้อยแล้ว`, 'info');
     }
@@ -313,25 +339,19 @@ export default function App() {
 
   // Save Approver
   const handleSaveApprover = (approver: Approver) => {
-    let updatedApprovers: Approver[] = [];
     const isEdit = approvers.some(a => a.id === approver.id);
+    saveApproverToFirestore(approver);
     if (isEdit) {
-      updatedApprovers = approvers.map(a => a.id === approver.id ? approver : a);
       triggerToast(`อัปเดตข้อมูลผู้อนุมัติ ${approver.name} สำเร็จ`, 'success');
     } else {
-      updatedApprovers = [...approvers, approver];
       triggerToast(`เพิ่มผู้อนุมัติ ${approver.name} สำเร็จ`, 'success');
     }
-    setApprovers(updatedApprovers);
-    saveStoredData(bookings, vehicles, drivers, updatedApprovers, caretakers);
   };
 
   // Delete Approver
   const handleDeleteApprover = (id: string) => {
     const target = approvers.find(a => a.id === id);
-    const updatedApprovers = approvers.filter(a => a.id !== id);
-    setApprovers(updatedApprovers);
-    saveStoredData(bookings, vehicles, drivers, updatedApprovers, caretakers);
+    deleteApproverFromFirestore(id);
     if (target) {
       triggerToast(`ลบผู้อนุมัติ ${target.name} เรียบร้อยแล้ว`, 'info');
     }
@@ -339,25 +359,19 @@ export default function App() {
 
   // Save Caretaker
   const handleSaveCaretaker = (caretaker: Caretaker) => {
-    let updatedCaretakers: Caretaker[] = [];
     const isEdit = caretakers.some(c => c.id === caretaker.id);
+    saveCaretakerToFirestore(caretaker);
     if (isEdit) {
-      updatedCaretakers = caretakers.map(c => c.id === caretaker.id ? caretaker : c);
       triggerToast(`อัปเดตข้อมูลเจ้าหน้าที่จัดดูแลยานพาหนะ ${caretaker.name} สำเร็จ`, 'success');
     } else {
-      updatedCaretakers = [...caretakers, caretaker];
       triggerToast(`เพิ่มเจ้าหน้าที่จัดดูแลยานพาหนะ ${caretaker.name} สำเร็จ`, 'success');
     }
-    setCaretakers(updatedCaretakers);
-    saveStoredData(bookings, vehicles, drivers, approvers, updatedCaretakers);
   };
 
   // Delete Caretaker
   const handleDeleteCaretaker = (id: string) => {
     const target = caretakers.find(c => c.id === id);
-    const updatedCaretakers = caretakers.filter(c => c.id !== id);
-    setCaretakers(updatedCaretakers);
-    saveStoredData(bookings, vehicles, drivers, approvers, updatedCaretakers);
+    deleteCaretakerFromFirestore(id);
     if (target) {
       triggerToast(`ลบเจ้าหน้าที่จัดดูแลยานพาหนะ ${target.name} เรียบร้อยแล้ว`, 'info');
     }

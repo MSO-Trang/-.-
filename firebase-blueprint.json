@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "vehicle": {
+      "title": "Vehicle",
+      "description": "Representing centralized vehicles in PMJ Trang.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "plateNumber": { "type": "string" },
+        "capacity": { "type": "integer" },
+        "status": { "type": "string" },
+        "imagePlaceholderColor": { "type": "string" },
+        "mileage": { "type": "integer" }
+      },
+      "required": ["id", "name", "type", "plateNumber", "capacity", "status", "imagePlaceholderColor"]
+    },
+    "driver": {
+      "title": "Driver",
+      "description": "Representing centralized drivers in PMJ Trang.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string" },
+        "avatarColor": { "type": "string" }
+      },
+      "required": ["id", "name", "phone", "status", "avatarColor"]
+    },
+    "booking": {
+      "title": "Booking",
+      "description": "Request for centralized vehicle in PMJ Trang.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "permitNumber": { "type": "string" },
+        "requesterName": { "type": "string" },
+        "requesterPosition": { "type": "string" },
+        "department": { "type": "string" },
+        "destination": { "type": "string" },
+        "purpose": { "type": "string" },
+        "passengersCount": { "type": "integer" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "vehicleId": { "type": "string" },
+        "driverId": { "type": "string" },
+        "status": { "type": "string" },
+        "approvedBy": { "type": "string" },
+        "approvedByPosition": { "type": "string" },
+        "caretakerName": { "type": "string" },
+        "caretakerPosition": { "type": "string" },
+        "remarks": { "type": "string" },
+        "startMileage": { "type": "integer" },
+        "endMileage": { "type": "integer" },
+        "createdAt": { "type": "string" }
+      },
+      "required": [
+        "id",
+        "permitNumber",
+        "requesterName",
+        "requesterPosition",
+        "department",
+        "destination",
+        "purpose",
+        "passengersCount",
+        "startDate",
+        "endDate",
+        "vehicleId",
+        "driverId",
+        "status",
+        "approvedBy",
+        "approvedByPosition",
+        "createdAt"
+      ]
+    },
+    "approver": {
+      "title": "Approver",
+      "description": "Authorized personnel to sign or approve vehicle bookings.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "position": { "type": "string" }
+      },
+      "required": ["id", "name", "position"]
+    },
+    "caretaker": {
+      "title": "Caretaker",
+      "description": "Authorized personnel in charge of vehicle administration and scheduling.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "position": { "type": "string" }
+      },
+      "required": ["id", "name", "position"]
+    }
+  },
+  "firestore": {
+    "/vehicles/{vehicleId}": {
+      "schema": "vehicle",
+      "description": "Collection of centralized government vehicles."
+    },
+    "/drivers/{driverId}": {
+      "schema": "driver",
+      "description": "Collection of designated drivers."
+    },
+    "/bookings/{bookingId}": {
+      "schema": "booking",
+      "description": "Collection of vehicle requests/bookings."
+    },
+    "/approvers/{approverId}": {
+      "schema": "approver",
+      "description": "Collection of authorized approvers."
+    },
+    "/caretakers/{caretakerId}": {
+      "schema": "caretaker",
+      "description": "Collection of vehicle caretakers."
+    }
+  }
+}
