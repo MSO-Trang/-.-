@@ -41,7 +41,7 @@ export default function DriverGoogleCalendar({
 }: DriverGoogleCalendarProps) {
   // Use May 2026 as default to match pre-populated data, but base it on current or target date
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date('2026-05-27T00:00:00'));
-  const [viewMode, setViewMode] = useState<'month' | 'week' | 'list'>('month');
+  const [viewMode, setViewMode] = useState<'month' | 'week' | 'day' | 'list'>('month');
   const [selectedDriverId, setSelectedDriverId] = useState<string>('ALL');
   const [selectedEvent, setSelectedEvent] = useState<Booking | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -86,6 +86,8 @@ export default function DriverGoogleCalendar({
         d.setMonth(d.getMonth() - 1);
       } else if (viewMode === 'week') {
         d.setDate(d.getDate() - 7);
+      } else if (viewMode === 'day') {
+        d.setDate(d.getDate() - 1);
       } else {
         d.setMonth(d.getMonth() - 1);
       }
@@ -100,6 +102,8 @@ export default function DriverGoogleCalendar({
         d.setMonth(d.getMonth() + 1);
       } else if (viewMode === 'week') {
         d.setDate(d.getDate() + 7);
+      } else if (viewMode === 'day') {
+        d.setDate(d.getDate() + 1);
       } else {
         d.setMonth(d.getMonth() + 1);
       }
@@ -298,6 +302,14 @@ export default function DriverGoogleCalendar({
               รายสัปดาห์
             </button>
             <button
+              onClick={() => setViewMode('day')}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition duration-150 cursor-pointer ${
+                viewMode === 'day' ? 'bg-white text-[#1a73e8] shadow-2xs' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              รายวัน
+            </button>
+            <button
               onClick={() => setViewMode('list')}
               className={`px-3 py-1.5 text-xs font-bold rounded-lg transition duration-150 cursor-pointer ${
                 viewMode === 'list' ? 'bg-white text-[#1a73e8] shadow-2xs' : 'text-slate-500 hover:text-slate-800'
@@ -375,6 +387,9 @@ export default function DriverGoogleCalendar({
               <span>
                 {weekDays[0].dayNum} {THAI_MONTHS_SHORT[weekDays[0].date.getMonth()]} - {weekDays[6].dayNum} {THAI_MONTHS_LONG[weekDays[6].date.getMonth()]} {weekDays[6].date.getFullYear() + 543}
               </span>
+            )}
+            {viewMode === 'day' && (
+              <span>วัน{THAI_DAYS_LONG[currentDate.getDay()]}ที่ {currentDate.getDate()} {THAI_MONTHS_LONG[currentDate.getMonth()]} {currentDate.getFullYear() + 543}</span>
             )}
             {viewMode === 'list' && (
               <span>รายการเดินทางสุทธิเดือน{THAI_MONTHS_LONG[currentDate.getMonth()]} {currentDate.getFullYear() + 543}</span>
@@ -636,6 +651,87 @@ export default function DriverGoogleCalendar({
                 );
               })
             )}
+          </div>
+        )}
+
+        {/* VIEW 4: DAILY TIMELINE VIEW */}
+        {viewMode === 'day' && (
+          <div className="space-y-4 animate-fade-in duration-300">
+            {/* Header for the selected day */}
+            <div className="bg-[#1a73e8]/5 border border-[#1a73e8]/10 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-[#1a73e8] text-white flex flex-col items-center justify-center rounded-xl font-sans shrink-0">
+                  <span className="text-[10px] font-bold uppercase leading-none">{THAI_DAYS_MINI[currentDate.getDay()]}</span>
+                  <span className="text-lg font-black leading-none mt-1">{currentDate.getDate()}</span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800 leading-tight">
+                    วัน{THAI_DAYS_LONG[currentDate.getDay()]}ที่ {currentDate.getDate()} {THAI_MONTHS_LONG[currentDate.getMonth()]} พ.ศ. {currentDate.getFullYear() + 543}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
+                    มีคิวงานตารางเดินทางทั้งสิ้น {getDayBookings(currentDate.toISOString().substring(0, 10)).length} รายการ
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleToday}
+                className="text-xs font-bold text-[#1a73e8] hover:bg-[#1a73e8]/10 bg-white border border-[#1a73e8]/25 px-3 py-1.5 rounded-xl shadow-2xs cursor-pointer"
+              >
+                กลับไปที่วันนี้ปัจจุบัน
+              </button>
+            </div>
+
+            {/* List of day bookings */}
+            <div className="space-y-3 min-h-[250px]">
+              {getDayBookings(currentDate.toISOString().substring(0, 10)).length === 0 ? (
+                <div className="h-44 flex flex-col items-center justify-center border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 text-slate-400 text-xs font-medium">
+                  <CalendarIcon size={32} className="text-slate-300 mb-2" />
+                  <p>ไม่มีรายการกิจกรรมเดินทางในวันนี้</p>
+                </div>
+              ) : (
+                getDayBookings(currentDate.toISOString().substring(0, 10)).map(b => {
+                  const driver = b.driverId === 'self-drive' ? { name: 'ขับเอง' } : drivers.find(d => d.id === b.driverId);
+                  const v = vehicles.find(veh => veh.id === b.vehicleId);
+                  return (
+                    <div
+                      key={b.id}
+                      onClick={() => setSelectedEvent(b)}
+                      className={`p-4 rounded-2xl border transition duration-150 hover:shadow-xs cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${getEventBadgeColor(b.status, b.driverId)}`}
+                    >
+                      <div className="flex items-start gap-4 min-w-0">
+                        <div className="p-2 bg-white/85 rounded-xl text-slate-800 border shadow-3xs shrink-0 mt-0.5 flex flex-col items-center justify-center min-w-[65px] h-[55px] border-slate-150">
+                          <Clock size={13} className="text-[#1a73e8] mb-0.5" />
+                          <span className="text-xs font-black font-mono text-slate-800">{formatTime(b.startDate)}</span>
+                        </div>
+                        <div className="min-w-0">
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase ${
+                            b.status === 'completed' ? 'bg-emerald-500 text-white' :
+                            b.status === 'pending' ? 'bg-amber-400 text-slate-900 font-extrabold animate-pulse' : 'bg-[#1a73e8] text-white'
+                          }`}>
+                            {b.status === 'completed' ? 'เสร็จสิ้น' : b.status === 'pending' ? 'รออนุมัติ' : 'อนุมัติแล้ว'}
+                          </span>
+                          <h4 className="text-sm font-extrabold text-slate-950 mt-1.5 leading-snug truncate">
+                            {b.destination}
+                          </h4>
+                          <p className="text-xs text-slate-600 mt-0.5 leading-relaxed font-semibold truncate">{b.purpose}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap sm:flex-col items-end gap-2 sm:gap-0.5 shrink-0 w-full sm:w-auto border-t sm:border-0 pt-3 sm:pt-0 border-slate-200/50 text-xs">
+                        <div className="flex items-center gap-1.5 font-extrabold text-slate-900">
+                          <User size={12} className="text-slate-400" />
+                          <span>คนขับ: {driver?.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 font-bold text-slate-600 sm:mt-1">
+                          <Car size={12} className="text-slate-400" />
+                          <span className="font-mono text-[10px] bg-white/70 px-1.5 py-0.5 rounded border border-slate-200">{v?.name} ({v?.plateNumber || '-'})</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
 
