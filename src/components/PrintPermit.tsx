@@ -111,7 +111,7 @@ export default function PrintPermit({
         
         {/* Actual A4 Page Style Document (TH Sarabun setup) */}
         <div 
-          className="bg-white w-[210mm] min-h-[297mm] p-[18mm] text-black border border-slate-300 shadow-md relative overflow-hidden font-sarabun leading-tight print:shadow-none print:border-none print:p-0 print:w-full print:min-h-0"
+          className="bg-white w-[210mm] min-h-[297mm] p-[18mm] text-black border border-slate-300 shadow-md relative overflow-hidden font-sarabun leading-tight print:shadow-none print:border-none print:p-0 print:w-full print:min-h-[297mm] flex flex-col"
           style={{ 
             fontFamily: '"TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif',
             fontSize: '12pt',
@@ -267,6 +267,25 @@ export default function PrintPermit({
               </div>
 
             </div>
+
+            {/* Flexible spacer to push passenger list and footer to the bottom */}
+            <div className="flex-grow min-h-[16px]"></div>
+
+            {/* Passenger List Box if any exists */}
+            {booking.passengersList && booking.passengersList.filter(name => name.trim() !== '').length > 0 && (
+              <div className="mt-4 pt-3 border-t border-dashed border-slate-300" style={{ fontSize: '9pt' }}>
+                <p className="font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
+                  <span>👥 รายชื่อผู้เข้าร่วมเดินทาง ({booking.passengersList.filter(name => name.trim() !== '').length} คน):</span>
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-slate-700 font-medium">
+                  {booking.passengersList.filter(name => name.trim() !== '').map((name, idx) => (
+                    <div key={idx} className="truncate">
+                      <span className="font-bold text-slate-400 font-mono mr-1">{idx + 1}.</span> {name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Bottom-most footer metadata */}
             <div className="pt-4 mt-2 text-center text-[10pt] text-slate-400 font-mono border-t border-slate-100 flex justify-between items-center print:pt-3">

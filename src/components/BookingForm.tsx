@@ -69,6 +69,7 @@ export default function BookingForm({
     destination: '',
     purpose: '',
     passengersCount: 1,
+    passengersList: [] as string[],
     startDate: '',
     endDate: '',
     vehicleId: '',
@@ -360,6 +361,7 @@ export default function BookingForm({
         destination: bookingToEdit.destination,
         purpose: bookingToEdit.purpose,
         passengersCount: bookingToEdit.passengersCount,
+        passengersList: bookingToEdit.passengersList || [],
         startDate: formatForInput(bookingToEdit.startDate),
         endDate: formatForInput(bookingToEdit.endDate),
         vehicleId: bookingToEdit.vehicleId,
@@ -613,6 +615,7 @@ export default function BookingForm({
       destination: formData.destination,
       purpose: formData.purpose,
       passengersCount: formData.passengersCount,
+      passengersList: formData.passengersList || [],
       startDate: new Date(formData.startDate).toISOString(),
       endDate: formData.endDate ? new Date(formData.endDate).toISOString() : '',
       vehicleId: formData.vehicleId,
@@ -1006,6 +1009,38 @@ export default function BookingForm({
                   <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-700 rounded-lg text-[10px] font-bold flex items-center gap-1.5 mt-1 animate-pulse">
                     <AlertTriangle size={12} className="shrink-0" />
                     จำนวนคน ({formData.passengersCount} ราย) เกินความจุของรถ {selectedVehicleObj.name} ({selectedVehicleObj.capacity} ที่นั่ง)
+                  </div>
+                )}
+
+                {/* รายชื่อผู้เดินทางร่วมเพิ่มเติม 1-13 คน */}
+                {formData.passengersCount > 1 && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 animate-fade-in">
+                    <h5 className="text-xs font-bold text-slate-700 flex items-center gap-1.5 mb-2.5">
+                      👥 รายชื่อผู้เข้าร่วมเดินทางร่วม ({Math.min(13, formData.passengersCount - 1)} คน)
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {Array.from({ length: Math.min(13, formData.passengersCount - 1) }).map((_, idx) => {
+                        const val = formData.passengersList?.[idx] || '';
+                        return (
+                          <div key={idx} className="relative">
+                            <span className="absolute left-3 top-2.5 text-[10px] text-slate-400 font-bold font-mono">
+                              {idx + 1}.
+                            </span>
+                            <input
+                              type="text"
+                              placeholder={`ชื่อ-นามสกุล ผู้ร่วมเดินทางคนที่ ${idx + 1}`}
+                              value={val}
+                              onChange={(e) => {
+                                const listStr = [...(formData.passengersList || [])];
+                                listStr[idx] = e.target.value;
+                                setFormData(prev => ({ ...prev, passengersList: listStr }));
+                              }}
+                              className="w-full text-xs font-semibold pl-8 pr-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-200 focus:border-[#a22055] transition text-slate-800"
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
