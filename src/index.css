@@ -6,3 +6,15 @@
   --font-sarabun: "TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif;
 }
 
+/* Increase the base root font size so all rem-based typography scales up across the entire web app */
+html {
+  font-size: 112.5% !important; /* Scales 16px to 18px */
+}
+
+/* Keep original scale when printing to prevent document overflows or clipping */
+@media print {
+  html {
+    font-size: 100% !important;
+  }
+}
+

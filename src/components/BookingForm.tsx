@@ -1057,7 +1057,7 @@ export default function BookingForm({
               <div className="h-6 w-1 rounded-full bg-[#a22055]" />
               <div className="flex items-center gap-2">
                 <Car size={18} className="text-[#a22055]" />
-                <h3 className="text-base font-extrabold text-slate-800 font-sans">
+                <h3 className="text-base font-bold text-slate-800 font-sans">
                   ส่วนที่ 3 : จัดสรรยานพาหนะและระบุพนักงานประจำรถราชการ
                 </h3>
               </div>
@@ -1066,8 +1066,8 @@ export default function BookingForm({
             {/* Visual Vehicle Cards Selection Grid */}
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                <label className="text-xs font-black text-slate-700 uppercase tracking-widest block flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center bg-[#a22055]/10 text-[#a22055] text-[10px] w-5 h-5 rounded-full font-black">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-widest block flex items-center gap-1.5">
+                  <span className="inline-flex items-center justify-center bg-[#a22055]/10 text-[#a22055] text-[10px] w-5 h-5 rounded-full font-bold">
                     1
                   </span>
                   <span>เลือกยานพาหนะราชการ (6 คันในคลังส่วนกลาง)</span>
@@ -1124,7 +1124,7 @@ export default function BookingForm({
                           }`}>
                             {translateVehicleType(v.type)}
                           </span>
-                          <h4 className="text-xs sm:text-[13px] font-extrabold text-slate-800 leading-snug">
+                          <h4 className="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug">
                             {v.name}
                           </h4>
                         </div>
@@ -1135,7 +1135,7 @@ export default function BookingForm({
                       
                       <div className="flex items-center gap-2 mt-2">
                         <div className="inline-flex bg-white border border-slate-300 rounded-md px-2 py-0.5 shadow-3xs">
-                          <span className="text-[10px] font-black text-slate-800 font-sans tracking-tight">
+                          <span className="text-[10px] font-bold text-slate-800 font-sans tracking-tight">
                             {v.plateNumber}
                           </span>
                         </div>
@@ -1147,19 +1147,19 @@ export default function BookingForm({
                       
                       <div className="mt-3 pt-2 border-t border-slate-100/70 flex items-center justify-between">
                         {isConflict ? (
-                          <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-rose-50 text-rose-600 border border-rose-100/60 flex items-center gap-1 leading-none">
+                          <span className="text-[10px] font-semibold px-1.5 py-1 rounded-md bg-rose-50 text-rose-600 border border-rose-100/60 flex items-center gap-1 leading-none">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                             ติดภารกิจอื่น
                           </span>
                         ) : (
-                          <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100/60 flex items-center gap-1 leading-none">
+                          <span className="text-[10px] font-semibold px-1.5 py-1 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100/60 flex items-center gap-1 leading-none">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-550" />
                             ว่างพร้อมใช้
                           </span>
                         )}
                         
                         {isSelected && (
-                          <span className="text-[10px] font-extrabold text-[#a22055] flex items-center gap-1">
+                          <span className="text-[10px] font-semibold text-[#a22055] flex items-center gap-1">
                             ✓ เลือกอยู่
                           </span>
                         )}
