@@ -376,11 +376,11 @@ export default function BookingForm({
         endMileage: bookingToEdit.endMileage !== undefined ? String(bookingToEdit.endMileage) : ''
       });
     } else {
-      // Create mode: pre-fill dates with today & tomorrow, and auto-run permit number
+      // Create mode: pre-fill dates starting from current time
       const nextNum = generateNextPermitNumber(bookings);
       const now = new Date();
-      const defaultStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 30);
-      const defaultEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 16, 30);
+      const defaultStart = now;
+      const defaultEnd = new Date(now.getTime() + 4 * 60 * 60 * 1000); // Default to 4 hours from now
       
       const defaultVehicleId = vehicles[0]?.id || '';
       const autoStartMileage = defaultVehicleId ? getLastVehicleMileage(defaultVehicleId) : 0;

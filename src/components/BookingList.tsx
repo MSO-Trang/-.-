@@ -540,8 +540,21 @@ export default function BookingList({
                       </td>
 
                       {/* Capacity */}
-                      <td className="py-2 px-1.5 text-center font-bold text-slate-705 whitespace-nowrap">
-                        👤 {b.passengersCount} คน
+                      <td className="py-2 px-1.5 text-center font-bold text-slate-705 whitespace-nowrap relative group">
+                        <span className="cursor-help hover:text-[#a22055] transition border-b border-dotted border-slate-350 pb-0.5">
+                          👤 {b.passengersCount} คน
+                        </span>
+                        {b.passengersList && b.passengersList.filter(name => name.trim() !== '').length > 0 && (
+                          <div className="absolute z-60 hidden group-hover:block bg-slate-900 text-white text-[11px] p-2.5 rounded-xl shadow-xl -top-1 left-1/2 -translate-x-1/2 -translate-y-full min-w-[200px] text-left border border-slate-700 pointer-events-none">
+                            <p className="font-bold border-b border-slate-700 pb-1 mb-1 text-pink-400">📋 รายชื่อผู้ร่วมเดินทาง:</p>
+                            <ul className="space-y-0.5 font-semibold list-decimal list-inside text-slate-250">
+                              {b.passengersList.filter(name => name.trim() !== '').map((name, i) => (
+                                <li key={i} className="truncate">{name}</li>
+                              ))}
+                            </ul>
+                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 border-r border-b border-slate-700 rotate-45"></div>
+                          </div>
+                        )}
                       </td>
 
                       {/* Departure and returns */}

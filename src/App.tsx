@@ -549,18 +549,6 @@ export default function App() {
           </button>
 
           <button
-            onClick={() => setActiveTab('bookings')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
-              activeTab === 'bookings'
-                ? 'bg-[#a22055] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
-            }`}
-          >
-            <FileText size={15} />
-            คลังใบขอใช้รถ
-          </button>
-
-          <button
             onClick={handleStartCreateMode}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
               activeTab === 'form' && !editingBooking
@@ -570,6 +558,18 @@ export default function App() {
           >
             <PlusCircle size={15} />
             เขียนใบขอใช้รถยนต์ใหม่
+          </button>
+
+          <button
+            onClick={() => setActiveTab('bookings')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
+              activeTab === 'bookings'
+                ? 'bg-[#a22055] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
+            }`}
+          >
+            <FileText size={15} />
+            คลังใบขอใช้รถ
           </button>
 
           <button
