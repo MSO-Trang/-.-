@@ -198,7 +198,11 @@ export default function PrintPermit({
 
             <div className="pt-2 flex justify-end text-center">
               <div className="w-80 leading-normal">
-                <p>ลงชื่อ .............................................................. ผู้ขออนุมัติใช้งาน</p>
+                <p className="flex items-baseline justify-center">
+                  <span className="w-24 text-right pr-1 shrink-0">ลงชื่อ</span>
+                  <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
+                  <span className="w-24 text-left pl-1 shrink-0">ผู้ขออนุมัติใช้งาน</span>
+                </p>
                 <div className="text-[12.5pt] text-slate-600 mt-1 font-semibold leading-tight">
                   ( {booking.requesterName} )
                   <br />
@@ -225,11 +229,15 @@ export default function PrintPermit({
                   </div>
                   
                   <div className="pt-2.5 text-center leading-normal">
-                    <p>ลงชื่อ ......................................................... ผู้ควบคุมการใช้รถ</p>
-                    <p className="font-bold mt-1 mx-auto" style={{ width: '241.812px', height: '22px' }}>
-                      ( {booking.caretakerName || '...................................................'} )
+                    <p className="flex items-baseline justify-center">
+                      <span className="w-24 text-right pr-1 shrink-0">ลงชื่อ</span>
+                      <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
+                      <span className="w-24 text-left pl-1 shrink-0 truncate">ผู้ควบคุมการใช้รถ</span>
                     </p>
-                    <p className="text-[11pt] text-slate-500 mx-auto" style={{ width: '243.797px' }}>
+                    <p className="font-bold mt-1 mx-auto text-center" style={{ width: '180px', fontSize: '11.5pt' }}>
+                      ( {booking.caretakerName || '..........................................................'} )
+                    </p>
+                    <p className="text-[10.5pt] text-slate-500 mx-auto text-center leading-tight mt-0.5" style={{ width: '180px' }}>
                       {booking.caretakerPosition || 'นักวิชาการจัดดูแลยานพาหนะ'}
                     </p>
                   </div>
@@ -255,11 +263,15 @@ export default function PrintPermit({
                   </div>
 
                   <div className="pt-2.5 text-center leading-normal">
-                    <p>ลงชื่อ ......................................................... ผู้มีอำนาจสั่งใช้รถ</p>
-                    <p className="font-bold mt-1 mx-auto" style={{ width: '278.812px' }}>
+                    <p className="flex items-baseline justify-center">
+                      <span className="w-24 text-right pr-1 shrink-0">ลงชื่อ</span>
+                      <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
+                      <span className="w-24 text-left pl-1 shrink-0 truncate">ผู้มีอำนาจสั่งใช้รถ</span>
+                    </p>
+                    <p className="font-bold mt-1 mx-auto text-center" style={{ width: '180px', fontSize: '11.5pt' }}>
                       ( {booking.approvedBy} )
                     </p>
-                    <p className="text-[11pt] text-slate-500 mx-auto" style={{ width: '288.812px' }}>
+                    <p className="text-[10.5pt] text-slate-500 mx-auto text-center leading-tight mt-0.5" style={{ width: '180px' }}>
                       {booking.approvedByPosition}
                     </p>
                   </div>

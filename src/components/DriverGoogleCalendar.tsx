@@ -39,13 +39,22 @@ export default function DriverGoogleCalendar({
   onUpdateStatus,
   onCompleteBookingWithMileage
 }: DriverGoogleCalendarProps) {
-  // Use May 2026 as default to match pre-populated data, but base it on current or target date
-  const [currentDate, setCurrentDate] = useState<Date>(() => new Date('2026-05-27T00:00:00'));
+  // Use current date as default
+  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
   const [viewMode, setViewMode] = useState<'month' | 'week' | 'day' | 'list'>('month');
   const [selectedDriverId, setSelectedDriverId] = useState<string>('ALL');
   const [selectedEvent, setSelectedEvent] = useState<Booking | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncSuccess, setSyncSuccess] = useState<boolean>(false);
+
+  // Get today's local date string in YYYY-MM-DD
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const date = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${date}`;
+  }, []);
 
   // Local mileage editor states
   const [localStartMileage, setLocalStartMileage] = useState<string>('');
@@ -112,7 +121,7 @@ export default function DriverGoogleCalendar({
   };
 
   const handleToday = () => {
-    setCurrentDate(new Date('2026-05-27T00:00:00'));
+    setCurrentDate(new Date());
   };
 
   // Google Calendar style Sync simulations
@@ -468,7 +477,7 @@ export default function DriverGoogleCalendar({
             <div className="grid grid-cols-7 gap-1 border-b border-r border-slate-100 bg-slate-100/50 rounded-b-xl overflow-hidden shadow-xs">
               {monthDays.map((cell, idx) => {
                 const dayBookings = getDayBookings(cell.isoStr);
-                const isToday = cell.isoStr === '2026-05-27'; // Fixed system context/local mock today
+                const isToday = cell.isoStr === todayStr; // Dynamic local current date
                 const hasBookings = dayBookings.length > 0;
 
                 return (
@@ -528,7 +537,7 @@ export default function DriverGoogleCalendar({
             {/* Days header column */}
             <div className="grid grid-cols-7 gap-2 text-center">
               {weekDays.map(cell => {
-                const isToday = cell.isoStr === '2026-05-27';
+                const isToday = cell.isoStr === todayStr;
                 return (
                   <div 
                     key={cell.isoStr} 
@@ -554,7 +563,7 @@ export default function DriverGoogleCalendar({
             <div className="grid grid-cols-7 gap-2 mt-4 bg-slate-50/50 p-2.5 rounded-2xl border border-slate-200/60 min-h-[350px]">
               {weekDays.map(cell => {
                 const dayBookings = getDayBookings(cell.isoStr);
-                const isToday = cell.isoStr === '2026-05-27';
+                const isToday = cell.isoStr === todayStr;
 
                 return (
                   <div key={cell.isoStr} className={`space-y-2.5 min-h-[300px] flex flex-col justify-start rounded-xl p-1.5 relative ${
