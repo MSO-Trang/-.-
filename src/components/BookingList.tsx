@@ -164,6 +164,9 @@ export default function BookingList({
     // Find the vehicle's last mileage to pre-fill start mileage if it isn't set yet
     let defaultStart = booking.startMileage;
     if (defaultStart === undefined || defaultStart === null) {
+      const targetVehicle = vehicles.find(v => v.id === booking.vehicleId);
+      const vehicleBaseMileage = targetVehicle?.mileage || 0;
+
       // Look up previous mileage (similar to BookingForm, but we can do it locally)
       const priorBookings = bookings.filter(
         b => b.vehicleId === booking.vehicleId && b.id !== booking.id && b.status !== 'cancelled' && b.status !== 'rejected'
@@ -172,20 +175,20 @@ export default function BookingList({
         const sorted = [...priorBookings].sort(
           (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
         );
-        let foundMil = 0;
+        let foundMil = vehicleBaseMileage;
         for (const pb of sorted) {
-          if (pb.endMileage !== undefined && pb.endMileage !== null && pb.endMileage > 0) {
+          if (pb.endMileage !== undefined && pb.endMileage !== null && pb.endMileage > vehicleBaseMileage) {
             foundMil = pb.endMileage;
             break;
           }
-          if (pb.startMileage !== undefined && pb.startMileage !== null && pb.startMileage > 0) {
+          if (pb.startMileage !== undefined && pb.startMileage !== null && pb.startMileage > vehicleBaseMileage) {
             foundMil = pb.startMileage;
             break;
           }
         }
         defaultStart = foundMil;
       } else {
-        defaultStart = 0;
+        defaultStart = vehicleBaseMileage;
       }
     }
     setMileageModalBooking(booking);
@@ -198,7 +201,7 @@ export default function BookingList({
     if (!mileageModalBooking) return;
     
     const startVal = parseInt(startMilInput, 10);
-    const endVal = parseInt(endMilInput, 15);
+    const endVal = parseInt(endMilInput, 10);
 
     if (isNaN(startVal) || startVal < 0) {
       setMilError('กรุณากรอกเลขไมล์เริ่มต้นให้ถูกต้อง');

@@ -10,7 +10,7 @@ import {
   deleteDoc, 
   getDocs 
 } from 'firebase/firestore';
-import { Booking, Vehicle, Driver, Approver, Caretaker } from '../types';
+import { Booking, Vehicle, Driver, Approver, Caretaker, DepartmentHead } from '../types';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase
@@ -188,6 +188,24 @@ export async function deleteCaretakerFromFirestore(id: string) {
   }
 }
 
+export async function saveDepartmentHeadToFirestore(head: DepartmentHead) {
+  const path = `departmentHeads/${head.id}`;
+  try {
+    await setDoc(doc(db, 'departmentHeads', head.id), cleanForFirestore(head));
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+  }
+}
+
+export async function deleteDepartmentHeadFromFirestore(id: string) {
+  const path = `departmentHeads/${id}`;
+  try {
+    await deleteDoc(doc(db, 'departmentHeads', id));
+  } catch (err) {
+    handleFirestoreError(err, OperationType.DELETE, path);
+  }
+}
+
 // Watchers
 export function watchVehicles(callback: (vehicles: Vehicle[]) => void) {
   return onSnapshot(collection(db, 'vehicles'), (snapshot) => {
@@ -249,13 +267,26 @@ export function watchCaretakers(callback: (caretakers: Caretaker[]) => void) {
   });
 }
 
+export function watchDepartmentHeads(callback: (heads: DepartmentHead[]) => void) {
+  return onSnapshot(collection(db, 'departmentHeads'), (snapshot) => {
+    const list: DepartmentHead[] = [];
+    snapshot.forEach((doc) => {
+      list.push(doc.data() as DepartmentHead);
+    });
+    callback(list);
+  }, (error) => {
+    handleFirestoreError(error, OperationType.GET, 'departmentHeads');
+  });
+}
+
 // Initial upload of existing / localStorage data to Firestore if completely empty
 export async function bootstrapFirestoreIfEmpty(
   localBookings: Booking[],
   localVehicles: Vehicle[],
   localDrivers: Driver[],
   localApprovers: Approver[],
-  localCaretakers: Caretaker[]
+  localCaretakers: Caretaker[],
+  localDepartmentHeads: DepartmentHead[] = []
 ) {
   try {
     // Check bookings collection
@@ -300,6 +331,15 @@ export async function bootstrapFirestoreIfEmpty(
       console.log('Bootstrapping caretakers collection into Firestore...');
       for (const c of localCaretakers) {
         await saveCaretakerToFirestore(c);
+      }
+    }
+
+    // Check departmentHeads collection
+    const deptHeadsSn = await getDocs(collection(db, 'departmentHeads'));
+    if (deptHeadsSn.empty) {
+      console.log('Bootstrapping departmentHeads collection into Firestore...');
+      for (const h of localDepartmentHeads) {
+        await saveDepartmentHeadToFirestore(h);
       }
     }
   } catch (error) {

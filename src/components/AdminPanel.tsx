@@ -22,7 +22,7 @@ import {
   Route,
   History
 } from 'lucide-react';
-import { Vehicle, Driver, Approver, Caretaker, Booking } from '../types';
+import { Vehicle, Driver, Approver, Caretaker, Booking, DepartmentHead } from '../types';
 import ConfirmModal from './ConfirmModal';
 
 interface AdminPanelProps {
@@ -30,6 +30,7 @@ interface AdminPanelProps {
   drivers: Driver[];
   approvers: Approver[];
   caretakers: Caretaker[];
+  departmentHeads: DepartmentHead[];
   bookings: Booking[];
   onSaveVehicle: (vehicle: Vehicle) => void;
   onDeleteVehicle: (id: string) => void;
@@ -39,6 +40,8 @@ interface AdminPanelProps {
   onDeleteApprover: (id: string) => void;
   onSaveCaretaker: (caretaker: Caretaker) => void;
   onDeleteCaretaker: (id: string) => void;
+  onSaveDepartmentHead: (head: DepartmentHead) => void;
+  onDeleteDepartmentHead: (id: string) => void;
   onLogout?: () => void;
 }
 
@@ -47,6 +50,7 @@ export default function AdminPanel({
   drivers,
   approvers,
   caretakers,
+  departmentHeads = [],
   bookings = [],
   onSaveVehicle,
   onDeleteVehicle,
@@ -56,9 +60,11 @@ export default function AdminPanel({
   onDeleteApprover,
   onSaveCaretaker,
   onDeleteCaretaker,
+  onSaveDepartmentHead,
+  onDeleteDepartmentHead,
   onLogout
 }: AdminPanelProps) {
-  const [activeSubTab, setActiveSubTab] = useState<'vehicles' | 'drivers' | 'approvers' | 'caretakers' | 'trips'>('vehicles');
+  const [activeSubTab, setActiveSubTab] = useState<'vehicles' | 'drivers' | 'approvers' | 'caretakers' | 'departmentHeads' | 'trips'>('vehicles');
   const [tripVehicleFilter, setTripVehicleFilter] = useState<string>('all');
   const [tripSearch, setTripSearch] = useState<string>('');
   const [tripStatusFilter, setTripStatusFilter] = useState<string>('all');
@@ -87,22 +93,26 @@ export default function AdminPanel({
   const [driverForm, setDriverForm] = useState<Partial<Driver> | null>(null);
   const [approverForm, setApproverForm] = useState<Partial<Approver> | null>(null);
   const [caretakerForm, setCaretakerForm] = useState<Partial<Caretaker> | null>(null);
+  const [departmentHeadForm, setDepartmentHeadForm] = useState<Partial<DepartmentHead> | null>(null);
   
   // Validation errors
   const [vehicleErrors, setVehicleErrors] = useState<{ [key: string]: string }>({});
   const [driverErrors, setDriverErrors] = useState<{ [key: string]: string }>({});
   const [approverErrors, setApproverErrors] = useState<{ [key: string]: string }>({});
   const [caretakerErrors, setCaretakerErrors] = useState<{ [key: string]: string }>({});
+  const [departmentHeadErrors, setDepartmentHeadErrors] = useState<{ [key: string]: string }>({});
 
   const resetAllForms = () => {
     setVehicleForm(null);
     setDriverForm(null);
     setApproverForm(null);
     setCaretakerForm(null);
+    setDepartmentHeadForm(null);
     setVehicleErrors({});
     setDriverErrors({});
     setApproverErrors({});
     setCaretakerErrors({});
+    setDepartmentHeadErrors({});
   };
 
   // Get all bookings with assigned vehicles for Trip Records (Completed Only)
@@ -131,8 +141,10 @@ export default function AdminPanel({
 
   const filteredTotalKm = React.useMemo(() => {
     return vehicleTripsGroup.reduce((sum, b) => {
-      const hasMileage = b.startMileage !== undefined && b.endMileage !== undefined && b.startMileage > 0 && b.endMileage > 0;
-      return sum + (hasMileage ? (b.endMileage! - b.startMileage!) : 0);
+      const sMil = b.startMileage !== undefined && b.startMileage !== null ? Number(b.startMileage) : NaN;
+      const eMil = b.endMileage !== undefined && b.endMileage !== null ? Number(b.endMileage) : NaN;
+      const hasMileage = !isNaN(sMil) && !isNaN(eMil) && eMil >= sMil && sMil >= 0 && eMil > 0;
+      return sum + (hasMileage ? (eMil - sMil) : 0);
     }, 0);
   }, [vehicleTripsGroup]);
 
@@ -143,15 +155,19 @@ export default function AdminPanel({
     let maxKmVehicleName = '';
 
     bookings.forEach(b => {
-      if (b.status === 'completed' && b.startMileage !== undefined && b.endMileage !== undefined) {
-        const diff = b.endMileage - b.startMileage;
-        if (diff > 0) {
-          totalKm += diff;
-          completedCount++;
-          if (diff > maxKm) {
-            maxKm = diff;
-            const veh = vehicles.find(v => v.id === b.vehicleId);
-            maxKmVehicleName = veh ? veh.plateNumber : '';
+      if (b.status === 'completed' && b.startMileage !== undefined && b.startMileage !== null && b.endMileage !== undefined && b.endMileage !== null) {
+        const sMil = Number(b.startMileage);
+        const eMil = Number(b.endMileage);
+        if (!isNaN(sMil) && !isNaN(eMil)) {
+          const diff = eMil - sMil;
+          if (diff > 0) {
+            totalKm += diff;
+            completedCount++;
+            if (diff > maxKm) {
+              maxKm = diff;
+              const veh = vehicles.find(v => v.id === b.vehicleId);
+              maxKmVehicleName = veh ? veh.plateNumber : '';
+            }
           }
         }
       }
@@ -325,6 +341,31 @@ export default function AdminPanel({
     setCaretakerErrors({});
   };
 
+  // DepartmentHead Submit
+  const handleDepartmentHeadSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!departmentHeadForm) return;
+
+    const errors: { [key: string]: string } = {};
+    if (!departmentHeadForm.name?.trim()) errors.name = 'กรุณากรอกชื่อและนามสกุลหัวหน้ากลุ่ม/ฝ่าย';
+    if (!departmentHeadForm.position?.trim()) errors.position = 'กรุณากรอกตำแหน่งราชการ';
+
+    if (Object.keys(errors).length > 0) {
+      setDepartmentHeadErrors(errors);
+      return;
+    }
+
+    const completedHead: DepartmentHead = {
+      id: departmentHeadForm.id || `H${Date.now()}`,
+      name: departmentHeadForm.name || '',
+      position: departmentHeadForm.position || ''
+    };
+
+    onSaveDepartmentHead(completedHead);
+    setDepartmentHeadForm(null);
+    setDepartmentHeadErrors({});
+  };
+
   return (
     <div className="space-y-6" id="admin-panel-view">
       
@@ -403,6 +444,20 @@ export default function AdminPanel({
             >
               <FileSignature size={13} />
               เจ้าหน้าที่จัดดูแลฯ ({caretakers.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveSubTab('departmentHeads');
+                resetAllForms();
+              }}
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
+                activeSubTab === 'departmentHeads' 
+                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <User size={13} />
+              หัวหน้ากลุ่ม/ฝ่าย ({departmentHeads.length})
             </button>
             <button
               onClick={() => {
@@ -1240,6 +1295,177 @@ export default function AdminPanel({
         </div>
       )}
 
+      {activeSubTab === 'departmentHeads' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+          
+          {/* List of Department Heads */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-slate-950 flex items-center gap-2 font-sans">
+                  <User size={18} className="text-[#a22055]" />
+                  รายชื่อหัวหน้ากลุ่มงาน / ฝ่าย
+                </h3>
+                <button
+                  onClick={() => {
+                    resetAllForms();
+                    setDepartmentHeadForm({
+                      name: '',
+                      position: ''
+                    });
+                  }}
+                  className="px-3 py-1.5 bg-[#a22055] hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm border border-pink-500 cursor-pointer"
+                >
+                  <Plus size={14} />
+                  เพิ่มหัวหน้าใหม่
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {departmentHeads.map((head) => (
+                  <div 
+                    key={head.id} 
+                    className="border border-pink-100 hover:border-pink-200 bg-white rounded-lg p-4 transition flex flex-col justify-between animate-fade-in"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-sans font-bold text-xs text-[#a22055] bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
+                          หัวหน้ากลุ่ม/ฝ่าย
+                        </span>
+                      </div>
+                      <h4 className="font-extrabold text-slate-900 text-sm mt-2 font-sans">{head.name}</h4>
+                      <p className="text-xs text-slate-500 mt-1 leading-normal font-medium">{head.position}</p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => {
+                          resetAllForms();
+                          setDepartmentHeadForm(head);
+                        }}
+                        className="p-1.5 hover:bg-pink-50/50 border border-slate-200 text-slate-655 hover:text-[#a22055] rounded transition flex items-center gap-1 text-xs font-bold cursor-pointer"
+                        title="แก้ไขข้อมูลหัวหน้า"
+                      >
+                        <Edit2 size={13} />
+                        แก้ไข
+                      </button>
+                      <button
+                        onClick={() => {
+                          setConfirmState({
+                            isOpen: true,
+                            title: 'ยืนยันลบข้อมูลผู้ดำรงตำแหน่งหัวหน้า',
+                            message: `คุณต้องการลบข้อมูลหัวหน้ากลุ่ม/ฝ่าย "${head.name}" ออกจากระบบพมจ. ใช่หรือไม่?`,
+                            confirmText: 'ลบหัวหน้ากลุ่ม/ฝ่าย',
+                            type: 'danger',
+                            onConfirm: () => {
+                              onDeleteDepartmentHead(head.id);
+                              if (departmentHeadForm?.id === head.id) setDepartmentHeadForm(null);
+                              closeConfirm();
+                            }
+                          });
+                        }}
+                        className="p-1.5 hover:bg-red-50 border border-red-100 text-red-655 hover:text-red-800 rounded transition flex items-center gap-1 text-xs font-bold cursor-pointer"
+                        title="ลบหัวหน้า"
+                      >
+                        <Trash2 size={13} />
+                        ลบ
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Form Side panel */}
+          <div className="lg:col-span-1">
+            {departmentHeadForm ? (
+              <form onSubmit={handleDepartmentHeadSubmit} className="bg-pink-50/55 text-slate-850 border border-pink-100 rounded-lg p-5 shadow-sm space-y-4 animate-fade-in">
+                <div className="flex items-center justify-between border-b border-pink-100 pb-3">
+                  <h3 className="text-sm font-bold text-[#a22055] flex items-center gap-1.5 font-sans">
+                    <PlusCircle size={16} />
+                    {departmentHeadForm.id ? 'แก้ไขข้อมูลหัวหน้า' : 'เพิ่มหัวหน้าใหม่'}
+                  </h3>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setDepartmentHeadForm(null);
+                      setDepartmentHeadErrors({});
+                    }}
+                    className="p-1 hover:bg-pink-100/50 rounded text-slate-400 hover:text-pink-700 transition cursor-pointer"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <div className="space-y-3.5 text-xs text-slate-700">
+                  
+                  {/* Name Input */}
+                  <div className="space-y-1">
+                    <label className="block font-bold text-slate-800">ชื่อ-นามสกุล หัวหน้า</label>
+                    <input 
+                      type="text"
+                      value={departmentHeadForm.name || ''}
+                      onChange={(e) => setDepartmentHeadForm({ ...departmentHeadForm, name: e.target.value })}
+                      placeholder="เช่น นางเสาวลักษณ์ มลสวัสดิ์"
+                      className="w-full bg-white text-slate-900 py-2 px-3 border border-pink-200 rounded outline-none focus:ring-1 focus:ring-pink-550 font-medium"
+                    />
+                    {departmentHeadErrors.name && (
+                      <p className="text-[10px] text-red-500 font-semibold">{departmentHeadErrors.name}</p>
+                    )}
+                  </div>
+
+                  {/* Position Input */}
+                  <div className="space-y-1">
+                    <label className="block font-bold text-slate-800">ตำแหน่งงานราชการ</label>
+                    <input 
+                      type="text"
+                      value={departmentHeadForm.position || ''}
+                      onChange={(e) => setDepartmentHeadForm({ ...departmentHeadForm, position: e.target.value })}
+                      placeholder="เช่น หัวหน้ากลุ่มส่งเสริมและพัฒนา พมจ.ตรัง"
+                      className="w-full bg-white text-slate-900 py-2 px-3 border border-pink-200 rounded outline-none focus:ring-1 focus:ring-pink-550 font-medium"
+                    />
+                    {departmentHeadErrors.position && (
+                      <p className="text-[10px] text-red-500 font-semibold">{departmentHeadErrors.position}</p>
+                    )}
+                  </div>
+
+                </div>
+
+                <div className="pt-2 border-t border-pink-100 flex items-center justify-end gap-2.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDepartmentHeadForm(null);
+                      setDepartmentHeadErrors({});
+                    }}
+                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-655 hover:text-slate-850 rounded font-bold transition cursor-pointer font-sans"
+                  >
+                    ยกเลิก
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-[#a22055] hover:bg-pink-700 text-white rounded font-bold transition flex items-center gap-1 border border-pink-550 shadow-sm hover:shadow cursor-pointer font-sans"
+                  >
+                    <Save size={14} />
+                    บันทึกหัวหน้ากลุ่ม/ฝ่าย
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="bg-pink-50/10 border border-pink-100 rounded-lg p-6 text-center space-y-3 shadow-none">
+                <User className="text-[#a22055] mx-auto animate-pulse" size={42} />
+                <h4 className="text-sm font-bold text-slate-900 font-sans">จัดการหัวหน้ากลุ่มงาน/ฝ่าย</h4>
+                <p className="text-xs text-slate-500 leading-relaxed md:max-w-[250px] mx-auto font-sans">
+                  คุณสามารถเพิ่มหรือแก้ไข รายชื่อหัวหน้ากลุ่มงาน/ฝ่าย เพื่อลงความเห็นเห็นควรอนุญาตในใบขอยานพาหนะได้อย่างง่ายดาย
+                </p>
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
+
       {activeSubTab === 'trips' && (
         <div className="space-y-6">
           {/* Quick Summary Cards */}
@@ -1375,8 +1601,10 @@ export default function AdminPanel({
                       const matchedDriver = drivers.find(d => d.id === b.driverId);
                       
                       // Calculate distance
-                      const hasMileage = b.startMileage !== undefined && b.endMileage !== undefined && b.startMileage > 0 && b.endMileage > 0;
-                      const distance = hasMileage ? (b.endMileage! - b.startMileage!) : 0;
+                      const sMil = b.startMileage !== undefined && b.startMileage !== null ? Number(b.startMileage) : NaN;
+                      const eMil = b.endMileage !== undefined && b.endMileage !== null ? Number(b.endMileage) : NaN;
+                      const hasMileage = !isNaN(sMil) && !isNaN(eMil) && eMil >= sMil && sMil >= 0 && eMil > 0;
+                      const distance = hasMileage ? (eMil - sMil) : 0;
                       
                       // Status formatting
                       let statusBadgeStyle = '';

@@ -12,7 +12,7 @@ import {
   AlertCircle,
   Settings
 } from 'lucide-react';
-import { Booking, Vehicle, Driver, Approver, Caretaker } from './types';
+import { Booking, Vehicle, Driver, Approver, Caretaker, DepartmentHead } from './types';
 import { getStoredData, saveStoredData } from './data/initialData';
 import { MSDHS_LOGO_BASE64 } from './data/logoBase64';
 import Dashboard from './components/Dashboard';
@@ -36,11 +36,14 @@ import {
   deleteApproverFromFirestore, 
   saveCaretakerToFirestore, 
   deleteCaretakerFromFirestore, 
+  saveDepartmentHeadToFirestore,
+  deleteDepartmentHeadFromFirestore,
   watchBookings, 
   watchVehicles, 
   watchDrivers, 
   watchApprovers, 
-  watchCaretakers 
+  watchCaretakers,
+  watchDepartmentHeads 
 } from './utils/firebaseService';
 
 export default function App() {
@@ -54,6 +57,7 @@ export default function App() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [approvers, setApprovers] = useState<Approver[]>([]);
   const [caretakers, setCaretakers] = useState<Caretaker[]>([]);
+  const [departmentHeads, setDepartmentHeads] = useState<DepartmentHead[]>([]);
   
   // Selection states
   const [editingBooking, setEditingBooking] = useState<Booking | undefined>(undefined);
@@ -142,14 +146,15 @@ export default function App() {
     testConnection();
 
     // 2. Load immediate cached backup from LocalStorage
-    const { bookings: savedB, vehicles: savedV, drivers: savedD, approvers: savedA, caretakers: savedC } = getStoredData();
+    const { bookings: savedB, vehicles: savedV, drivers: savedD, approvers: savedA, caretakers: savedC, departmentHeads: savedH } = getStoredData();
     setBookings(savedB);
     setVehicles(savedV);
     setDrivers(savedD);
     setApprovers(savedA || []);
     setCaretakers(savedC || []);
+    setDepartmentHeads(savedH || []);
 
-    // 3. Setup real-time listeners for all 5 entities
+    // 3. Setup real-time listeners for all entities
     const unsubBookings = watchBookings((updatedBookings) => {
       const sorted = [...updatedBookings].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -178,8 +183,13 @@ export default function App() {
       localStorage.setItem('pmj_trang_caretakers', JSON.stringify(updatedCaretakers));
     });
 
+    const unsubDepartmentHeads = watchDepartmentHeads((updatedHeads) => {
+      setDepartmentHeads(updatedHeads);
+      localStorage.setItem('pmj_trang_department_heads', JSON.stringify(updatedHeads));
+    });
+
     // 4. Bootstrap Firestore on first-ever load if it's currently empty
-    bootstrapFirestoreIfEmpty(savedB, savedV, savedD, savedA || [], savedC || []);
+    bootstrapFirestoreIfEmpty(savedB, savedV, savedD, savedA || [], savedC || [], savedH || []);
 
     return () => {
       unsubBookings();
@@ -187,6 +197,7 @@ export default function App() {
       unsubDrivers();
       unsubApprovers();
       unsubCaretakers();
+      unsubDepartmentHeads();
     };
   }, []);
 
@@ -234,6 +245,12 @@ export default function App() {
     const isEdit = bookings.some(b => b.id === booking.id);
     try {
       await saveBookingToFirestore(booking);
+      if (booking.vehicleId && booking.status === 'completed' && booking.endMileage) {
+        const v = vehicles.find(v => v.id === booking.vehicleId);
+        if (v) {
+          await saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, booking.endMileage) });
+        }
+      }
       if (isEdit) {
         triggerToast(`ทำการบันทึกและรันใบจองเลขที่ ${booking.permitNumber} เรียบร้อยแล้ว`, 'success');
       } else {
@@ -254,6 +271,12 @@ export default function App() {
     const updated = { ...b, status };
     try {
       await saveBookingToFirestore(updated);
+      if (status === 'completed' && b.vehicleId && b.endMileage) {
+        const v = vehicles.find(v => v.id === b.vehicleId);
+        if (v) {
+          await saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, b.endMileage) });
+        }
+      }
       let ThaiStatus = 'ยกเลิกการเดินทาง';
       if (status === 'approved') ThaiStatus = 'อนุมัติการใช้ยานพาหนะ';
       if (status === 'pending') ThaiStatus = 'ตั้งสถานะกลับเป็นรออนุมัติ';
@@ -417,6 +440,34 @@ export default function App() {
       await deleteCaretakerFromFirestore(id);
       if (target) {
         triggerToast(`ลบเจ้าหน้าที่จัดดูแลยานพาหนะ ${target.name} เรียบร้อยแล้ว`, 'info');
+      }
+    } catch (err: any) {
+      triggerToast(`ลบข้อมูลล้มเหลว: ${err.message || err}`, 'error');
+    }
+  };
+
+  // Save DepartmentHead
+  const handleSaveDepartmentHead = async (head: DepartmentHead) => {
+    const isEdit = departmentHeads.some(h => h.id === head.id);
+    try {
+      await saveDepartmentHeadToFirestore(head);
+      if (isEdit) {
+        triggerToast(`อัปเดตข้อมูลหัวหน้ากลุ่ม/ฝ่าย ${head.name} สำเร็จ`, 'success');
+      } else {
+        triggerToast(`เพิ่มหัวหน้ากลุ่ม/ฝ่าย ${head.name} สำเร็จ`, 'success');
+      }
+    } catch (err: any) {
+      triggerToast(`บันทึกข้อมูลล้มเหลว: ${err.message || err}`, 'error');
+    }
+  };
+
+  // Delete DepartmentHead
+  const handleDeleteDepartmentHead = async (id: string) => {
+    const target = departmentHeads.find(h => h.id === id);
+    try {
+      await deleteDepartmentHeadFromFirestore(id);
+      if (target) {
+        triggerToast(`ลบหัวหน้ากลุ่ม/ฝ่าย ${target.name} เรียบร้อยแล้ว`, 'info');
       }
     } catch (err: any) {
       triggerToast(`ลบข้อมูลล้มเหลว: ${err.message || err}`, 'error');
@@ -679,6 +730,7 @@ export default function App() {
               drivers={drivers}
               approvers={approvers}
               caretakers={caretakers}
+              departmentHeads={departmentHeads}
               onSave={handleSaveBooking}
               onCancel={() => {
                 setEditingBooking(undefined);
@@ -717,6 +769,7 @@ export default function App() {
                 drivers={drivers}
                 approvers={approvers}
                 caretakers={caretakers}
+                departmentHeads={departmentHeads}
                 bookings={bookings}
                 onSaveVehicle={handleSaveVehicle}
                 onDeleteVehicle={handleDeleteVehicle}
@@ -726,6 +779,8 @@ export default function App() {
                 onDeleteApprover={handleDeleteApprover}
                 onSaveCaretaker={handleSaveCaretaker}
                 onDeleteCaretaker={handleDeleteCaretaker}
+                onSaveDepartmentHead={handleSaveDepartmentHead}
+                onDeleteDepartmentHead={handleDeleteDepartmentHead}
                 onLogout={handleAdminLogout}
               />
             ) : (

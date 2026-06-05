@@ -18,3 +18,10 @@ html {
   }
 }
 
+/* Force TH Sarabun font family on the entire government form page and all its descendants to override other font utilities */
+#government-form-paper,
+#government-form-paper * {
+  font-family: "TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif !important;
+}
+
+

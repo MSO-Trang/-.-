@@ -222,9 +222,13 @@ export default function Dashboard({
 
     filteredBookingsForStats.forEach(b => {
       if (b.status === 'completed' && b.startMileage !== undefined && b.startMileage !== null && b.endMileage !== undefined && b.endMileage !== null) {
-        const dist = b.endMileage - b.startMileage;
-        if (dist > 0) {
-          distances[b.vehicleId] = (distances[b.vehicleId] || 0) + dist;
+        const sMil = Number(b.startMileage);
+        const eMil = Number(b.endMileage);
+        if (!isNaN(sMil) && !isNaN(eMil)) {
+          const dist = eMil - sMil;
+          if (dist > 0) {
+            distances[b.vehicleId] = (distances[b.vehicleId] || 0) + dist;
+          }
         }
       }
     });

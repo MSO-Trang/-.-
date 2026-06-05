@@ -1,4 +1,4 @@
-import { Vehicle, Driver, Booking, Approver, Caretaker } from '../types';
+import { Vehicle, Driver, Booking, Approver, Caretaker, DepartmentHead } from '../types';
 
 export const INITIAL_VEHICLES: Vehicle[] = [
   {
@@ -119,6 +119,13 @@ export const INITIAL_CARETAKERS: Caretaker[] = [
   { id: 'C2', name: 'นางสาวสมใจ นึกมั่น', position: 'เจ้าหน้าที่กลุ่มงานอำนวยการ พมจ.ตรัง' }
 ];
 
+export const INITIAL_DEPARTMENT_HEADS: DepartmentHead[] = [
+  { id: 'H1', name: 'นางเสาวลักษณ์ มลสวัสดิ์', position: 'หัวหน้ากลุ่มการพัฒนาสังคมและสวัสดิการ' },
+  { id: 'H2', name: 'นายชัยยศ ศุภโชค', position: 'หัวหน้ากลุ่มนโยบายและวิชาการ' },
+  { id: 'H3', name: 'นางกนกพร สัจจารักษ์', position: 'หัวหน้าศูนย์บริการคนพิการ' },
+  { id: 'H4', name: 'นายสุมิตร นิรันดร์', position: 'หัวหน้าฝ่ายบริหารทั่วไป' }
+];
+
 export const APPROVERS = [
   { name: 'นางสาววิมลศรี สินประเสริฐ', position: 'พัฒนาสังคมและความมั่นคงของมนุษย์จังหวัดตรัง' },
   { name: 'นายสุมิตร นิรันดร์', position: 'หัวหน้ากลุ่มอำนวยการ (รักษาการแทนพัฒนาสังคมและความมั่นคงของมนุษย์จังหวัดตรัง)' },
@@ -216,7 +223,8 @@ export const getStoredData = () => {
       vehicles: INITIAL_VEHICLES, 
       drivers: INITIAL_DRIVERS,
       approvers: INITIAL_APPROVERS,
-      caretakers: INITIAL_CARETAKERS
+      caretakers: INITIAL_CARETAKERS,
+      departmentHeads: INITIAL_DEPARTMENT_HEADS
     };
   }
   
@@ -225,6 +233,7 @@ export const getStoredData = () => {
   const savedDrivers = localStorage.getItem('pmj_trang_drivers');
   const savedApprovers = localStorage.getItem('pmj_trang_approvers');
   const savedCaretakers = localStorage.getItem('pmj_trang_caretakers');
+  const savedDepartmentHeads = localStorage.getItem('pmj_trang_department_heads');
   
   const rawBookings: Booking[] = savedBookings ? JSON.parse(savedBookings) : INITIAL_BOOKINGS;
   
@@ -248,7 +257,8 @@ export const getStoredData = () => {
     vehicles: savedVehicles ? JSON.parse(savedVehicles) : INITIAL_VEHICLES,
     drivers: savedDrivers ? JSON.parse(savedDrivers) : INITIAL_DRIVERS,
     approvers: savedApprovers ? JSON.parse(savedApprovers) : INITIAL_APPROVERS,
-    caretakers: savedCaretakers ? JSON.parse(savedCaretakers) : INITIAL_CARETAKERS
+    caretakers: savedCaretakers ? JSON.parse(savedCaretakers) : INITIAL_CARETAKERS,
+    departmentHeads: savedDepartmentHeads ? JSON.parse(savedDepartmentHeads) : INITIAL_DEPARTMENT_HEADS
   };
 };
 
@@ -257,7 +267,8 @@ export const saveStoredData = (
   vehicles: Vehicle[], 
   drivers: Driver[], 
   approvers?: Approver[], 
-  caretakers?: Caretaker[]
+  caretakers?: Caretaker[],
+  departmentHeads?: DepartmentHead[]
 ) => {
   if (typeof window === 'undefined') return;
   localStorage.setItem('pmj_trang_bookings', JSON.stringify(bookings));
@@ -265,6 +276,7 @@ export const saveStoredData = (
   localStorage.setItem('pmj_trang_drivers', JSON.stringify(drivers));
   if (approvers) localStorage.setItem('pmj_trang_approvers', JSON.stringify(approvers));
   if (caretakers) localStorage.setItem('pmj_trang_caretakers', JSON.stringify(caretakers));
+  if (departmentHeads) localStorage.setItem('pmj_trang_department_heads', JSON.stringify(departmentHeads));
 };
 
 export const generateNextPermitNumber = (bookings: Booking[]): string => {

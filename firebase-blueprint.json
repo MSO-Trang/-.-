@@ -51,6 +51,8 @@
         "approvedByPosition": { "type": "string" },
         "caretakerName": { "type": "string" },
         "caretakerPosition": { "type": "string" },
+        "departmentHeadName": { "type": "string" },
+        "departmentHeadPosition": { "type": "string" },
         "remarks": { "type": "string" },
         "startMileage": { "type": "integer" },
         "endMileage": { "type": "integer" },
@@ -96,6 +98,17 @@
         "position": { "type": "string" }
       },
       "required": ["id", "name", "position"]
+    },
+    "departmentHead": {
+      "title": "DepartmentHead",
+      "description": "Authorized personnel in charge of a department or division who can recommend approval.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "position": { "type": "string" }
+      },
+      "required": ["id", "name", "position"]
     }
   },
   "firestore": {
@@ -118,6 +131,10 @@
     "/caretakers/{caretakerId}": {
       "schema": "caretaker",
       "description": "Collection of vehicle caretakers."
+    },
+    "/departmentHeads/{headId}": {
+      "schema": "departmentHead",
+      "description": "Collection of department heads."
     }
   }
 }

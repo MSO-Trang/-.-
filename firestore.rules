@@ -90,5 +90,11 @@ service cloud.firestore {
       allow create, update: if isValidId(caretakerId) && isValidCaretaker(incoming());
       allow delete: if isValidId(caretakerId);
     }
+
+    match /departmentHeads/{headId} {
+      allow read: if true;
+      allow create, update: if isValidId(headId) && isValidApprover(incoming());
+      allow delete: if isValidId(headId);
+    }
   }
 }

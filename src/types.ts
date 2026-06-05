@@ -38,6 +38,8 @@ export interface Booking {
   approvedByPosition: string;
   caretakerName?: string;
   caretakerPosition?: string;
+  departmentHeadName?: string;
+  departmentHeadPosition?: string;
   remarks?: string;
   startMileage?: number;
   endMileage?: number;
@@ -51,6 +53,12 @@ export interface Approver {
 }
 
 export interface Caretaker {
+  id: string;
+  name: string;
+  position: string;
+}
+
+export interface DepartmentHead {
   id: string;
   name: string;
   position: string;
