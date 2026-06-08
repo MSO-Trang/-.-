@@ -320,7 +320,7 @@ export default function BookingForm({
   };
   
   // Custom states for wizard / presentation
-  const [formMode, setFormMode] = useState<'step' | 'all'>('step');
+  const [formMode, setFormMode] = useState<'step' | 'all'>('all');
   const [currentStep, setCurrentStep] = useState(1);
 
   const handleSelectDestinationTag = (tag: string) => {
@@ -421,7 +421,6 @@ export default function BookingForm({
       const nextNum = generateNextPermitNumber(bookings);
       const now = new Date();
       const defaultStart = now;
-      const defaultEnd = new Date(now.getTime() + 4 * 60 * 60 * 1000); // Default to 4 hours from now
       
       const defaultVehicleId = vehicles[0]?.id || '';
       const autoStartMileage = defaultVehicleId ? getLastVehicleMileage(defaultVehicleId) : 0;
@@ -433,7 +432,7 @@ export default function BookingForm({
         ...prev,
         permitNumber: nextNum,
         startDate: formatForInput(defaultStart.toISOString()),
-        endDate: formatForInput(defaultEnd.toISOString()),
+        endDate: '',
         vehicleId: defaultVehicleId,
         driverId: drivers[0]?.id || '',
         approvedBy: approvers[0]?.name || '',
@@ -450,7 +449,7 @@ export default function BookingForm({
 
   // Live validation & overlap detection
   const vehicleConflicts = useMemo(() => {
-    if (!formData.vehicleId || !formData.startDate || !formData.endDate) return [];
+    if (!formData.vehicleId || !formData.startDate) return [];
     return findConflicts(
       bookings,
       formData.vehicleId,
@@ -462,7 +461,7 @@ export default function BookingForm({
   }, [formData.vehicleId, formData.startDate, formData.endDate, bookings, bookingToEdit]);
 
   const driverConflicts = useMemo(() => {
-    if (!formData.driverId || formData.driverId === 'self-drive' || !formData.startDate || !formData.endDate) return [];
+    if (!formData.driverId || formData.driverId === 'self-drive' || !formData.startDate) return [];
     return findConflicts(
       bookings,
       formData.driverId,
@@ -488,7 +487,8 @@ export default function BookingForm({
     if (checked) {
       const parentHead = departmentHeads.find(h => h.id === selectedDeptHeadId) || departmentHeads[0];
       if (parentHead) {
-        const newPos = parentHead.position.startsWith('แทน') ? parentHead.position : `แทน${parentHead.position}`;
+        const basePosition = parentHead.position;
+        const newPos = basePosition.startsWith('แทน') ? basePosition : `แทน${basePosition}`;
         setFormData(prev => ({
           ...prev,
           departmentHeadName: '',
@@ -512,7 +512,8 @@ export default function BookingForm({
     setSelectedDeptHeadId(newId);
     const selectedHead = departmentHeads.find(h => h.id === newId);
     if (selectedHead) {
-      const newPos = selectedHead.position.startsWith('แทน') ? selectedHead.position : `แทน${selectedHead.position}`;
+      const basePosition = selectedHead.position;
+      const newPos = basePosition.startsWith('แทน') ? basePosition : `แทน${basePosition}`;
       setFormData(prev => ({
         ...prev,
         departmentHeadPosition: newPos
@@ -546,8 +547,9 @@ export default function BookingForm({
       
       if (matchedHead) {
         setSelectedDeptHeadId(matchedHead.id || '');
+        const basePosition = matchedHead.position;
         if (isCustomDeptHead) {
-          const newPos = matchedHead.position.startsWith('แทน') ? matchedHead.position : `แทน${matchedHead.position}`;
+          const newPos = basePosition.startsWith('แทน') ? basePosition : `แทน${basePosition}`;
           setFormData(prev => ({
             ...prev,
             department: value,
@@ -558,7 +560,7 @@ export default function BookingForm({
             ...prev,
             department: value,
             departmentHeadName: matchedHead.name,
-            departmentHeadPosition: matchedHead.position
+            departmentHeadPosition: basePosition
           }));
         }
       } else {
@@ -832,37 +834,6 @@ export default function BookingForm({
 
         {/* Presentation Toggle & Action Row */}
         <div className="flex flex-wrap items-center gap-4 sm:self-end lg:self-center">
-          {/* Presentation Mode Switcher */}
-          <div className="flex bg-slate-100/80 border border-slate-200/50 p-1 rounded-2xl select-none">
-            <button
-              type="button"
-              onClick={() => {
-                setFormMode('step');
-                setCurrentStep(1);
-              }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all outline-none cursor-pointer ${
-                formMode === 'step'
-                  ? 'bg-white text-[#a22055] shadow-2xs font-extrabold'
-                  : 'text-slate-450 hover:text-slate-700'
-              }`}
-            >
-              <ClipboardList size={13} />
-              กรอกทีละขั้นตอน
-            </button>
-            <button
-              type="button"
-              onClick={() => setFormMode('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all outline-none cursor-pointer ${
-                formMode === 'all'
-                  ? 'bg-white text-[#a22055] shadow-2xs font-extrabold'
-                  : 'text-slate-450 hover:text-slate-700'
-              }`}
-            >
-              <Layers size={13} />
-              แสดงหน้าเดียวทั้งหมด
-            </button>
-          </div>
-
           <button
             type="button"
             onClick={onCancel}
@@ -898,64 +869,7 @@ export default function BookingForm({
 
       <form onSubmit={handleSubmit} className="space-y-8">
         
-        {/* Step-by-Step Interactive Stepper Header */}
-        {formMode === 'step' && (
-          <div className="bg-slate-50 border border-slate-200/60 p-4 rounded-3xl space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-black text-slate-700 tracking-wide uppercase flex items-center gap-1.5">
-                <span className="inline-block w-2.5 h-2.5 bg-[#a22055] rounded-full animate-pulse" />
-                ขั้นตอนการกรอกเอกสารจองรถ ({currentStep}/4)
-              </span>
-              <span className="text-[10px] text-slate-400 font-bold hidden sm:inline">
-                * สามารถคลิกรูปป้ายขั้นตอนด้านล่างเพื่อเลือกกระโดดข้ามหน้าแก้ไขได้ตามอิสระ
-              </span>
-            </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { id: 1, label: 'วันเวลา & ปลายทาง', icon: Calendar, desc: 'ส่วนที่ 1' },
-                { id: 2, label: 'ผู้เสนอขอ & คณะ', icon: Users, desc: 'ส่วนที่ 2' },
-                { id: 3, label: 'ยานพาหนะ & พลขับ', icon: Car, desc: 'ส่วนที่ 3' },
-                { id: 4, label: 'นายคลัง & ผู้อนุมัติ', icon: ShieldCheck, desc: 'ส่วนที่ 4' },
-              ].map((step) => {
-                const StepIcon = step.icon;
-                const isActive = currentStep === step.id;
-                const isCompleted = currentStep > step.id;
-                
-                return (
-                  <button
-                    key={step.id}
-                    type="button"
-                    onClick={() => {
-                      setCurrentStep(step.id);
-                    }}
-                    className={`text-left p-3 rounded-2xl border transition-all cursor-pointer select-none outline-none flex items-center gap-3 ${
-                      isActive
-                        ? 'border-[#a22055] bg-white ring-2 ring-[#a22055]/10 text-[#a22055] shadow-xs'
-                        : isCompleted
-                          ? 'border-emerald-200 bg-emerald-50/20 text-emerald-700 hover:bg-white'
-                          : 'border-slate-200/70 bg-white/70 hover:bg-slate-50 text-slate-500'
-                    }`}
-                  >
-                    <div className={`p-2 rounded-xl shrink-0 flex items-center justify-center ${
-                      isActive 
-                        ? 'bg-[#a22055] text-white' 
-                        : isCompleted 
-                          ? 'bg-emerald-500 text-white' 
-                          : 'bg-slate-100 text-slate-400'
-                    }`}>
-                      {isCompleted ? <Check size={14} className="stroke-[3]" /> : <StepIcon size={14} />}
-                    </div>
-                    <div className="min-w-0 pr-1">
-                      <span className="text-[9px] text-slate-400 font-bold block leading-none mb-1">{step.desc}</span>
-                      <span className="text-xs font-extrabold block leading-normal truncate">{step.label}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
         
         {/* =======================================
             STEP 1: journey timing and destination 
@@ -1835,13 +1749,15 @@ export default function BookingForm({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 block">ตำแหน่งระดับราชการ</label>
+                      <label className="text-xs font-bold text-slate-700 block">
+                        ตำแหน่งหัวหน้ากลุ่ม/ฝ่าย
+                      </label>
                       <input
                         type="text"
                         name="departmentHeadPosition"
                         value={formData.departmentHeadPosition}
-                        disabled
-                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-400 font-bold outline-none font-sans"
+                        onChange={handleChange}
+                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none font-sans bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
                       />
                     </div>
                   </div>
@@ -1881,12 +1797,15 @@ export default function BookingForm({
 
                       {/* 3. Result Position with "แทน" automatically prepended */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-700 block">ตำแหน่งราชการที่ปรากฏในใบคำขอ</label>
+                        <label className="text-xs font-bold text-slate-700 block">
+                          ตำแหน่งที่ปรากฏในใบคำขอ (หัวหน้ากลุ่ม/ฝ่าย)
+                        </label>
                         <input
                           type="text"
+                          name="departmentHeadPosition"
                           value={formData.departmentHeadPosition}
-                          disabled
-                          className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-100/80 text-rose-700 font-extrabold outline-none"
+                          onChange={handleChange}
+                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-extrabold outline-none bg-white text-rose-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
                         />
                       </div>
                     </div>
@@ -2042,60 +1961,23 @@ export default function BookingForm({
         )}
 
         {/* Action button controls */}
-        <div className="pt-6 border-t border-slate-100/70 flex flex-wrap items-center justify-between gap-4">
+        <div className="pt-6 border-t border-slate-100/70 flex flex-wrap items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2.5 border border-slate-200 text-slate-450 hover:text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold rounded-xl transition cursor-pointer"
+          >
+            ปิดยกเลิกไม่บันทึก
+          </button>
           
-          <div>
-            {formMode === 'step' && currentStep > 1 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setCurrentStep(prev => prev - 1);
-                  scrollToTop();
-                }}
-                className="px-4 py-2.5 border border-slate-200 text-slate-600 hover:text-slate-800 hover:bg-slate-50 text-xs sm:text-sm font-semibold rounded-xl transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <ChevronLeft size={16} />
-                ย้อนกลับขั้นตอนก่อนหน้า
-              </button>
-            )}
-          </div>
-
-          {/* Save / Next / Cancel buttons */}
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2.5 border border-slate-200 text-slate-450 hover:text-slate-700 hover:bg-slate-50 text-xs sm:text-sm font-semibold rounded-xl transition cursor-pointer"
-            >
-              ปิดยกเลิกไม่บันทึก
-            </button>
-            
-            {formMode === 'step' && currentStep < 4 ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (validateStep(currentStep)) {
-                    setCurrentStep(prev => prev + 1);
-                    scrollToTop();
-                  }
-                }}
-                className="px-6 py-2.5 bg-[#a22055] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md shadow-[#a22055]/15 flex items-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
-              >
-                ขั้นตอนถัดไป
-                <ChevronRight size={16} />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-[#a22055] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md shadow-[#a22055]/15 flex items-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
-                id="btn-save-booking"
-              >
-                <Save size={15} />
-                {isEditMode ? 'บันทึกการปรับปรุงใบใช้รถ' : 'ส่งบันทึกขอใช้รถราชการ'}
-              </button>
-            )}
-          </div>
-
+          <button
+            type="submit"
+            className="px-6 py-2.5 bg-[#a22055] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md shadow-[#a22055]/15 flex items-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
+            id="btn-save-booking"
+          >
+            <Save size={15} />
+            {isEditMode ? 'บันทึกการปรับปรุงใบใช้รถ' : 'ส่งบันทึกขอใช้รถราชการ'}
+          </button>
         </div>
 
       </form>

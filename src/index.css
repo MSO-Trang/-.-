@@ -24,4 +24,59 @@ html {
   font-family: "TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif !important;
 }
 
+/* Tighten the font spacing, line heights, and remove bold styles in the booking form */
+#booking-form,
+#booking-form * {
+  font-weight: 400 !important;
+  letter-spacing: -0.015em !important;
+  line-height: 1.25 !important;
+}
+
+/* Keep headers, main titles, buttons, and badges with a slightly readable medium weight (not bold) and neat alignment */
+#booking-form h2,
+#booking-form h3,
+#booking-form h2 *,
+#booking-form h3 *,
+#booking-form button,
+#booking-form button * {
+  font-weight: 500 !important;
+}
+
+/* Squeeze margins and paddings inside the booking form to make it compact */
+#booking-form {
+  padding: 1.25rem !important;
+}
+
+#booking-form .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 1rem !important;
+}
+
+#booking-form .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.75rem !important;
+}
+
+#booking-form .space-y-5 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.5rem !important;
+}
+
+#booking-form .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.5rem !important;
+}
+
+#booking-form .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.25rem !important;
+}
+
+#booking-form .space-y-1\.5 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.25rem !important;
+}
+
+#step-1-journey,
+#step-2-requester,
+#step-3-vehicle,
+#step-4-\[\#a22055\] {
+  padding: 1.25rem !important;
+}
+
+
 

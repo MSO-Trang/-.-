@@ -10,9 +10,9 @@ export const isOverlapping = (
   endB: string
 ): boolean => {
   const sA = new Date(startA).getTime();
-  const eA = new Date(endA).getTime();
+  const eA = endA ? new Date(endA).getTime() : sA + (4 * 60 * 60 * 1000);
   const sB = new Date(startB).getTime();
-  const eB = new Date(endB).getTime();
+  const eB = endB ? new Date(endB).getTime() : sB + (4 * 60 * 60 * 1000);
   
   if (isNaN(sA) || isNaN(eA) || isNaN(sB) || isNaN(eB)) return false;
   
@@ -31,7 +31,7 @@ export const findConflicts = (
   endDate: string,
   excludeBookingId?: string
 ): Booking[] => {
-  if (!startDate || !endDate) return [];
+  if (!startDate) return [];
   
   return bookings.filter(b => {
     // Ignore excluded booking (like editing itself) or finished/cancelled bookings

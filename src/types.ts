@@ -40,6 +40,7 @@ export interface Booking {
   caretakerPosition?: string;
   departmentHeadName?: string;
   departmentHeadPosition?: string;
+  departmentHeadRank?: string;
   remarks?: string;
   startMileage?: number;
   endMileage?: number;
@@ -62,6 +63,7 @@ export interface DepartmentHead {
   id: string;
   name: string;
   position: string;
+  rank?: string;
 }
 
 export interface SystemStats {

@@ -754,6 +754,7 @@ export default function App() {
               booking={printingBooking}
               vehicles={vehicles}
               drivers={drivers}
+              departmentHeads={departmentHeads}
               onBack={() => {
                 setPrintingBooking(undefined);
                 setActiveTab('bookings');

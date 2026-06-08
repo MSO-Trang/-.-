@@ -358,7 +358,8 @@ export default function AdminPanel({
     const completedHead: DepartmentHead = {
       id: departmentHeadForm.id || `H${Date.now()}`,
       name: departmentHeadForm.name || '',
-      position: departmentHeadForm.position || ''
+      position: departmentHeadForm.position || '',
+      rank: departmentHeadForm.rank || ''
     };
 
     onSaveDepartmentHead(completedHead);
@@ -1311,7 +1312,8 @@ export default function AdminPanel({
                     resetAllForms();
                     setDepartmentHeadForm({
                       name: '',
-                      position: ''
+                      position: '',
+                      rank: ''
                     });
                   }}
                   className="px-3 py-1.5 bg-[#a22055] hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm border border-pink-500 cursor-pointer"
@@ -1334,7 +1336,10 @@ export default function AdminPanel({
                         </span>
                       </div>
                       <h4 className="font-extrabold text-slate-900 text-sm mt-2 font-sans">{head.name}</h4>
-                      <p className="text-xs text-slate-500 mt-1 leading-normal font-medium">{head.position}</p>
+                      <p className="text-xs text-slate-500 mt-1 leading-normal font-semibold text-[#a22055]">{head.position}</p>
+                      {head.rank && (
+                        <p className="text-xs text-slate-500 mt-0.5 leading-normal font-medium">ตำแหน่ง: {head.rank}</p>
+                      )}
                     </div>
 
                     <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
@@ -1417,7 +1422,7 @@ export default function AdminPanel({
 
                   {/* Position Input */}
                   <div className="space-y-1">
-                    <label className="block font-bold text-slate-800">ตำแหน่งงานราชการ</label>
+                    <label className="block font-bold text-slate-800">หัวหน้ากลุ่ม/ฝ่าย</label>
                     <input 
                       type="text"
                       value={departmentHeadForm.position || ''}
@@ -1428,6 +1433,18 @@ export default function AdminPanel({
                     {departmentHeadErrors.position && (
                       <p className="text-[10px] text-red-500 font-semibold">{departmentHeadErrors.position}</p>
                     )}
+                  </div>
+
+                  {/* Rank Input */}
+                  <div className="space-y-1">
+                    <label className="block font-bold text-slate-800">ตำแหน่งทางราชการ</label>
+                    <input 
+                      type="text"
+                      value={departmentHeadForm.rank || ''}
+                      onChange={(e) => setDepartmentHeadForm({ ...departmentHeadForm, rank: e.target.value })}
+                      placeholder="เช่น นักพัฒนาสังคมชำนาญการพิเศษ"
+                      className="w-full bg-white text-slate-900 py-2 px-3 border border-pink-200 rounded outline-none focus:ring-1 focus:ring-pink-550 font-medium"
+                    />
                   </div>
 
                 </div>
