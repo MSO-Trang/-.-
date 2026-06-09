@@ -568,7 +568,7 @@ export default function App() {
       
       {/* Top Professional Header Bar - Hidden during A4 Printing */}
       <header className="bg-white border-b border-slate-100 shrink-0 sticky top-0 z-40 print:hidden shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-18 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Logo and Thai Agency Name */}
           <div className="flex items-center gap-3">
@@ -588,7 +588,34 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5 justify-center md:justify-end">
+            {/* Quick Access Action Tabs - High Visibility Duo */}
+            <div className="flex items-center gap-1 p-1 bg-slate-50 border border-slate-200/60 rounded-xl shadow-xs shrink-0">
+              <button
+                onClick={handleStartCreateMode}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer select-none ${
+                  activeTab === 'form' && !editingBooking
+                    ? 'bg-[#a22055] text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#a22055]'
+                }`}
+              >
+                <PlusCircle size={14} className={activeTab === 'form' && !editingBooking ? 'text-white' : 'text-[#a22055]'} />
+                <span>เขียนใบขอใช้รถยนต์ใหม่</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('mileage')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer select-none ${
+                  activeTab === 'mileage'
+                    ? 'bg-[#a22055] text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#a22055]'
+                }`}
+              >
+                <Gauge size={14} className={activeTab === 'mileage' ? 'text-white' : 'text-[#a22055]'} />
+                <span>บันทึกเลขไมล์ขากลับ</span>
+              </button>
+            </div>
+
             {/* Clock Widget */}
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 rounded-full">
               <Clock size={13} className="text-[#a22055] shrink-0 animate-pulse" />
@@ -659,7 +686,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-5 print:p-0 print:m-0 print:max-w-full">
         
         {/* Navigation Rail / Tab Ribbon - Minimalist and Clean */}
-        <div className="bg-white border border-slate-200/75 p-1 rounded-xl shadow-xs flex flex-wrap gap-1 items-center shrink-0 print:hidden">
+        <div className="bg-white border border-slate-200/75 p-1 rounded-xl shadow-xs flex flex-wrap gap-1 items-center shrink-0 print:hidden justify-center sm:justify-start">
           
           <button
             onClick={() => setActiveTab('dashboard')}
@@ -674,18 +701,6 @@ export default function App() {
           </button>
 
           <button
-            onClick={handleStartCreateMode}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
-              activeTab === 'form' && !editingBooking
-                ? 'bg-[#a22055] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
-            }`}
-          >
-            <PlusCircle size={15} />
-            เขียนใบขอใช้รถยนต์ใหม่
-          </button>
-
-          <button
             onClick={() => setActiveTab('bookings')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
               activeTab === 'bookings'
@@ -695,18 +710,6 @@ export default function App() {
           >
             <FileText size={15} />
             คลังใบขอใช้รถ
-          </button>
-
-          <button
-            onClick={() => setActiveTab('mileage')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
-              activeTab === 'mileage'
-                ? 'bg-[#a22055] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
-            }`}
-          >
-            <Gauge size={15} />
-            บันทึกเลขไมล์ขากลับ 🏁
           </button>
 
           <button

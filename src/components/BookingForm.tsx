@@ -1085,34 +1085,13 @@ export default function BookingForm({
                   name="destination"
                   value={formData.destination}
                   onChange={handleChange}
-                  rows={2}
-                  placeholder="เช่น อบต.ควนธานี ต.ควนธานี อ.กันตัง จ.ตรัง เพื่อลงพื้นที่ตรวจเยี่ยมบ้านผู้ประสบปัญหาเฉียบพลัน"
-                  className={`w-full px-4 py-2.5 border rounded-xl text-sm text-slate-700 ${
+                  rows={1}
+                  placeholder=""
+                  className={`w-full px-4 py-1.5 border rounded-xl text-sm text-slate-700 ${
                     errors.destination ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-400 bg-white' : 'border-slate-200 focus:ring-rose-100 focus:border-[#a22055] bg-slate-50/30'
                   } outline-none focus:ring-2`}
                 />
                 {errors.destination && <p className="text-xs text-rose-500 font-semibold">{errors.destination}</p>}
-                <p className="text-[10px] text-slate-400">โปรดกรอกรายละเอียดตำบลและอำเภอปลายทางในจังหวัดตรัง (หรือจังหวัดเป้าหมาย) เพื่อให้ผู้ขับวางแผนเส้นทางสะดวกรวดเร็วยิ่งขึ้น</p>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  <span className="text-[10px] text-slate-400 self-center font-bold">แนะนำปลายทางด่วน:</span>
-                  {[
-                    'อบต.ควนธานี อ.กันตัง จ.ตรัง',
-                    'อำเภอย่านตาขาว จังหวัดตรัง',
-                    'อำเภอห้วยยอด จังหวัดตรัง',
-                    'เทศบาลนครตรัง อำเภอเมืองตรัง',
-                    'ศาลากลางจังหวัดตรัง',
-                    'จังหวัดพัทลุง'
-                  ].map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => handleSelectDestinationTag(tag)}
-                      className="text-[10px] bg-slate-50 border border-slate-200 hover:border-[#a22055]/30 hover:bg-[#a22055]/5 text-slate-600 hover:text-[#a22055] px-2 py-0.5 rounded-lg transition cursor-pointer select-none font-bold"
-                    >
-                      📍 {tag}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               {/* Purpose */}
@@ -1125,32 +1104,13 @@ export default function BookingForm({
                   name="purpose"
                   value={formData.purpose}
                   onChange={handleChange}
-                  rows={2}
-                  placeholder="เช่น พัฒนาส่งเสริมอาชีพผู้พิการและเยี่ยมเยียนผู้สูงอายุในสภาวะยากลำบาก คณะเจ้าหน้าที่ พม. ร่วมสภากาชาด"
-                  className={`w-full px-4 py-2.5 border rounded-xl text-sm text-slate-700 ${
+                  rows={1}
+                  placeholder=""
+                  className={`w-full px-4 py-1.5 border rounded-xl text-sm text-slate-700 ${
                     errors.purpose ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-400 bg-white' : 'border-slate-200 focus:ring-rose-100 focus:border-[#a22055] bg-slate-50/30'
                   } outline-none focus:ring-2`}
                 />
                 {errors.purpose && <p className="text-xs text-rose-500 font-semibold">{errors.purpose}</p>}
-                <p className="text-[10px] text-slate-400">ใส่โครงการจัดงาน คำสั่งจังหวัด หรือภารกิจความจำเป็นเพื่อบันทึกประเมินค่าใช้จ่ายนํ้ามันเบิกงบประมาณถัดไป</p>
-                <div className="flex flex-wrap gap-1.5 mt-2">
-                  <span className="text-[10px] text-slate-400 self-center font-bold">แนะนำวัตถุประสงค์ด่วน:</span>
-                  {[
-                    'ลงพื้นที่ตรวจเยี่ยมช่วยเหลือเยียวยาผู้ประสบปัญหาทางสังคมเฉียบพลัน',
-                    'เข้าร่วมสัมมนาประชุมเชิงปฏิบัติการเพื่อบูรณาการระบบคุ้มครองผู้เปราะบาง',
-                    'นำส่งสิทธิสวัสดิการและเยี่ยมบ้านคนพิการและผู้สุงอายุที่เจ็บป่วยติดเตียง',
-                    'รับส่งหนังสือด่วนติดต่อฝ่ายงานสารบรรณ ณ ศาลากลางจังหวัดตรัง'
-                  ].map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => handleSelectPurposeTag(tag)}
-                      className="text-[10px] bg-slate-50 border border-slate-200 hover:border-[#a22055]/30 hover:bg-[#a22055]/5 text-slate-600 hover:text-[#a22055] px-2 py-0.5 rounded-lg transition cursor-pointer select-none font-bold text-left max-w-full truncate"
-                    >
-                      📝 {tag}
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
           </div>
