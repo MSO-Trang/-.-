@@ -63,15 +63,107 @@ export default function DriverGoogleCalendar({
 
   useEffect(() => {
     if (selectedEvent) {
-      setLocalStartMileage(selectedEvent.startMileage !== undefined ? String(selectedEvent.startMileage) : '0');
-      setLocalEndMileage(selectedEvent.endMileage !== undefined ? String(selectedEvent.endMileage) : '');
+      let defaultStart = selectedEvent.startMileage;
+      if (defaultStart === undefined || defaultStart === null) {
+        const targetVehicle = vehicles.find(v => v.id === selectedEvent.vehicleId);
+        const vehicleBaseMileage = targetVehicle?.mileage || 0;
+
+        const currentStartTime = new Date(selectedEvent.startDate).getTime();
+
+        // 1. Look up prior bookings chronologically
+        const priorBookings = bookings.filter(
+          b => b.vehicleId === selectedEvent.vehicleId && 
+               b.id !== selectedEvent.id && 
+               b.status !== 'cancelled' && 
+               b.status !== 'rejected' &&
+               new Date(b.startDate).getTime() < currentStartTime
+        );
+        
+        let foundMil = 0;
+        if (priorBookings.length > 0) {
+          const sorted = [...priorBookings].sort(
+            (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
+          );
+          for (const pb of sorted) {
+            if (pb.endMileage !== undefined && pb.endMileage !== null && pb.endMileage > 0) {
+              foundMil = pb.endMileage;
+              break;
+            }
+            if (pb.startMileage !== undefined && pb.startMileage !== null && pb.startMileage > 0) {
+              foundMil = pb.startMileage;
+              break;
+            }
+          }
+        }
+
+        if (foundMil > 0) {
+          defaultStart = foundMil;
+        } else {
+          // 2. Look up subsequent bookings
+          const subsequentBookings = bookings.filter(
+            b => b.vehicleId === selectedEvent.vehicleId &&
+                 b.id !== selectedEvent.id &&
+                 b.status !== 'cancelled' &&
+                 b.status !== 'rejected' &&
+                 new Date(b.startDate).getTime() >= currentStartTime
+          );
+
+          if (subsequentBookings.length > 0) {
+            const sortedSubsequent = [...subsequentBookings].sort(
+              (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+            );
+            for (const pb of sortedSubsequent) {
+              if (pb.startMileage !== undefined && pb.startMileage !== null && pb.startMileage > 0) {
+                foundMil = pb.startMileage;
+                break;
+              }
+              if (pb.endMileage !== undefined && pb.endMileage !== null && pb.endMileage > 0) {
+                foundMil = pb.endMileage;
+                break;
+              }
+            }
+          }
+
+          if (foundMil > 0) {
+            defaultStart = foundMil;
+          } else {
+            // 3. Fallback: lowest of any completed bookings with mileage
+            const anyWithMileage = bookings.filter(
+              b => b.vehicleId === selectedEvent.vehicleId &&
+                   b.id !== selectedEvent.id &&
+                   b.status !== 'cancelled' &&
+                   b.status !== 'rejected' &&
+                   ((b.startMileage !== undefined && b.startMileage !== null && b.startMileage > 0) ||
+                    (b.endMileage !== undefined && b.endMileage !== null && b.endMileage > 0))
+            );
+
+            if (anyWithMileage.length > 0) {
+              let minMil = Infinity;
+              for (const b of anyWithMileage) {
+                if (b.startMileage && b.startMileage < minMil) minMil = b.startMileage;
+                if (b.endMileage && b.endMileage < minMil) minMil = b.endMileage;
+              }
+              if (minMil !== Infinity && minMil > 0) {
+                defaultStart = minMil;
+              } else {
+                defaultStart = vehicleBaseMileage;
+              }
+            } else {
+              defaultStart = vehicleBaseMileage;
+            }
+          }
+        }
+      }
+
+      setLocalStartMileage(String(defaultStart));
+      setLocalEndMileage(selectedEvent.endMileage !== undefined && selectedEvent.endMileage !== null ? String(selectedEvent.endMileage) : '');
       setLocalMileageError('');
     } else {
       setLocalStartMileage('');
       setLocalEndMileage('');
       setLocalMileageError('');
     }
-  }, [selectedEvent]);
+  }, [selectedEvent, bookings, vehicles]);
 
   // Thai months and days
   const THAI_MONTHS_SHORT = [
@@ -842,21 +934,29 @@ export default function DriverGoogleCalendar({
                 {selectedEvent.status === 'approved' && (
                   <div className="bg-rose-50/40 border border-[#a22055]/15 rounded-xl p-2 space-y-1.5 text-slate-705">
                     <span className="inline-flex px-1.5 py-0.5 rounded bg-[#a22055] text-white text-[8px] font-black uppercase tracking-wider">
-                      🏁 บันทึกเลขไมล์เดินทาง
+                      🏁 บันทึกเลขไมล์ขากลับหลังสิ้นสุดภารกิจ
                     </span>
-                    <div className="grid grid-cols-2 gap-2">
+                    
+                    <div className="space-y-1.5 relative">
                       <div className="space-y-0.5">
-                        <label className="text-[9px] font-extrabold text-slate-500 block">ไมล์เริ่มต้น (กม.)</label>
+                        <label className="text-[9px] font-extrabold text-indigo-805 block flex justify-between items-center">
+                          <span>📟 แก้ไขเลขไมล์เริ่มต้นเดินทาง (กม.)</span>
+                          <span className="text-[8px] bg-indigo-100 text-indigo-800 px-1 rounded font-black">แก้ไขได้ (กรณีสลับคิว)</span>
+                        </label>
                         <input
                           type="number"
                           value={localStartMileage}
-                          onChange={(e) => setLocalStartMileage(e.target.value)}
-                          placeholder="0"
-                          className="w-full px-2 py-0.5 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold outline-none"
+                          onChange={(e) => {
+                            setLocalStartMileage(e.target.value);
+                            if (localMileageError) setLocalMileageError('');
+                          }}
+                          placeholder="พิมพ์เลขไมล์เริ่มต้น"
+                          className="w-full px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-mono font-bold outline-none focus:ring-1 focus:ring-indigo-100 placeholder-slate-300"
                         />
                       </div>
+
                       <div className="space-y-0.5">
-                        <label className="text-[9px] font-extrabold text-[#a22055] block">ไมล์ขากลับ (กม.) *</label>
+                        <label className="text-[9px] font-extrabold text-[#a22055] block">ป้อนเลขไมล์ขากลับสะสมปัจจุบัน (กม.) *</label>
                         <input
                           type="number"
                           value={localEndMileage}
@@ -864,8 +964,9 @@ export default function DriverGoogleCalendar({
                             setLocalEndMileage(e.target.value);
                             if (localMileageError) setLocalMileageError('');
                           }}
-                          placeholder="เลขไมล์"
-                          className="w-full px-2 py-0.5 bg-white border border-[#a22055]/30 rounded-lg text-xs font-mono font-bold outline-none"
+                          placeholder="พิมพ์เลขไมล์ล่าสุดที่มาตรวัดรถ"
+                          className="w-full px-2.5 py-1 bg-white border border-[#a22055] rounded-lg text-xs font-mono font-black outline-none"
+                          autoFocus
                         />
                       </div>
                     </div>

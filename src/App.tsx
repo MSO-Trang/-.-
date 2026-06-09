@@ -10,7 +10,8 @@ import {
   Building2, 
   FileCheck,
   AlertCircle,
-  Settings
+  Settings,
+  Gauge
 } from 'lucide-react';
 import { Booking, Vehicle, Driver, Approver, Caretaker, DepartmentHead } from './types';
 import { getStoredData, saveStoredData } from './data/initialData';
@@ -22,6 +23,7 @@ import Schedules from './components/Schedules';
 import PrintPermit from './components/PrintPermit';
 import AdminPanel from './components/AdminPanel';
 import AdminLogin from './components/AdminLogin';
+import MileageTracker from './components/MileageTracker';
 import { initAuth, googleSignIn as loginGoogle, googleSignOut as logoutGoogle } from './utils/googleCalendarService';
 import { 
   testConnection, 
@@ -48,8 +50,8 @@ import {
 
 export default function App() {
   
-  // App views: 'dashboard' | 'bookings' | 'form' | 'schedules' | 'print' | 'admin'
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'form' | 'schedules' | 'print' | 'admin'>('dashboard');
+  // App views: 'dashboard' | 'bookings' | 'form' | 'schedules' | 'print' | 'admin' | 'mileage'
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'form' | 'schedules' | 'print' | 'admin' | 'mileage'>('dashboard');
   
   // App primary data pools
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -240,16 +242,95 @@ export default function App() {
     }, 4500);
   };
 
+  // Automated cascade updating for vehicle bookings to sync up subsequent trip mileages
+  const cascadeMileageForVehicle = async (vehicleId: string, bookingIdThatWasSaved: string, updatedBookingObj: Booking, currentBookings: Booking[]) => {
+    try {
+      // 1. Create a copy of the current bookings and apply the updated booking
+      const bookingsCopy = currentBookings.map(b => b.id === bookingIdThatWasSaved ? { ...updatedBookingObj } : { ...b });
+      if (!bookingsCopy.some(b => b.id === bookingIdThatWasSaved)) {
+        bookingsCopy.push({ ...updatedBookingObj });
+      }
+
+      // 2. Filter bookings for this vehicle that are NOT cancelled/rejected
+      const vehicleBookings = bookingsCopy.filter(b => b.vehicleId === vehicleId && b.status !== 'cancelled' && b.status !== 'rejected');
+
+      // 3. Sort chronologically by startDate
+      const sorted = [...vehicleBookings].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+      const bookingsToSave: Booking[] = [];
+      
+      // 4. Cascade modifications
+      for (let i = 0; i < sorted.length; i++) {
+        const current = sorted[i];
+        let changed = false;
+
+        if (i > 0) {
+          const prev = sorted[i - 1];
+          if (prev.endMileage !== undefined && prev.endMileage !== null) {
+            if (current.startMileage !== prev.endMileage) {
+              current.startMileage = prev.endMileage;
+              changed = true;
+
+              if (current.endMileage !== undefined && current.endMileage !== null && current.endMileage < current.startMileage) {
+                current.endMileage = current.startMileage;
+              }
+            }
+          }
+        }
+
+        if (changed) {
+          bookingsToSave.push(current);
+        }
+      }
+
+      // 5. Save all cascaded bookings
+      for (const b of bookingsToSave) {
+        await saveBookingToFirestore(b);
+      }
+
+      // Update local state immediately so user sees changes instantly
+      let updatedLocalBookings = currentBookings.map(b => {
+        if (b.id === bookingIdThatWasSaved) {
+          return { ...updatedBookingObj };
+        }
+        const cascaded = bookingsToSave.find(cb => cb.id === b.id);
+        if (cascaded) {
+          return { ...cascaded };
+        }
+        return b;
+      });
+
+      if (!updatedLocalBookings.some(b => b.id === bookingIdThatWasSaved)) {
+        updatedLocalBookings.push({ ...updatedBookingObj });
+      }
+
+      const sortedByCreatedAt = [...updatedLocalBookings].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setBookings(sortedByCreatedAt);
+
+      // 6. Update vehicle's overall mileage based on the absolute highest 'endMileage' among ALL completed bookings for this vehicle
+      const completedForVehicle = sorted.filter(b => b.status === 'completed' && b.endMileage !== undefined && b.endMileage !== null);
+      if (completedForVehicle.length > 0) {
+        const maxEndMileage = Math.max(...completedForVehicle.map(b => b.endMileage || 0));
+        const v = vehicles.find(v => v.id === vehicleId);
+        if (v && v.mileage !== maxEndMileage) {
+          await saveVehicleToFirestore({ ...v, mileage: maxEndMileage });
+          setVehicles(prevVehicles => prevVehicles.map(veh => veh.id === v.id ? { ...veh, mileage: maxEndMileage } : veh));
+        }
+      }
+    } catch (err) {
+      console.error('Error cascading mileage updates:', err);
+    }
+  };
+
   // Save Booking Callback
   const handleSaveBooking = async (booking: Booking) => {
     const isEdit = bookings.some(b => b.id === booking.id);
     try {
       await saveBookingToFirestore(booking);
-      if (booking.vehicleId && booking.status === 'completed' && booking.endMileage) {
-        const v = vehicles.find(v => v.id === booking.vehicleId);
-        if (v) {
-          await saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, booking.endMileage) });
-        }
+      if (booking.vehicleId) {
+        await cascadeMileageForVehicle(booking.vehicleId, booking.id, booking, bookings);
       }
       if (isEdit) {
         triggerToast(`ทำการบันทึกและรันใบจองเลขที่ ${booking.permitNumber} เรียบร้อยแล้ว`, 'success');
@@ -271,11 +352,8 @@ export default function App() {
     const updated = { ...b, status };
     try {
       await saveBookingToFirestore(updated);
-      if (status === 'completed' && b.vehicleId && b.endMileage) {
-        const v = vehicles.find(v => v.id === b.vehicleId);
-        if (v) {
-          await saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, b.endMileage) });
-        }
+      if (b.vehicleId) {
+        await cascadeMileageForVehicle(b.vehicleId, updated.id, updated, bookings);
       }
       let ThaiStatus = 'ยกเลิกการเดินทาง';
       if (status === 'approved') ThaiStatus = 'อนุมัติการใช้ยานพาหนะ';
@@ -300,12 +378,8 @@ export default function App() {
     };
     try {
       await saveBookingToFirestore(updated);
-
-      if (b.vehicleId && endMil) {
-        const v = vehicles.find(v => v.id === b.vehicleId);
-        if (v) {
-          await saveVehicleToFirestore({ ...v, mileage: Math.max(v.mileage || 0, endMil) });
-        }
+      if (b.vehicleId) {
+        await cascadeMileageForVehicle(b.vehicleId, updated.id, updated, bookings);
       }
       
       triggerToast(`บันทึกเลขไมล์เดินทางเสร็จสิ้น (${startMil.toLocaleString()} → ${endMil.toLocaleString()} กม.) ของเอกสารสลักหลัง ${b.permitNumber} เรียบร้อยแล้ว`, 'success');
@@ -624,6 +698,18 @@ export default function App() {
           </button>
 
           <button
+            onClick={() => setActiveTab('mileage')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
+              activeTab === 'mileage'
+                ? 'bg-[#a22055] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
+            }`}
+          >
+            <Gauge size={15} />
+            บันทึกเลขไมล์ขากลับ 🏁
+          </button>
+
+          <button
             onClick={() => setActiveTab('schedules')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
               activeTab === 'schedules'
@@ -736,6 +822,16 @@ export default function App() {
                 setEditingBooking(undefined);
                 setActiveTab('bookings');
               }}
+              isAdmin={isAdminLoggedIn}
+            />
+          )}
+
+          {activeTab === 'mileage' && (
+            <MileageTracker
+              bookings={bookings}
+              vehicles={vehicles}
+              drivers={drivers}
+              onCompleteBookingWithMileage={handleCompleteBookingWithMileage}
               isAdmin={isAdminLoggedIn}
             />
           )}

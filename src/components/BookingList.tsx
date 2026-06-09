@@ -167,28 +167,90 @@ export default function BookingList({
       const targetVehicle = vehicles.find(v => v.id === booking.vehicleId);
       const vehicleBaseMileage = targetVehicle?.mileage || 0;
 
-      // Look up previous mileage (similar to BookingForm, but we can do it locally)
+      const currentStartTime = new Date(booking.startDate).getTime();
+
+      // 1. Look up prior bookings chronologically
       const priorBookings = bookings.filter(
-        b => b.vehicleId === booking.vehicleId && b.id !== booking.id && b.status !== 'cancelled' && b.status !== 'rejected'
+        b => b.vehicleId === booking.vehicleId && 
+             b.id !== booking.id && 
+             b.status !== 'cancelled' && 
+             b.status !== 'rejected' &&
+             new Date(b.startDate).getTime() < currentStartTime
       );
+      
+      let foundMil = 0;
       if (priorBookings.length > 0) {
         const sorted = [...priorBookings].sort(
           (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
         );
-        let foundMil = vehicleBaseMileage;
         for (const pb of sorted) {
-          if (pb.endMileage !== undefined && pb.endMileage !== null && pb.endMileage > vehicleBaseMileage) {
+          if (pb.endMileage !== undefined && pb.endMileage !== null && pb.endMileage > 0) {
             foundMil = pb.endMileage;
             break;
           }
-          if (pb.startMileage !== undefined && pb.startMileage !== null && pb.startMileage > vehicleBaseMileage) {
+          if (pb.startMileage !== undefined && pb.startMileage !== null && pb.startMileage > 0) {
             foundMil = pb.startMileage;
             break;
           }
         }
+      }
+
+      if (foundMil > 0) {
         defaultStart = foundMil;
       } else {
-        defaultStart = vehicleBaseMileage;
+        // 2. Look up subsequent bookings (fallback for out-of-order logs)
+        const subsequentBookings = bookings.filter(
+          b => b.vehicleId === booking.vehicleId &&
+               b.id !== booking.id &&
+               b.status !== 'cancelled' &&
+               b.status !== 'rejected' &&
+               new Date(b.startDate).getTime() >= currentStartTime
+        );
+
+        if (subsequentBookings.length > 0) {
+          const sortedSubsequent = [...subsequentBookings].sort(
+            (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+          );
+          for (const pb of sortedSubsequent) {
+            if (pb.startMileage !== undefined && pb.startMileage !== null && pb.startMileage > 0) {
+              foundMil = pb.startMileage;
+              break;
+            }
+            if (pb.endMileage !== undefined && pb.endMileage !== null && pb.endMileage > 0) {
+              foundMil = pb.endMileage;
+              break;
+            }
+          }
+        }
+
+        if (foundMil > 0) {
+          defaultStart = foundMil;
+        } else {
+          // 3. Overall minimum of any completed/mileage bookings for this vehicle
+          const anyWithMileage = bookings.filter(
+            b => b.vehicleId === booking.vehicleId &&
+                 b.id !== booking.id &&
+                 b.status !== 'cancelled' &&
+                 b.status !== 'rejected' &&
+                 ((b.startMileage !== undefined && b.startMileage !== null && b.startMileage > 0) ||
+                  (b.endMileage !== undefined && b.endMileage !== null && b.endMileage > 0))
+          );
+
+          if (anyWithMileage.length > 0) {
+            let minMil = Infinity;
+            for (const b of anyWithMileage) {
+              if (b.startMileage && b.startMileage < minMil) minMil = b.startMileage;
+              if (b.endMileage && b.endMileage < minMil) minMil = b.endMileage;
+            }
+            if (minMil !== Infinity && minMil > 0) {
+              defaultStart = minMil;
+            } else {
+              defaultStart = vehicleBaseMileage;
+            }
+          } else {
+            defaultStart = vehicleBaseMileage;
+          }
+        }
       }
     }
     setMileageModalBooking(booking);
@@ -824,27 +886,33 @@ export default function BookingList({
             {/* Input fields */}
             <div className="space-y-4">
               
-              {/* Start Mileage */}
+              {/* Start Mileage (Always editable to handle out-of-order logs) */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-750 block">
-                  1. เลขไมล์เริ่มต้นออกเดินทาง (กิโลเมตร)
+                <label className="text-xs font-bold text-slate-750 block flex justify-between">
+                  <span className="text-indigo-805 font-bold">📟 เลขไมล์ออกเดินทาง (กม.)</span>
+                  <span className="text-[9px] bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-black">
+                    แก้ไขได้ (กรณีสลับคิวบันทึก)
+                  </span>
                 </label>
                 <div className="relative">
                   <input
                     type="number"
                     value={startMilInput}
-                    onChange={(e) => setStartMilInput(e.target.value)}
+                    onChange={(e) => {
+                      setStartMilInput(e.target.value);
+                      if (milError) setMilError('');
+                    }}
                     placeholder="กรอกเลขไมล์เริ่มต้น"
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-600 outline-none focus:ring-2 focus:ring-rose-100 focus:border-[#a22055] font-mono font-bold"
+                    className="w-full px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-mono font-black text-slate-800 outline-none focus:ring-2 focus:ring-indigo-50 placeholder-slate-300"
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">กม.</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-500">กม.</span>
                 </div>
               </div>
 
               {/* End Mileage */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 block flex justify-between">
-                  <span>2. เลขไมล์สิ้นสุดการเดินทางสะสม (กม.)</span>
+                <label className="text-xs font-bold text-slate-750 block flex justify-between">
+                  <span className="text-[#a22055] font-black">🏁 ระบุเลขไมล์สะสมหลังเสร็จงาน (กม.)</span>
                   <span className="text-rose-600 font-extrabold text-[10px]">* จำเป็น</span>
                 </label>
                 <div className="relative">
@@ -855,11 +923,11 @@ export default function BookingList({
                       setEndMilInput(e.target.value);
                       if (milError) setMilError('');
                     }}
-                    placeholder="พิมพ์เลขไมล์เสร็จสิ้นภารกิจขากลับ"
-                    className="w-full px-4 py-2.5 border border-[#a22055]/30 focus:border-[#a22055] rounded-xl text-sm text-slate-850 outline-none focus:ring-2 focus:ring-rose-100 font-mono font-black"
+                    placeholder="กรอกเลขกิโลเมตรล่าสุด เช่น 134590"
+                    className="w-full px-4 py-2.5 bg-white border border-[#a22055] rounded-xl text-sm text-slate-850 outline-none focus:ring-2 focus:ring-rose-100 font-mono font-black placeholder-slate-300"
                     autoFocus
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#a22055]">กม.</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#a22055]">กม.</span>
                 </div>
               </div>
 

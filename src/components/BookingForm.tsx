@@ -347,32 +347,84 @@ export default function BookingForm({
     const baseMileage = targetVeh?.mileage || 0;
     
     if (!bookings || bookings.length === 0) return baseMileage;
+    
+    const chosenStartStr = formData?.startDate || (bookingToEdit?.startDate) || '';
+    const chosenStartTime = chosenStartStr ? new Date(chosenStartStr).getTime() : Infinity;
+
+    // 1. Prior Bookings chronologically
     const priorBookings = bookings.filter(
-      b => b.vehicleId === vId && b.id !== bookingToEdit?.id && b.status !== 'cancelled' && b.status !== 'rejected'
+      b => b.vehicleId === vId && 
+           b.id !== bookingToEdit?.id && 
+           b.status !== 'cancelled' && 
+           b.status !== 'rejected' &&
+           (chosenStartTime === Infinity || new Date(b.startDate).getTime() < chosenStartTime)
     );
-    if (priorBookings.length === 0) return baseMileage;
-    
-    // Sort by end date descending
-    const sorted = [...priorBookings].sort(
-      (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
-    );
-    
-    for (const b of sorted) {
-      if (b.endMileage !== undefined && b.endMileage !== null && b.endMileage > baseMileage) {
-        return b.endMileage;
+
+    if (priorBookings.length > 0) {
+      const sorted = [...priorBookings].sort(
+        (a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime()
+      );
+      
+      for (const b of sorted) {
+        if (b.endMileage !== undefined && b.endMileage !== null && b.endMileage > 0) {
+          return b.endMileage;
+        }
+        if (b.startMileage !== undefined && b.startMileage !== null && b.startMileage > 0) {
+          return b.startMileage;
+        }
       }
-      if (b.startMileage !== undefined && b.startMileage !== null && b.startMileage > baseMileage) {
-        return b.startMileage;
+
+      let maxMil = 0;
+      for (const b of priorBookings) {
+        if (b.endMileage && b.endMileage > maxMil) maxMil = b.endMileage;
+        if (b.startMileage && b.startMileage > maxMil) maxMil = b.startMileage;
+      }
+      if (maxMil > 0) return maxMil;
+    }
+
+    // 2. Subsequent Bookings (if no prior bookings exist or none have mileage recorded)
+    const subsequentBookings = bookings.filter(
+      b => b.vehicleId === vId &&
+           b.id !== bookingToEdit?.id &&
+           b.status !== 'cancelled' &&
+           b.status !== 'rejected' &&
+           (chosenStartTime !== Infinity && new Date(b.startDate).getTime() >= chosenStartTime)
+    );
+
+    if (subsequentBookings.length > 0) {
+      const sortedSubsequent = [...subsequentBookings].sort(
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
+      for (const b of sortedSubsequent) {
+        if (b.startMileage !== undefined && b.startMileage !== null && b.startMileage > 0) {
+          return b.startMileage;
+        }
+        if (b.endMileage !== undefined && b.endMileage !== null && b.endMileage > 0) {
+          return b.endMileage;
+        }
       }
     }
-    
-    // Fallback to max numerical mileage values
-    let maxMil = baseMileage;
-    for (const b of priorBookings) {
-      if (b.endMileage && b.endMileage > maxMil) maxMil = b.endMileage;
-      if (b.startMileage && b.startMileage > maxMil) maxMil = b.startMileage;
+
+    // 3. Overall minimum of any completed/mileage bookings for this vehicle
+    const anyWithMileage = bookings.filter(
+      b => b.vehicleId === vId &&
+           b.id !== bookingToEdit?.id &&
+           b.status !== 'cancelled' &&
+           b.status !== 'rejected' &&
+           ((b.startMileage !== undefined && b.startMileage !== null && b.startMileage > 0) ||
+            (b.endMileage !== undefined && b.endMileage !== null && b.endMileage > 0))
+    );
+
+    if (anyWithMileage.length > 0) {
+      let minMil = Infinity;
+      for (const b of anyWithMileage) {
+        if (b.startMileage && b.startMileage < minMil) minMil = b.startMileage;
+        if (b.endMileage && b.endMileage < minMil) minMil = b.endMileage;
+      }
+      if (minMil !== Infinity && minMil > 0) return minMil;
     }
-    return maxMil;
+
+    return baseMileage;
   };
 
   // Auto-generate run-number or populate for editing
@@ -1571,92 +1623,7 @@ export default function BookingForm({
               )}
             </div>
 
-            {/* Mileage Registration Segment */}
-              <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-4 md:p-5 mt-6 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="p-1 px-2 bg-[#a22055] text-white font-extrabold text-[10px] rounded-md tracking-wide">
-                      มาตรเลขไมล์คุมพัสดุ
-                    </span>
-                    <h4 className="text-xs font-bold text-slate-800">สถิติเลขกิโลเมตรสะสมของยานพาหนะราชการ</h4>
-                  </div>
-                  {formData.vehicleId && (
-                    <span className="text-[10px] bg-rose-50 border border-rose-100/40 px-2 py-0.5 rounded-full font-bold text-[#a22055] self-start sm:self-auto font-mono">
-                      แชสซีคันนี้: {formData.vehicleId}
-                    </span>
-                  )}
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Start Mileage */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 flex items-center justify-between gap-1">
-                      <span className="flex items-center gap-1">
-                        <span>เลขไมล์เริ่มต้นก่อนออกเดินทาง (กม.)</span>
-                        <span className="text-rose-500 font-extrabold">*</span>
-                      </span>
-                      {!isAdmin && (
-                        <span className="text-[9px] bg-amber-50 text-amber-700 font-extrabold px-1.5 py-0.5 rounded border border-amber-250/50">
-                          เฉพาะแอดมิน
-                        </span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      name="startMileage"
-                      value={formData.startMileage}
-                      onChange={handleChange}
-                      disabled={!isAdmin}
-                      placeholder={!isAdmin ? "ระบบประมวลผลเลขไมล์อัตโนมัติ" : "กรอกเลขไมล์เริ่มต้น เช่น 135000"}
-                      className={`w-full px-4 py-2 border rounded-xl text-xs sm:text-sm text-slate-700 outline-none font-mono font-bold ${
-                        !isAdmin 
-                          ? 'bg-slate-100/80 border-slate-200 text-slate-400 cursor-not-allowed' 
-                          : 'bg-white border-slate-200 focus:ring-2 focus:ring-rose-100 focus:border-[#a22055]'
-                      }`}
-                    />
-                    <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
-                      <span>✓ ป้องกันการผิดพลาดรันเลขครั้งก่อนอัตโนมัติ:</span>
-                      <span className="font-mono underline font-black">{getLastVehicleMileage(formData.vehicleId).toLocaleString()} กม.</span>
-                    </p>
-                  </div>
-
-                  {/* End Mileage */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-slate-700 flex items-center justify-between gap-1">
-                      <span>เลขไมล์สิ้นสุดการเดินทางสะสม (กม.)</span>
-                      {!isAdmin && (
-                        <span className="text-[9px] bg-amber-50 text-amber-700 font-extrabold px-1.5 py-0.5 rounded border border-amber-250/50">
-                          เฉพาะแอดมิน
-                        </span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      name="endMileage"
-                      value={formData.endMileage}
-                      onChange={handleChange}
-                      disabled={!isAdmin}
-                      placeholder={!isAdmin ? "รอพนักงานขับรถหรือแอดมินลงบันทึกในระบบ" : "บันทึกเมื่อกลับมาถึง เช่น 135450"}
-                      className={`w-full px-4 py-2 border rounded-xl text-xs sm:text-sm font-mono font-bold outline-none focus:ring-2 ${
-                        !isAdmin 
-                          ? 'bg-slate-100/80 border-slate-200 text-slate-400 cursor-not-allowed' 
-                          : errors.endMileage 
-                            ? 'bg-white border-rose-400 focus:ring-rose-200 text-slate-700' 
-                            : 'bg-white border-slate-200 focus:ring-[#a22055] text-slate-700'
-                      }`}
-                    />
-                    {errors.endMileage ? (
-                      <p className="text-[10px] text-rose-500 font-extrabold">{errors.endMileage}</p>
-                    ) : (
-                      <p className="text-[10px] text-slate-400 font-medium font-sans">
-                        {!isAdmin 
-                          ? "(เฉพาะผู้ใช้งานระดับแอดมินจึงจะมีสิทธิ์ลงบันทึกเลขไมล์ขากลับในหน้านี้)" 
-                          : "(เว้นว่างไว้เพื่อบันทึกเมื่อรถขับกลับมาถึงเป้าหมายจังหวัดตรัง)"}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           )}
 
