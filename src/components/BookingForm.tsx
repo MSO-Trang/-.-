@@ -83,6 +83,7 @@ export default function BookingForm({
     caretakerPosition: '',
     departmentHeadName: '',
     departmentHeadPosition: '',
+    departmentHeadRank: '',
     remarks: '',
     startMileage: '',
     endMileage: ''
@@ -464,6 +465,7 @@ export default function BookingForm({
         caretakerPosition: bookingToEdit.caretakerPosition || (caretakers[0]?.position || ''),
         departmentHeadName: bookingToEdit.departmentHeadName || (departmentHeads[0]?.name || ''),
         departmentHeadPosition: bookingToEdit.departmentHeadPosition || (departmentHeads[0]?.position || ''),
+        departmentHeadRank: bookingToEdit.departmentHeadRank || (foundHead?.rank || (departmentHeads[0]?.rank || '')),
         remarks: bookingToEdit.remarks || '',
         startMileage: bookingToEdit.startMileage !== undefined ? String(bookingToEdit.startMileage) : String(getLastVehicleMileage(bookingToEdit.vehicleId)),
         endMileage: bookingToEdit.endMileage !== undefined ? String(bookingToEdit.endMileage) : ''
@@ -493,6 +495,7 @@ export default function BookingForm({
         caretakerPosition: caretakers[0]?.position || '',
         departmentHeadName: departmentHeads[0]?.name || '',
         departmentHeadPosition: departmentHeads[0]?.position || '',
+        departmentHeadRank: departmentHeads[0]?.rank || '',
         startMileage: autoStartMileage > 0 ? String(autoStartMileage) : '0',
         endMileage: ''
       }));
@@ -544,7 +547,8 @@ export default function BookingForm({
         setFormData(prev => ({
           ...prev,
           departmentHeadName: '',
-          departmentHeadPosition: newPos
+          departmentHeadPosition: newPos,
+          departmentHeadRank: parentHead.rank || ''
         }));
       }
     } else {
@@ -553,7 +557,8 @@ export default function BookingForm({
         setFormData(prev => ({
           ...prev,
           departmentHeadName: parentHead.name,
-          departmentHeadPosition: parentHead.position
+          departmentHeadPosition: parentHead.position,
+          departmentHeadRank: parentHead.rank || ''
         }));
       }
     }
@@ -568,7 +573,8 @@ export default function BookingForm({
       const newPos = basePosition.startsWith('แทน') ? basePosition : `แทน${basePosition}`;
       setFormData(prev => ({
         ...prev,
-        departmentHeadPosition: newPos
+        departmentHeadPosition: newPos,
+        departmentHeadRank: selectedHead.rank || ''
       }));
     }
   };
@@ -600,19 +606,22 @@ export default function BookingForm({
       if (matchedHead) {
         setSelectedDeptHeadId(matchedHead.id || '');
         const basePosition = matchedHead.position;
+        const baseRank = matchedHead.rank || '';
         if (isCustomDeptHead) {
           const newPos = basePosition.startsWith('แทน') ? basePosition : `แทน${basePosition}`;
           setFormData(prev => ({
             ...prev,
             department: value,
-            departmentHeadPosition: newPos
+            departmentHeadPosition: newPos,
+            departmentHeadRank: baseRank
           }));
         } else {
           setFormData(prev => ({
             ...prev,
             department: value,
             departmentHeadName: matchedHead.name,
-            departmentHeadPosition: basePosition
+            departmentHeadPosition: basePosition,
+            departmentHeadRank: baseRank
           }));
         }
       } else {
@@ -660,7 +669,8 @@ export default function BookingForm({
       setFormData(prev => ({
         ...prev,
         departmentHeadName: value,
-        departmentHeadPosition: selectedHead?.position || ''
+        departmentHeadPosition: selectedHead?.position || '',
+        departmentHeadRank: selectedHead?.rank || ''
       }));
       return;
     }
@@ -851,6 +861,7 @@ export default function BookingForm({
       caretakerPosition: formData.caretakerPosition,
       departmentHeadName: formData.departmentHeadName,
       departmentHeadPosition: formData.departmentHeadPosition,
+      departmentHeadRank: formData.departmentHeadRank,
       remarks: formData.remarks,
       startMileage: formData.startMileage ? parseInt(formData.startMileage, 10) : undefined,
       endMileage: formData.endMileage ? parseInt(formData.endMileage, 10) : undefined,
@@ -1660,9 +1671,9 @@ export default function BookingForm({
                 {/* CONDITIONAL RENDERING ON STATUS */}
                 {!isCustomDeptHead ? (
                   /* NORMAL MODE: Dropdown selector */
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 block">เลือกหัวหน้ากลุ่ม / ฝ่าย</label>
+                      <label className="text-[11px] font-bold text-slate-700 block">เลือกหัวหน้ากลุ่ม / ฝ่าย</label>
                       <select
                         name="departmentHeadName"
                         value={formData.departmentHeadName}
@@ -1676,14 +1687,28 @@ export default function BookingForm({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-700 block">
-                        ตำแหน่งหัวหน้ากลุ่ม/ฝ่าย
+                      <label className="text-[11px] font-bold text-slate-700 block">
+                        หัวหน้ากลุ่ม / ฝ่าย (ตำแหน่งผู้อนุมัติร่วม)
                       </label>
                       <input
                         type="text"
                         name="departmentHeadPosition"
                         value={formData.departmentHeadPosition}
                         onChange={handleChange}
+                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none font-sans bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-700 block">
+                        ตำแหน่งทางราชการ (ระดับ / ประเภทตำแหน่ง)
+                      </label>
+                      <input
+                        type="text"
+                        name="departmentHeadRank"
+                        value={formData.departmentHeadRank}
+                        onChange={handleChange}
+                        placeholder="เช่น นักพัฒนาสังคมชำนาญการพิเศษ"
                         className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none font-sans bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
                       />
                     </div>
@@ -1695,10 +1720,10 @@ export default function BookingForm({
                       💡 <span>ระบบจะช่วยพิมพ์คำว่า <strong>"แทน"</strong> นำหน้าชื่อตำแหน่งเดิมเพื่อความถูกต้องตามแบบฟอร์มกฎหมายราชการให้โดยอัตโนมัติ</span>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       {/* 1. Target head who we are signing instead of */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-700 block">ปฏิบัติหน้าที่แทนตำแหน่งของ</label>
+                        <label className="text-[11px] font-bold text-slate-700 block">ปฏิบัติหน้าที่แทนตำแหน่งของ</label>
                         <select
                           value={selectedDeptHeadId}
                           onChange={handleCustomParentHeadClassChange}
@@ -1712,7 +1737,7 @@ export default function BookingForm({
 
                       {/* 2. Custom name text input */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-700 block">ชื่อ-นามสกุล ผู้ปฏิบัติราชการแทน (ผู้เซ็นแทน)</label>
+                        <label className="text-[11px] font-bold text-slate-700 block">ชื่อ-นามสกุล ผู้ปฏิบัติราชการแทน (ผู้เซ็นแทน)</label>
                         <input
                           type="text"
                           value={formData.departmentHeadName}
@@ -1724,8 +1749,8 @@ export default function BookingForm({
 
                       {/* 3. Result Position with "แทน" automatically prepended */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-700 block">
-                          ตำแหน่งที่ปรากฏในใบคำขอ (หัวหน้ากลุ่ม/ฝ่าย)
+                        <label className="text-[11px] font-bold text-slate-700 block">
+                          ตำแหน่งหัวหน้ากลุ่ม/ฝ่ายที่เซ็นแทน
                         </label>
                         <input
                           type="text"
@@ -1733,6 +1758,21 @@ export default function BookingForm({
                           value={formData.departmentHeadPosition}
                           onChange={handleChange}
                           className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-extrabold outline-none bg-white text-rose-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
+                        />
+                      </div>
+
+                      {/* 4. Rank of the signing person */}
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-slate-700 block">
+                          ตำแหน่งทางราชการของผู้เซ็นแทน
+                        </label>
+                        <input
+                          type="text"
+                          name="departmentHeadRank"
+                          value={formData.departmentHeadRank}
+                          onChange={handleChange}
+                          placeholder="เช่น นักพัฒนาสังคมชำนาญการพิเศษ"
+                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
                         />
                       </div>
                     </div>

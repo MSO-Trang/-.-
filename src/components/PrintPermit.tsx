@@ -25,7 +25,10 @@ export default function PrintPermit({
 
   // Find the department head to get their rank configured in admin panel
   const matchedHead = departmentHeads?.find(h => h.name === booking.departmentHeadName);
-  const displayPosition = matchedHead?.rank || booking.departmentHeadPosition || '...................................................';
+  const headRank = booking.departmentHeadRank || matchedHead?.rank || '';
+  const headPos = booking.departmentHeadPosition || matchedHead?.position || '';
+  // Show only civil service rank (e.g. 'นักพัฒนาสังคมชำนาญการพิเศษ') if available, otherwise fallback to group position title
+  const displayPosition = headRank || headPos || '...................................................';
 
   useEffect(() => {
     try {
@@ -467,7 +470,12 @@ export default function PrintPermit({
                       <p className="flex items-baseline justify-center">
                         <span className="w-16 text-right pr-1 shrink-0 select-none">(ลงชื่อ)</span>
                         <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
-                        <span className="text-left pl-1 shrink-0 font-sans min-w-24">{booking.department ? `หัวหน้า${booking.department}` : 'หัวหน้ากลุ่ม/ฝ่าย'}</span>
+                        <span className="text-left pl-1 shrink-0 font-sans min-w-24">
+                          {(booking.departmentHeadPosition?.startsWith('แทน') || booking.departmentHeadPosition?.includes('แทน'))
+                            ? (booking.department ? `แทนหัวหน้า${booking.department}` : 'แทนหัวหน้ากลุ่ม/ฝ่าย')
+                            : (booking.department ? `หัวหน้า${booking.department}` : 'หัวหน้ากลุ่ม/ฝ่าย')
+                          }
+                        </span>
                       </p>
                       <p className="font-bold mt-1 text-black">
                         ( {booking.departmentHeadName || '......................................................................'} )
