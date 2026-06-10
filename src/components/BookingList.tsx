@@ -133,7 +133,9 @@ export default function BookingList({
       const vehicle = vehicles.find(v => v.id === booking.vehicleId);
       const driver = booking.driverId === 'self-drive' 
         ? { name: 'ขับขี่ด้วยตนเอง', phone: '-' }
-        : drivers.find(d => d.id === booking.driverId);
+        : booking.driverId === 'passenger-drive'
+          ? { name: booking.customDriverName ? `ผู้ร่วมเดินทางขับเอง (${booking.customDriverName})` : 'ผู้ร่วมเดินทางขับเอง', phone: '-' }
+          : drivers.find(d => d.id === booking.driverId);
 
       // Call actual Google Calendar Event creation API
       await syncBookingToGoogleCalendar(booking, vehicle, driver, activeToken);
@@ -413,7 +415,8 @@ export default function BookingList({
             className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
           >
             <option value="ALL">👤 คัดกรองตามคนขับ</option>
-            <option value="self-drive" className="font-semibold text-[#aa4e6e]">🚙 ขับรถยนต์ด้วยตนเอง</option>
+            <option value="self-drive" className="font-semibold text-[#aa4e6e]">🚙 ขับรถยนต์ด้วยตนเอง (ผู้ขอ)</option>
+            <option value="passenger-drive" className="font-semibold text-emerald-700">👥 ผู้ร่วมเดินทางเป็นคนขับ</option>
             {drivers.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
             ))}
@@ -578,7 +581,9 @@ export default function BookingList({
                   const vehicle = vehicles.find(v => v.id === b.vehicleId);
                   const driver = b.driverId === 'self-drive'
                     ? { id: 'self-drive', name: 'ขับรถยนต์ด้วยตนเอง', phone: '-', status: 'available' as const, avatarColor: 'bg-slate-600' }
-                    : drivers.find(d => d.id === b.driverId);
+                    : b.driverId === 'passenger-drive'
+                      ? { id: 'passenger-drive', name: b.customDriverName ? `ผู้ร่วมทริปขับ (${b.customDriverName})` : 'ผู้ร่วมทริปขับ', phone: '-', status: 'available' as const, avatarColor: 'bg-slate-600' }
+                      : drivers.find(d => d.id === b.driverId);
                   const statusInfo = translateStatus(b.status);
 
                   return (

@@ -107,7 +107,7 @@ export default function Schedules({
             if (!carConflicts[b1.vehicleId].includes(b2)) carConflicts[b1.vehicleId].push(b2);
           }
           // If same driver, add to driver conflicts
-          if (b1.driverId === b2.driverId && b1.driverId !== 'self-drive') {
+          if (b1.driverId === b2.driverId && b1.driverId !== 'self-drive' && b1.driverId !== 'passenger-drive') {
             driverConflicts[b1.driverId] = driverConflicts[b1.driverId] || [];
             if (!driverConflicts[b1.driverId].includes(b1)) driverConflicts[b1.driverId].push(b1);
             if (!driverConflicts[b1.driverId].includes(b2)) driverConflicts[b1.driverId].push(b2);
@@ -228,6 +228,7 @@ export default function Schedules({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {(() => {
             const selfDriveBookings = bookingsForSelectedDay.filter(b => b.driverId === 'self-drive');
+            const passengerDriveBookings = bookingsForSelectedDay.filter(b => b.driverId === 'passenger-drive');
             const displayDrivers = [...drivers];
             if (selfDriveBookings.length > 0) {
               displayDrivers.push({
@@ -236,6 +237,15 @@ export default function Schedules({
                 phone: 'ไม่ต้องใช้พนักงานขับรถ',
                 status: 'available',
                 avatarColor: 'bg-slate-700 text-white'
+              });
+            }
+            if (passengerDriveBookings.length > 0) {
+              displayDrivers.push({
+                id: 'passenger-drive',
+                name: 'ผู้ร่วมทริปเดินทางเป็นคนขับ',
+                phone: 'รายชื่อทีมเวิร์คสแตนบาย',
+                status: 'available',
+                avatarColor: 'bg-emerald-600 text-white font-black'
               });
             }
             return displayDrivers.map(d => {
@@ -254,7 +264,7 @@ export default function Schedules({
                   <div className="space-y-1.5 pb-3 border-b border-slate-100">
                     <div className="flex items-center justify-between">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${d.avatarColor}`}>
-                        {d.id === 'self-drive' ? '🚗' : d.name.substring(3, 5)}
+                        {d.id === 'self-drive' ? '🚗' : d.id === 'passenger-drive' ? '👥' : d.name.substring(3, 5)}
                       </div>
                       {isConflicting && (
                         <span className="p-1 bg-red-105 text-red-650 rounded-full animate-pulse" title="ตารางเวลาคนขับชนกัน">
@@ -375,7 +385,9 @@ export default function Schedules({
                        {dayBookings.map(b => {
                         const driver = b.driverId === 'self-drive'
                           ? { id: 'self-drive', name: 'ขับรถยนต์ด้วยตนเอง', phone: '-', status: 'available' as const, avatarColor: 'bg-slate-600' }
-                          : drivers.find(d => d.id === b.driverId);
+                          : b.driverId === 'passenger-drive'
+                            ? { id: 'passenger-drive', name: b.customDriverName ? `ผู้ร่วมทริปขับ (${b.customDriverName})` : 'ผู้ร่วมเดินทางเป็นคนขับ', phone: '-', status: 'available' as const, avatarColor: 'bg-emerald-600' }
+                            : drivers.find(d => d.id === b.driverId);
                         return (
                           <div
                             key={b.id}

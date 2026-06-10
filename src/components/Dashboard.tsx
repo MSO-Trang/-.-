@@ -419,7 +419,9 @@ export default function Dashboard({
                     const vehicle = vehicles.find(v => v.id === b.vehicleId);
                     const driver = b.driverId === 'self-drive'
                       ? { id: 'self-drive', name: 'ขับรถยนต์ด้วยตนเอง', phone: '-', status: 'available' as const, avatarColor: 'bg-slate-600' }
-                      : drivers.find(d => d.id === b.driverId);
+                      : b.driverId === 'passenger-drive'
+                        ? { id: 'passenger-drive', name: b.customDriverName ? `ผู้ร่วมทริปขับ (${b.customDriverName})` : 'ผู้ร่วมเดินทางเป็นคนขับ', phone: '-', status: 'available' as const, avatarColor: 'bg-slate-600' }
+                        : drivers.find(d => d.id === b.driverId);
                     return (
                       <tr key={b.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition text-xs">
                         <td className="py-3.5 px-4">

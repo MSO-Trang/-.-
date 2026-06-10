@@ -344,6 +344,7 @@ export default function DriverGoogleCalendar({
       case 'D4': return 'bg-sky-50 text-sky-700 border-sky-150';
       case 'D5': return 'bg-violet-50 text-violet-700 border-violet-150';
       case 'self-drive': return 'bg-slate-50 text-slate-700 border-slate-150';
+      case 'passenger-drive': return 'bg-emerald-50 text-emerald-700 border-emerald-150';
       default: return 'bg-rose-50 text-rose-700 border-rose-150';
     }
   };
@@ -356,7 +357,8 @@ export default function DriverGoogleCalendar({
       case 'D4': return 'bg-sky-500';
       case 'D5': return 'bg-violet-500';
       case 'self-drive': return 'bg-slate-500';
-      default: return 'bg-rose-500';
+      case 'passenger-drive': return 'bg-emerald-500';
+      default: return 'bg-rose-505';
     }
   };
 
@@ -508,6 +510,7 @@ export default function DriverGoogleCalendar({
           >
             <option value="ALL">👤 เลือกพนักงานคนขับทั้งหมด (รวม)</option>
             <option value="self-drive">🚗 ขับรถยนต์ด้วยตนเอง</option>
+            <option value="passenger-drive">👥 ผู้ร่วมเดินทางเป็นคนขับ</option>
             {drivers.map(d => (
               <option key={d.id} value={d.id}>
                 👨‍✈️ {d.name} {d.status === 'busy' ? '(งานชุก)' : '(ว่าง)'}
@@ -667,7 +670,11 @@ export default function DriverGoogleCalendar({
                       </div>
                     ) : (
                       dayBookings.map(b => {
-                        const driver = b.driverId === 'self-drive' ? { name: 'ขับเอง' } : drivers.find(d => d.id === b.driverId);
+                        const driver = b.driverId === 'self-drive' 
+                          ? { name: 'ขับเอง' } 
+                          : b.driverId === 'passenger-drive'
+                            ? { name: b.customDriverName ? `ผู้ร่วมเดินทางขับ (${b.customDriverName})` : 'ผู้ร่วมคณะขับ' }
+                            : drivers.find(d => d.id === b.driverId);
                         const v = vehicles.find(veh => veh.id === b.vehicleId);
                         return (
                           <div
@@ -716,7 +723,11 @@ export default function DriverGoogleCalendar({
               </div>
             ) : (
               filteredListBookings.map(b => {
-                const driver = b.driverId === 'self-drive' ? { name: 'ขับรถเอง' } : drivers.find(d => d.id === b.driverId);
+                const driver = b.driverId === 'self-drive' 
+                  ? { name: 'ขับรถเอง' } 
+                  : b.driverId === 'passenger-drive'
+                    ? { name: b.customDriverName ? `ผู้ร่วมเดินทางขับ (${b.customDriverName})` : 'ผู้ร่วมคณะขับขี่' }
+                    : drivers.find(d => d.id === b.driverId);
                 const v = vehicles.find(veh => veh.id === b.vehicleId);
                 return (
                   <div
@@ -791,7 +802,11 @@ export default function DriverGoogleCalendar({
                 </div>
               ) : (
                 getDayBookings(currentDate.toISOString().substring(0, 10)).map(b => {
-                  const driver = b.driverId === 'self-drive' ? { name: 'ขับเอง' } : drivers.find(d => d.id === b.driverId);
+                  const driver = b.driverId === 'self-drive' 
+                    ? { name: 'ขับเอง' } 
+                    : b.driverId === 'passenger-drive'
+                      ? { name: b.customDriverName ? `ผู้ร่วมทริปขับ (${b.customDriverName})` : 'ผู้ร่วมปาร์ตี้ขับ' }
+                      : drivers.find(d => d.id === b.driverId);
                   const v = vehicles.find(veh => veh.id === b.vehicleId);
                   return (
                     <div
@@ -888,10 +903,14 @@ export default function DriverGoogleCalendar({
                     </div>
                     <div className="min-w-0 flex-1">
                       <h5 className="font-extrabold text-slate-400 text-[9.5px] uppercase tracking-wide">พนักงานขับรถ</h5>
-                      <p className="mt-0.5 text-slate-800 font-extrabold text-[10.5px] truncate" title={selectedEvent.driverId === 'self-drive' ? 'ขับรถยนต์ราชการด้วยตนเอง' : drivers.find(d => d.id === selectedEvent.driverId)?.name || 'รอมอบหมาย'}>
-                        {selectedEvent.driverId === 'self-drive' ? 'ขับรถยนต์เอง' : drivers.find(d => d.id === selectedEvent.driverId)?.name || 'รอมอบหมาย'}
+                      <p className="mt-0.5 text-slate-800 font-extrabold text-[10.5px] truncate" title={selectedEvent.driverId === 'self-drive' ? 'ขับรถยนต์ราชการด้วยตนเอง' : selectedEvent.driverId === 'passenger-drive' ? `ผู้ร่วมเดินทางขับเอง (${selectedEvent.customDriverName || 'ไม่ระบุชื่อ'})` : drivers.find(d => d.id === selectedEvent.driverId)?.name || 'รอมอบหมาย'}>
+                        {selectedEvent.driverId === 'self-drive' 
+                          ? 'ขับรถยนต์เอง' 
+                          : selectedEvent.driverId === 'passenger-drive' 
+                            ? `ผู้ร่วมเดินทางขับ (${selectedEvent.customDriverName || 'ไม่ระบุชื่อ'})` 
+                            : drivers.find(d => d.id === selectedEvent.driverId)?.name || 'รอมอบหมาย'}
                       </p>
-                      {selectedEvent.driverId !== 'self-drive' && drivers.find(d => d.id === selectedEvent.driverId)?.phone && (
+                      {selectedEvent.driverId !== 'self-drive' && selectedEvent.driverId !== 'passenger-drive' && drivers.find(d => d.id === selectedEvent.driverId)?.phone && (
                         <p className="text-[#1a73e8] text-[9px] font-black mt-0.5 truncate">
                           📞 {drivers.find(d => d.id === selectedEvent.driverId)?.phone}
                         </p>

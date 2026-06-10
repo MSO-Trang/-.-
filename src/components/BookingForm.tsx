@@ -76,6 +76,7 @@ export default function BookingForm({
     endDate: '',
     vehicleId: '',
     driverId: '',
+    customDriverName: '',
     status: 'pending' as BookingStatus,
     approvedBy: '',
     approvedByPosition: '',
@@ -458,6 +459,7 @@ export default function BookingForm({
         endDate: formatForInput(bookingToEdit.endDate),
         vehicleId: bookingToEdit.vehicleId,
         driverId: bookingToEdit.driverId,
+        customDriverName: bookingToEdit.customDriverName || '',
         status: bookingToEdit.status,
         approvedBy: bookingToEdit.approvedBy,
         approvedByPosition: bookingToEdit.approvedByPosition,
@@ -516,7 +518,7 @@ export default function BookingForm({
   }, [formData.vehicleId, formData.startDate, formData.endDate, bookings, bookingToEdit]);
 
   const driverConflicts = useMemo(() => {
-    if (!formData.driverId || formData.driverId === 'self-drive' || !formData.startDate) return [];
+    if (!formData.driverId || formData.driverId === 'self-drive' || formData.driverId === 'passenger-drive' || !formData.startDate) return [];
     return findConflicts(
       bookings,
       formData.driverId,
@@ -533,8 +535,11 @@ export default function BookingForm({
 
   const selectedDriverObj = useMemo(() => {
     if (formData.driverId === 'self-drive') return { name: '🚙 ขับรถยนต์ปฏิบัติหน้าที่ด้วยตัวเอง' };
+    if (formData.driverId === 'passenger-drive') {
+      return { name: formData.customDriverName ? `🚙 ผู้ร่วมเดินทางขับเอง (${formData.customDriverName})` : '🚙 ผู้ร่วมเดินทางเป็นผู้ขับขี่' };
+    }
     return drivers.find(d => d.id === formData.driverId);
-  }, [formData.driverId, drivers]);
+  }, [formData.driverId, formData.customDriverName, drivers]);
 
   const handleCustomDeptHeadToggle = (checked: boolean) => {
     setIsCustomDeptHead(checked);
@@ -731,7 +736,11 @@ export default function BookingForm({
 
     else if (step === 3) {
       if (!formData.vehicleId) newErrors.vehicleId = 'กรุณาเลือกยานพาหนะราชการ';
-      if (!formData.driverId) newErrors.driverId = 'กรุณาเลือกพนักงานขับรถหรือเลือกผู้ขับขี่เอง';
+      if (!formData.driverId) {
+        newErrors.driverId = 'กรุณาเลือกพนักงานขับรถหรือเลือกผู้ขับขี่เอง';
+      } else if (formData.driverId === 'passenger-drive' && !formData.customDriverName.trim()) {
+        newErrors.customDriverName = 'กรุณาระบุหรือเลือกชื่อผู้ร่วมเดินทางที่ทำหน้าที่ขับรถยนต์';
+      }
     }
 
     else if (step === 4) {
@@ -754,6 +763,7 @@ export default function BookingForm({
       } else if (step === 3) {
         delete copy.vehicleId;
         delete copy.driverId;
+        delete copy.customDriverName;
       } else if (step === 4) {
         delete copy.permitNumber;
       }
@@ -785,7 +795,11 @@ export default function BookingForm({
     }
 
     if (!formData.vehicleId) newErrors.vehicleId = 'กรุณาเลือกยานพาหนะ';
-    if (!formData.driverId) newErrors.driverId = 'กรุณาเลือกพนักงานขับรถ';
+    if (!formData.driverId) {
+      newErrors.driverId = 'กรุณาเลือกพนักงานขับรถ';
+    } else if (formData.driverId === 'passenger-drive' && !formData.customDriverName.trim()) {
+      newErrors.customDriverName = 'กรุณาระบุหรือเลือกชื่อผู้ร่วมเดินทางที่ทำหน้าที่ขับรถยนต์';
+    }
     
     // Validate passengers capacity
     if (selectedVehicleObj && formData.passengersCount > selectedVehicleObj.capacity) {
@@ -854,6 +868,7 @@ export default function BookingForm({
       endDate: formData.endDate ? new Date(formData.endDate).toISOString() : '',
       vehicleId: formData.vehicleId,
       driverId: formData.driverId,
+      customDriverName: formData.driverId === 'passenger-drive' ? formData.customDriverName : '',
       status: formData.status,
       approvedBy: formData.approvedBy,
       approvedByPosition: formData.approvedByPosition,
@@ -1498,6 +1513,55 @@ export default function BookingForm({
                   </div>
                 </button>
 
+                {/* Standout Passenger-Drive Special Card */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, driverId: 'passenger-drive' }));
+                    if (errors.driverId) {
+                      setErrors(prev => {
+                        const copy = { ...prev };
+                        delete copy.driverId;
+                        return copy;
+                      });
+                    }
+                  }}
+                  className={`text-left p-4.5 rounded-2xl border-2 transition-all relative flex flex-col justify-between min-h-[145px] hover:shadow-xs active:scale-[0.98] cursor-pointer outline-none select-none ${
+                    formData.driverId === 'passenger-drive'
+                      ? 'border-[#aa4e6e] bg-[#aa4e6e]/5 shadow-sm ring-1 ring-[#aa4e6e]/20 border-l-4'
+                      : 'border-slate-100 hover:border-[#aa4e6e]/30 bg-white shadow-2xs'
+                  }`}
+                >
+                  <div className="flex justify-between items-start w-full">
+                    <div>
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 block w-fit mb-1.5 leading-none">
+                        อนุญาตส่วนกลาง
+                      </span>
+                      <h4 className="text-xs sm:text-[13px] font-extrabold text-slate-800">
+                        👥 ผู้ร่วมเดินทางเป็นคนขับ
+                      </h4>
+                    </div>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-emerald-50 border border-emerald-150">
+                      <Users size={14} className="text-emerald-600" />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-tight font-medium">
+                    ผู้ร่วมเดินทางท่านอื่นที่เดินทางร่วมไปในทริปเป็นทำหน้าที่ขับรถควบคุมยานพาหนะแทน
+                  </p>
+                  
+                  <div className="mt-3 pt-2 border-t border-slate-100/70 flex items-center justify-between">
+                    <span className="text-[10px] font-extrabold px-1.5 py-1 rounded-md bg-emerald-50/70 text-emerald-700 border border-emerald-100/50 flex items-center gap-1 leading-none">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      เพื่อนในทริปขับ
+                    </span>
+                    {formData.driverId === 'passenger-drive' && (
+                      <span className="text-[10px] font-extrabold text-[#aa4e6e] flex items-center gap-1">
+                        ✓ เลือกอยู่
+                      </span>
+                    )}
+                  </div>
+                </button>
+
                 {drivers.map((d) => {
                   const conflicts = findConflicts(bookings, d.id, 'driver', formData.startDate, formData.endDate, bookingToEdit?.id);
                   const isConflict = conflicts.length > 0;
@@ -1571,6 +1635,82 @@ export default function BookingForm({
                   );
                 })}
               </div>
+
+              {/* Dynamic Input Panel when Passenger Drive is chosen */}
+              {formData.driverId === 'passenger-drive' && (
+                <div className="p-5 bg-emerald-50/45 border border-emerald-100 rounded-2xl space-y-4 animate-fade-in mt-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <div className="p-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg">
+                      <Info size={14} className="shrink-0" />
+                    </div>
+                    <div>
+                      <h5 className="text-xs font-black text-slate-800">ข้อมูลผู้ขับขี่ที่เป็นบุคลากรผู้ร่วมเดินทาง</h5>
+                      <p className="text-[10px] text-slate-400 font-medium leading-relaxed">กรอกหรือเลือกชื่อเพื่อนผู้ร่วมเดินทางที่ตกลงกันไว้ในการทำหน้าที่เป็นผู้ขับควบคุมความปลอดภัย ยานพาหนะราชการชั่วคราวในการเดินทางไปครั้งนี้</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-extrabold text-slate-700 block">
+                      ระบุ ชื่อ-นามสกุล ผู้ร่วมเดินทางผู้ขับยานพาหนะ *
+                    </label>
+                    <input
+                      type="text"
+                      name="customDriverName"
+                      placeholder="เช่น นายอัญญาวุฒิ วานิชย์ (หรือคลิกเลือกจากรายชื่อด้านล่างหากระบุผู้เข้าร่วมไว้แล้ว)"
+                      value={formData.customDriverName}
+                      onChange={(e) => {
+                        setFormData(prev => ({ ...prev, customDriverName: e.target.value }));
+                        if (errors.customDriverName) {
+                          setErrors(prev => {
+                            const copy = { ...prev };
+                            delete copy.customDriverName;
+                            return copy;
+                          });
+                        }
+                      }}
+                      className={`w-full text-xs font-semibold px-3 py-2.5 border rounded-xl bg-white focus:outline-none focus:ring-1 transition text-slate-800 ${
+                        errors.customDriverName ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-400' : 'border-slate-200 focus:ring-rose-200 focus:border-[#aa4e6e]'
+                      }`}
+                    />
+                    {errors.customDriverName && (
+                      <p className="text-xs text-rose-500 font-semibold mt-1">{errors.customDriverName}</p>
+                    )}
+                  </div>
+
+                  {/* Recommendation list based on the actual typed passengers in step 2 */}
+                  {formData.passengersList && formData.passengersList.filter(name => name && name.trim()).length > 0 ? (
+                    <div className="space-y-2 pt-2 border-t border-slate-100/50">
+                      <span className="text-[10px] font-bold text-slate-450 block">หรือคลิกเลือกดึงรายชื่อจาก ผู้ร่วมเดินทางร่วมหลัก ที่แอดไว้ในส่วนที่ 2:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {formData.passengersList.filter(name => name && name.trim()).map((pName, pIdx) => (
+                          <button
+                            key={pIdx}
+                            type="button"
+                            onClick={() => {
+                              setFormData(prev => ({ ...prev, customDriverName: pName }));
+                              if (errors.customDriverName) {
+                                setErrors(prev => {
+                                  const copy = { ...prev };
+                                  delete copy.customDriverName;
+                                  return copy;
+                                });
+                              }
+                            }}
+                            className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-[10px] font-bold text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-250 rounded-xl cursor-pointer transition duration-150 shadow-3xs"
+                          >
+                            👤 {pName}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[10px] text-amber-600 font-semibold bg-amber-50/70 border border-amber-100/50 p-2 rounded-lg leading-snug">
+                      ℹ️ หากย้อนกลับไปในขั้นตอนก่อนหน้าเพื่อพิมพ์ระบุชื่อ "ผู้ร่วมเดินทางร่วมคณะ" คุณจะดึงชื่อมาคลิกเลือกเป็นคนขับตรงนี้ได้ง่ายทันทีอย่างสะดวกรวดเร็ว
+                    </p>
+                  )}
+                </div>
+              )}
+
               {errors.driverId && <p className="text-xs text-rose-500 font-semibold">{errors.driverId}</p>}
 
               {/* Conflict Alert Box for selected driver */}

@@ -41,7 +41,9 @@ export default function PrintPermit({
   const vehicle = vehicles.find(v => v.id === booking.vehicleId);
   const driver = booking.driverId === 'self-drive'
     ? { id: 'self-drive', name: 'ขับรถยนต์ด้วยตนเอง (ผู้ขออนุญาตเป็นผู้ขับขี่)', phone: 'ผู้ใช้รถขับเอง' }
-    : drivers.find(d => d.id === booking.driverId);
+    : booking.driverId === 'passenger-drive'
+      ? { id: 'passenger-drive', name: booking.customDriverName ? `ผู้ร่วมเดินทางเป็นคนขับ (${booking.customDriverName})` : 'ผู้ร่วมเดินทางเป็นผู้ขับขี่รถยนต์', phone: 'ผู้ใช้รถร่วมเดินทางขับเอง' }
+      : drivers.find(d => d.id === booking.driverId);
   
   // Format creation date (the date requested/created)
   const createdDateThai = formatThaiDate(booking.createdAt, false);

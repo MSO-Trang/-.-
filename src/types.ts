@@ -32,7 +32,8 @@ export interface Booking {
   startDate: string; // ISO DateTime
   endDate: string; // ISO DateTime
   vehicleId: string;
-  driverId: string;
+  driverId: string; // "self-drive", "passenger-drive", or actual driver ID
+  customDriverName?: string; // name of passenger or fellow traveler driving
   status: BookingStatus;
   approvedBy: string;
   approvedByPosition: string;
