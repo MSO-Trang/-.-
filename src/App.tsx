@@ -581,7 +581,7 @@ export default function App() {
               }}
             />
             <div>
-              <span className="text-[10px] text-[#a22055] font-bold block leading-none uppercase tracking-widest font-sans">สำนักงานพมจ.ตรัง</span>
+              <span className="text-[10px] text-[#aa4e6e] font-bold block leading-none uppercase tracking-widest font-sans">สำนักงานพมจ.ตรัง</span>
               <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-normal mt-0.5">
                 ระบบควบคุมและจองใช้รถยนต์ราชการส่วนกลาง
               </h1>
@@ -595,11 +595,11 @@ export default function App() {
                 onClick={handleStartCreateMode}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer select-none ${
                   activeTab === 'form' && !editingBooking
-                    ? 'bg-[#a22055] text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#a22055]'
+                    ? 'bg-[#aa4e6e] text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#aa4e6e]'
                 }`}
               >
-                <PlusCircle size={14} className={activeTab === 'form' && !editingBooking ? 'text-white' : 'text-[#a22055]'} />
+                <PlusCircle size={14} className={activeTab === 'form' && !editingBooking ? 'text-white' : 'text-[#aa4e6e]'} />
                 <span>เขียนใบขอใช้รถยนต์ใหม่</span>
               </button>
 
@@ -607,18 +607,18 @@ export default function App() {
                 onClick={() => setActiveTab('mileage')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer select-none ${
                   activeTab === 'mileage'
-                    ? 'bg-[#a22055] text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#a22055]'
+                    ? 'bg-[#aa4e6e] text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#aa4e6e]'
                 }`}
               >
-                <Gauge size={14} className={activeTab === 'mileage' ? 'text-white' : 'text-[#a22055]'} />
+                <Gauge size={14} className={activeTab === 'mileage' ? 'text-white' : 'text-[#aa4e6e]'} />
                 <span>บันทึกเลขไมล์ขากลับ</span>
               </button>
             </div>
 
             {/* Clock Widget */}
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 rounded-full">
-              <Clock size={13} className="text-[#a22055] shrink-0 animate-pulse" />
+              <Clock size={13} className="text-[#aa4e6e] shrink-0 animate-pulse" />
               <span className="text-xs font-medium font-mono whitespace-nowrap">เวลาปัจจุบัน: {currentClock || 'กำลังโหลด...'}</span>
             </div>
 
@@ -661,7 +661,7 @@ export default function App() {
                 </span>
                 <button
                   onClick={handleAdminLogout}
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-250 hover:text-[#a22055] hover:border-[#a22055] text-xs font-semibold rounded-lg transition shrink-0 cursor-pointer"
+                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-250 hover:text-[#aa4e6e] hover:border-[#aa4e6e] text-xs font-semibold rounded-lg transition shrink-0 cursor-pointer"
                   title="ออกจากระบบผู้ดูแล"
                 >
                   ออกจากระบบ
@@ -672,7 +672,7 @@ export default function App() {
                 onClick={() => {
                   setActiveTab('admin');
                 }}
-                className="flex items-center gap-1 px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-[#a22055] border border-pink-205 text-xs font-extrabold rounded-lg transition shrink-0 cursor-pointer shadow-xs"
+                className="flex items-center gap-1 px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-[#aa4e6e] border border-pink-205 text-xs font-extrabold rounded-lg transition shrink-0 cursor-pointer shadow-xs"
               >
                 🔐 เข้าสู่ระบบ Admin
               </button>
@@ -692,8 +692,8 @@ export default function App() {
             onClick={() => setActiveTab('dashboard')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
               activeTab === 'dashboard'
-                ? 'bg-[#a22055] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
+                ? 'bg-[#aa4e6e] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
             }`}
           >
             <BarChart3 size={15} />
@@ -704,8 +704,8 @@ export default function App() {
             onClick={() => setActiveTab('bookings')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
               activeTab === 'bookings'
-                ? 'bg-[#a22055] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
+                ? 'bg-[#aa4e6e] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
             }`}
           >
             <FileText size={15} />
@@ -716,8 +716,8 @@ export default function App() {
             onClick={() => setActiveTab('schedules')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
               activeTab === 'schedules'
-                ? 'bg-[#a22055] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
+                ? 'bg-[#aa4e6e] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
             }`}
           >
             <Calendar size={15} />
@@ -728,8 +728,8 @@ export default function App() {
             onClick={() => setActiveTab('admin')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs md:text-sm font-semibold transition ${
               activeTab === 'admin'
-                ? 'bg-[#a22055] text-white shadow-xs'
-                : 'text-slate-600 hover:bg-slate-50 hover:text-[#a22055]'
+                ? 'bg-[#aa4e6e] text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
             }`}
           >
             <Settings size={15} />

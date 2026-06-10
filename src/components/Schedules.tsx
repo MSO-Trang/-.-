@@ -142,7 +142,7 @@ export default function Schedules({
       <div className="bg-white border border-slate-200/70 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
         
         <div className="flex items-center gap-2">
-          <Calendar className="text-[#a22055]" size={20} />
+          <Calendar className="text-[#aa4e6e]" size={20} />
           <div className="space-y-0.5 font-sans">
             <h2 className="text-lg font-bold text-slate-900">แผงควบคุมและจัดแจงเที่ยวรถยนต์ราชการ</h2>
             <p className="text-xs text-slate-400">ตรวจสอบความสอดคล้อง ป้องกันการจองชนเวลา ทั้งยานพาหนะและทีมคนขับ</p>
@@ -155,7 +155,7 @@ export default function Schedules({
             onClick={() => setViewType('drivers')}
             className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer ${
               viewType === 'drivers' 
-                ? 'bg-white text-[#a22055] shadow-xs' 
+                ? 'bg-white text-[#aa4e6e] shadow-xs' 
                 : 'text-slate-500 hover:text-slate-850'
             }`}
           >
@@ -165,7 +165,7 @@ export default function Schedules({
             onClick={() => setViewType('vehicles')}
             className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer ${
               viewType === 'vehicles' 
-                ? 'bg-white text-[#a22055] shadow-xs' 
+                ? 'bg-white text-[#aa4e6e] shadow-xs' 
                 : 'text-slate-500 hover:text-slate-850'
             }`}
           >
@@ -302,7 +302,7 @@ export default function Schedules({
 
                             {/* Destination */}
                             <div className="flex items-start gap-1 font-bold text-slate-800 mb-0.5">
-                              <MapPin size={10} className="text-[#a22055] shrink-0 mt-0.5" />
+                              <MapPin size={10} className="text-[#aa4e6e] shrink-0 mt-0.5" />
                               <span className="truncate">{b.destination.split(' ')[0]}</span>
                             </div>
 
@@ -399,7 +399,7 @@ export default function Schedules({
                             </div>
 
                             <div className="flex items-start gap-1 font-bold text-slate-800 mb-0.5">
-                              <MapPin size={10} className="text-[#a22055] shrink-0 mt-0.5" />
+                              <MapPin size={10} className="text-[#aa4e6e] shrink-0 mt-0.5" />
                               <span className="truncate">{b.destination.split(' ')[0]}</span>
                             </div>
 

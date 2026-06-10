@@ -6,16 +6,10 @@
   --font-sarabun: "TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif;
 }
 
-/* Increase the base root font size so all rem-based typography scales up across the entire web app */
+/* Ensure comfortable reading layout and smooth system fonts */
 html {
-  font-size: 112.5% !important; /* Scales 16px to 18px */
-}
-
-/* Keep original scale when printing to prevent document overflows or clipping */
-@media print {
-  html {
-    font-size: 100% !important;
-  }
+  font-size: 100%;
+  scroll-behavior: smooth;
 }
 
 /* Force TH Sarabun font family on the entire government form page and all its descendants to override other font utilities */
@@ -24,59 +18,25 @@ html {
   font-family: "TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif !important;
 }
 
-/* Tighten the font spacing, line heights, and remove bold styles in the booking form */
-#booking-form,
-#booking-form * {
-  font-weight: 400 !important;
-  letter-spacing: -0.015em !important;
-  line-height: 1.25 !important;
+/* Custom Scrollbar for a premium feeling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-/* Keep headers, main titles, buttons, and badges with a slightly readable medium weight (not bold) and neat alignment */
-#booking-form h2,
-#booking-form h3,
-#booking-form h2 *,
-#booking-form h3 *,
-#booking-form button,
-#booking-form button * {
-  font-weight: 500 !important;
+::-webkit-scrollbar-track {
+  background: #f8fafc;
 }
 
-/* Squeeze margins and paddings inside the booking form to make it compact */
-#booking-form {
-  padding: 1.25rem !important;
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
 }
 
-#booking-form .space-y-8 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 1rem !important;
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-#booking-form .space-y-6 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.75rem !important;
-}
-
-#booking-form .space-y-5 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.5rem !important;
-}
-
-#booking-form .space-y-4 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.5rem !important;
-}
-
-#booking-form .space-y-2 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.25rem !important;
-}
-
-#booking-form .space-y-1\.5 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.25rem !important;
-}
-
-#step-1-journey,
-#step-2-requester,
-#step-3-vehicle,
-#step-4-\[\#a22055\] {
-  padding: 1.25rem !important;
-}
 
 
 

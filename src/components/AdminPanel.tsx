@@ -322,8 +322,8 @@ export default function AdminPanel({
     if (!caretakerForm) return;
 
     const errors: { [key: string]: string } = {};
-    if (!caretakerForm.name?.trim()) errors.name = 'กรุณากรอกชื่อและนามสกุลเจ้าหน้าที่จัดดูแล';
-    if (!caretakerForm.position?.trim()) errors.position = 'กรุณากรอกตำแหน่งราชการ';
+    if (!caretakerForm.name?.trim()) errors.name = 'กรุณากรอกชื่อและนามสกุลเจ้าหน้าที่จัดดูแลฯ';
+    if (!caretakerForm.position?.trim()) errors.position = 'กรุณากรอกตำแหน่ง';
 
     if (Object.keys(errors).length > 0) {
       setCaretakerErrors(errors);
@@ -369,111 +369,25 @@ export default function AdminPanel({
 
   return (
     <div className="space-y-6" id="admin-panel-view">
-      
       {/* Date Navigation Bar and View Select */}
-      <div className="bg-gradient-to-r from-white via-pink-55/10 to-white border border-pink-100 rounded-2xl p-6 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-        <div className="flex items-start sm:items-center gap-3.5">
-          <div className="p-3 bg-pink-50 border border-pink-100 rounded-2xl shrink-0">
-            <Settings className="text-[#a22055]" size={22} />
-          </div>
-          <div className="space-y-1">
-            <h2 className="text-base font-black text-slate-900 font-sans flex flex-wrap items-center gap-2">
-              <span>แผงควบคุมหลักผู้ดูแลระบบ</span>
-              <span className="px-2.5 py-0.5 text-[9px] bg-gradient-to-r from-[#a22055] to-pink-600 text-white font-extrabold rounded-full tracking-wider whitespace-nowrap font-mono">สนง.พมจ.ตรัง</span>
-            </h2>
-            <p className="text-[11.5px] text-slate-500 leading-relaxed font-sans">
-              ระบบศูนย์ข้อสั่งราชการ คุมทะเบียนคลังรถยนต์ ทะเบียนรายชื่อพนักงานขับ และสรุปยอดรายงานระยะทางสถิติสะสม
-            </p>
-          </div>
-        </div>
-        
-        {/* Subtab switcher */}
-        <div className="flex flex-wrap items-center gap-3 shrink-0 w-full xl:w-auto">
-          <div className="flex flex-wrap bg-slate-100/80 p-0.5 rounded-xl border border-slate-200/60 w-full lg:w-auto justify-stretch">
-            <button
-              onClick={() => {
-                setActiveSubTab('vehicles');
-                resetAllForms();
-              }}
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
-                activeSubTab === 'vehicles' 
-                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Car size={13} />
-              คลังรถราชการ ({vehicles.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubTab('drivers');
-                resetAllForms();
-              }}
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
-                activeSubTab === 'drivers' 
-                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Users size={13} />
-              คนขับประจำกอง ({drivers.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubTab('approvers');
-                resetAllForms();
-              }}
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
-                activeSubTab === 'approvers' 
-                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Award size={13} />
-              ผู้ลงนาม ({approvers.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubTab('caretakers');
-                resetAllForms();
-              }}
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
-                activeSubTab === 'caretakers' 
-                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <FileSignature size={13} />
-              เจ้าหน้าที่จัดดูแลฯ ({caretakers.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubTab('departmentHeads');
-                resetAllForms();
-              }}
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
-                activeSubTab === 'departmentHeads' 
-                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <User size={13} />
-              หัวหน้ากลุ่ม/ฝ่าย ({departmentHeads.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveSubTab('trips');
-                resetAllForms();
-              }}
-              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
-                activeSubTab === 'trips' 
-                  ? 'bg-white text-[#a22055] shadow-xs border border-slate-200' 
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Route size={13} />
-              สถิติวิ่งรถ ({bookings.filter(b => b.vehicleId && b.status === 'completed').length})
-            </button>
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs flex flex-col gap-6">
+        {/* Top Header Row with Title & Logout */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="p-3 bg-pink-50 border border-pink-100 rounded-2xl shrink-0">
+              <Settings className="text-[#aa4e6e]" size={22} />
+            </div>
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-lg font-black text-slate-900 font-sans">
+                  แผงควบคุมหลักผู้ดูแลระบบ
+                </h2>
+                <span className="px-2.5 py-0.5 text-[9px] bg-gradient-to-r from-[#aa4e6e] to-pink-600 text-white font-extrabold rounded-full tracking-wider whitespace-nowrap font-mono">สนง.พมจ.ตรัง</span>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed font-sans">
+                ระบบศูนย์ข้อสั่งราชการ คุมทะเบียนคลังรถยนต์ ทะเบียนรายชื่อพนักงานขับ และสรุปยอดรายงานระยะทางสถิติสะสม
+              </p>
+            </div>
           </div>
 
           {onLogout && (
@@ -492,12 +406,102 @@ export default function AdminPanel({
                   }
                 });
               }}
-              className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-[#a22055] border border-rose-250 hover:border-[#a22055] text-xs font-black rounded-lg transition cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0 font-sans"
+              className="md:self-center self-start px-3.5 py-2 bg-rose-50 hover:bg-rose-100/80 text-[#aa4e6e] border border-rose-250 hover:border-[#aa4e6e] text-xs font-black rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs shrink-0 font-sans"
               title="ออกจากระบบทันที"
             >
-              🚪 ออกจากระบบ
+              🚪 ออกจากระบบแอดมิน
             </button>
           )}
+        </div>
+        
+        {/* Subtab switcher */}
+        <div className="flex flex-wrap items-center gap-3 shrink-0 w-full">
+          <div className="flex flex-wrap bg-slate-50 p-1 rounded-xl border border-slate-200/60 w-full justify-stretch gap-1">
+            <button
+              onClick={() => {
+                setActiveSubTab('vehicles');
+                resetAllForms();
+              }}
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
+                activeSubTab === 'vehicles' 
+                  ? 'bg-white text-[#aa4e6e] shadow-xs border border-slate-200/80' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              <Car size={13} />
+              คลังรถราชการ ({vehicles.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveSubTab('drivers');
+                resetAllForms();
+              }}
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
+                activeSubTab === 'drivers' 
+                  ? 'bg-white text-[#aa4e6e] shadow-xs border border-slate-200/80' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              <Users size={13} />
+              คนขับประจำกอง ({drivers.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveSubTab('approvers');
+                resetAllForms();
+              }}
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
+                activeSubTab === 'approvers' 
+                  ? 'bg-white text-[#aa4e6e] shadow-xs border border-slate-200/80' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              <Award size={13} />
+              ผู้ลงนาม ({approvers.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveSubTab('caretakers');
+                resetAllForms();
+              }}
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
+                activeSubTab === 'caretakers' 
+                  ? 'bg-white text-[#aa4e6e] shadow-xs border border-slate-200/80' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              <FileSignature size={13} />
+              เจ้าหน้าที่จัดดูแลฯ ({caretakers.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveSubTab('departmentHeads');
+                resetAllForms();
+              }}
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
+                activeSubTab === 'departmentHeads' 
+                  ? 'bg-white text-[#aa4e6e] shadow-xs border border-slate-200/80' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              <User size={13} />
+              หัวหน้ากลุ่ม/ฝ่าย ({departmentHeads.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveSubTab('trips');
+                resetAllForms();
+              }}
+              className={`flex-1 lg:flex-none flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition cursor-pointer whitespace-nowrap ${
+                activeSubTab === 'trips' 
+                  ? 'bg-white text-[#aa4e6e] shadow-xs border border-slate-200/80' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
+              }`}
+            >
+              <Route size={13} />
+              สถิติวิ่งรถ ({bookings.filter(b => b.vehicleId && b.status === 'completed').length})
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1304,7 +1308,7 @@ export default function AdminPanel({
             <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-slate-950 flex items-center gap-2 font-sans">
-                  <User size={18} className="text-[#a22055]" />
+                  <User size={18} className="text-[#aa4e6e]" />
                   รายชื่อหัวหน้ากลุ่มงาน / ฝ่าย
                 </h3>
                 <button
@@ -1316,7 +1320,7 @@ export default function AdminPanel({
                       rank: ''
                     });
                   }}
-                  className="px-3 py-1.5 bg-[#a22055] hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm border border-pink-500 cursor-pointer"
+                  className="px-3 py-1.5 bg-[#aa4e6e] hover:bg-pink-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm border border-pink-500 cursor-pointer"
                 >
                   <Plus size={14} />
                   เพิ่มหัวหน้าใหม่
@@ -1331,12 +1335,12 @@ export default function AdminPanel({
                   >
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-sans font-bold text-xs text-[#a22055] bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
+                        <span className="font-sans font-bold text-xs text-[#aa4e6e] bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
                           หัวหน้ากลุ่ม/ฝ่าย
                         </span>
                       </div>
                       <h4 className="font-extrabold text-slate-900 text-sm mt-2 font-sans">{head.name}</h4>
-                      <p className="text-xs text-slate-500 mt-1 leading-normal font-semibold text-[#a22055]">{head.position}</p>
+                      <p className="text-xs text-slate-500 mt-1 leading-normal font-semibold text-[#aa4e6e]">{head.position}</p>
                       {head.rank && (
                         <p className="text-xs text-slate-500 mt-0.5 leading-normal font-medium">ตำแหน่ง: {head.rank}</p>
                       )}
@@ -1348,7 +1352,7 @@ export default function AdminPanel({
                           resetAllForms();
                           setDepartmentHeadForm(head);
                         }}
-                        className="p-1.5 hover:bg-pink-50/50 border border-slate-200 text-slate-655 hover:text-[#a22055] rounded transition flex items-center gap-1 text-xs font-bold cursor-pointer"
+                        className="p-1.5 hover:bg-pink-50/50 border border-slate-200 text-slate-655 hover:text-[#aa4e6e] rounded transition flex items-center gap-1 text-xs font-bold cursor-pointer"
                         title="แก้ไขข้อมูลหัวหน้า"
                       >
                         <Edit2 size={13} />
@@ -1387,7 +1391,7 @@ export default function AdminPanel({
             {departmentHeadForm ? (
               <form onSubmit={handleDepartmentHeadSubmit} className="bg-pink-50/55 text-slate-850 border border-pink-100 rounded-lg p-5 shadow-sm space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-pink-100 pb-3">
-                  <h3 className="text-sm font-bold text-[#a22055] flex items-center gap-1.5 font-sans">
+                  <h3 className="text-sm font-bold text-[#aa4e6e] flex items-center gap-1.5 font-sans">
                     <PlusCircle size={16} />
                     {departmentHeadForm.id ? 'แก้ไขข้อมูลหัวหน้า' : 'เพิ่มหัวหน้าใหม่'}
                   </h3>
@@ -1462,7 +1466,7 @@ export default function AdminPanel({
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-[#a22055] hover:bg-pink-700 text-white rounded font-bold transition flex items-center gap-1 border border-pink-550 shadow-sm hover:shadow cursor-pointer font-sans"
+                    className="px-4 py-2 bg-[#aa4e6e] hover:bg-pink-700 text-white rounded font-bold transition flex items-center gap-1 border border-pink-550 shadow-sm hover:shadow cursor-pointer font-sans"
                   >
                     <Save size={14} />
                     บันทึกหัวหน้ากลุ่ม/ฝ่าย
@@ -1471,7 +1475,7 @@ export default function AdminPanel({
               </form>
             ) : (
               <div className="bg-pink-50/10 border border-pink-100 rounded-lg p-6 text-center space-y-3 shadow-none">
-                <User className="text-[#a22055] mx-auto animate-pulse" size={42} />
+                <User className="text-[#aa4e6e] mx-auto animate-pulse" size={42} />
                 <h4 className="text-sm font-bold text-slate-900 font-sans">จัดการหัวหน้ากลุ่มงาน/ฝ่าย</h4>
                 <p className="text-xs text-slate-500 leading-relaxed md:max-w-[250px] mx-auto font-sans">
                   คุณสามารถเพิ่มหรือแก้ไข รายชื่อหัวหน้ากลุ่มงาน/ฝ่าย เพื่อลงความเห็นเห็นควรอนุญาตในใบขอยานพาหนะได้อย่างง่ายดาย
@@ -1667,7 +1671,7 @@ export default function AdminPanel({
                           <td className="p-3 align-middle font-sans whitespace-nowrap">
                             {matchedVehicle ? (
                               <div className="space-y-0.5">
-                                <span className="font-extrabold text-[#a22055] block">
+                                <span className="font-extrabold text-[#aa4e6e] block">
                                   {matchedVehicle.plateNumber}
                                 </span>
                                 <span className="text-[11px] text-slate-500 font-medium">
@@ -1763,9 +1767,9 @@ export default function AdminPanel({
                       <td colSpan={3} className="p-3 text-right text-xs font-black text-slate-600">
                         🏁 ยอดรวมระยะทางรถที่เดินทางเสร็จสิ้นแล้วทั้งหมด:
                       </td>
-                      <td className="p-3 text-sm font-black text-[#a22055] whitespace-nowrap bg-pink-50/20">
-                        <div className="inline-flex items-center gap-1.5 bg-[#a22055]/5 border border-[#a22055]/15 px-2.5 py-1 rounded-lg text-[#a22055]">
-                          <Route size={14} className="text-[#a22055]" />
+                      <td className="p-3 text-sm font-black text-[#aa4e6e] whitespace-nowrap bg-pink-50/20">
+                        <div className="inline-flex items-center gap-1.5 bg-[#aa4e6e]/5 border border-[#aa4e6e]/15 px-2.5 py-1 rounded-lg text-[#aa4e6e]">
+                          <Route size={14} className="text-[#aa4e6e]" />
                           <span>{filteredTotalKm.toLocaleString()} กม.</span>
                         </div>
                       </td>

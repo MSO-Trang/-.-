@@ -342,7 +342,7 @@ export default function BookingList({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1 font-sans">
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-            <FileText className="text-[#a22055]" size={20} />
+            <FileText className="text-[#aa4e6e]" size={20} />
             ฐานข้อมูลและบันทึกประวัติการขอใช้รถยนต์ราชการ
           </h2>
           <p className="text-xs text-slate-400">
@@ -351,7 +351,7 @@ export default function BookingList({
         </div>
         <button
           onClick={onAddNew}
-          className="px-4 py-2 bg-[#a22055] hover:bg-[#8c1c4a] text-white font-semibold rounded-xl text-xs md:text-sm transition flex items-center gap-1.5 cursor-pointer"
+          className="px-4 py-2 bg-[#aa4e6e] hover:bg-[#8c1c4a] text-white font-semibold rounded-xl text-xs md:text-sm transition flex items-center gap-1.5 cursor-pointer"
           id="btn-add-new-list"
         >
           <CalendarRange size={14} />
@@ -362,7 +362,7 @@ export default function BookingList({
       {/* Advanced Filters Block */}
       <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-5 space-y-4">
         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-705 uppercase tracking-wider">
-          <Filter size={13} className="text-[#a22055]" />
+          <Filter size={13} className="text-[#aa4e6e]" />
           <span>เครื่องมือค้นหาและกรองข้อมูลขั้นสูง</span>
         </div>
 
@@ -378,7 +378,7 @@ export default function BookingList({
               placeholder="ค้นหาชื่อ, เลขที่, ปลายทาง..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-3 py-2 w-full bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#a22055] focus:border-[#a22055]"
+              className="pl-9 pr-3 py-2 w-full bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
             />
           </div>
 
@@ -386,7 +386,7 @@ export default function BookingList({
           <select
             value={selectedDept}
             onChange={(e) => setSelectedDept(e.target.value)}
-            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#a22055] focus:border-[#a22055]"
+            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
           >
             <option value="ALL">🔍 ทุกกลุ่มงานสังกัด</option>
             {DEPARTMENTS.map((dept, idx) => (
@@ -398,7 +398,7 @@ export default function BookingList({
           <select
             value={selectedVehicle}
             onChange={(e) => setSelectedVehicle(e.target.value)}
-            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#a22055] focus:border-[#a22055]"
+            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
           >
             <option value="ALL">🚗 คัดกรองตามรถยนต์</option>
             {vehicles.map((v) => (
@@ -410,10 +410,10 @@ export default function BookingList({
           <select
             value={selectedDriver}
             onChange={(e) => setSelectedDriver(e.target.value)}
-            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#a22055] focus:border-[#a22055]"
+            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
           >
             <option value="ALL">👤 คัดกรองตามคนขับ</option>
-            <option value="self-drive" className="font-semibold text-[#a22055]">🚙 ขับรถยนต์ด้วยตนเอง</option>
+            <option value="self-drive" className="font-semibold text-[#aa4e6e]">🚙 ขับรถยนต์ด้วยตนเอง</option>
             {drivers.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
             ))}
@@ -423,7 +423,7 @@ export default function BookingList({
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#a22055] focus:border-[#a22055]"
+            className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
           >
             <option value="ALL">🔘 คัดด้วยสถานะอนุมัติ</option>
             <option value="pending">รออนุมัติ (Pending)</option>
@@ -438,7 +438,7 @@ export default function BookingList({
         {/* Date Range Picker Sub-row */}
         <div className="pt-3 border-t border-slate-200/50 grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
           <div className="md:col-span-3 text-xs font-bold text-slate-700 flex items-center gap-1.5">
-            <CalendarRange size={14} className="text-[#a22055]" />
+            <CalendarRange size={14} className="text-[#aa4e6e]" />
             <span>กรองช่วงเวลาเดินทาง (วันที่ออกเดินทาง):</span>
           </div>
           
@@ -450,7 +450,7 @@ export default function BookingList({
                   type="date"
                   value={startDateFilter}
                   onChange={(e) => setStartDateFilter(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#a22055] focus:border-[#a22055] font-sans font-semibold text-slate-700"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e] font-sans font-semibold text-slate-700"
                   title="จากวันที่เลือกเดินทางเริ่มต้น"
                 />
               </div>
@@ -463,7 +463,7 @@ export default function BookingList({
                   type="date"
                   value={endDateFilter}
                   onChange={(e) => setEndDateFilter(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#a22055] focus:border-[#a22055] font-sans font-semibold text-slate-700"
+                  className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e] font-sans font-semibold text-slate-700"
                   title="ถึงวันที่เลือกเดินทางสิ้นสุด"
                 />
               </div>
@@ -473,7 +473,7 @@ export default function BookingList({
                 <button
                   type="button"
                   onClick={() => { setStartDateFilter(''); setEndDateFilter(''); }}
-                  className="p-1 px-2.5 text-[10px] text-[#a22055] hover:text-[#8c1c4a] bg-rose-50 rounded-md border border-rose-150 font-sans font-bold hover:bg-rose-100 transition shrink-0"
+                  className="p-1 px-2.5 text-[10px] text-[#aa4e6e] hover:text-[#8c1c4a] bg-rose-50 rounded-md border border-rose-150 font-sans font-bold hover:bg-rose-100 transition shrink-0"
                 >
                   ล้างวันที่
                 </button>
@@ -484,11 +484,11 @@ export default function BookingList({
             {(startDateFilter || endDateFilter) && (
               <div className="text-[10px] text-slate-450 font-semibold px-1 flex items-center gap-1">
                 <span>🔍 กรองจาก:</span>
-                <span className="text-[#a22055] font-bold">
+                <span className="text-[#aa4e6e] font-bold">
                   {startDateFilter ? formatThaiDate(startDateFilter, false) : 'เริ่มต้นแรกสุด'}
                 </span>
                 <span>ถึง</span>
-                <span className="text-[#a22055] font-bold">
+                <span className="text-[#aa4e6e] font-bold">
                   {endDateFilter ? formatThaiDate(endDateFilter, false) : 'สิ้นสุดตาราง'}
                 </span>
               </div>
@@ -527,7 +527,7 @@ export default function BookingList({
         {/* Resets and results counter */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200">
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-            <span>พบเอกสารขอจองสิทธิ์ทั้งหมด <span className="font-semibold text-[#a22055]">{filteredBookings.length}</span> รายการ</span>
+            <span>พบเอกสารขอจองสิทธิ์ทั้งหมด <span className="font-semibold text-[#aa4e6e]">{filteredBookings.length}</span> รายการ</span>
             {isAdmin ? (
               <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-50 border border-emerald-150 px-2.5 py-0.5 rounded shadow-xs text-[10px]">
                 🔓 โหมดผู้ดูแลระบบ (ตรวจอนุมัติ/แก้ไข/ลบข้อมูลการจองได้ถาวร)
@@ -541,7 +541,7 @@ export default function BookingList({
           {(searchTerm || selectedDept !== 'ALL' || selectedVehicle !== 'ALL' || selectedDriver !== 'ALL' || selectedStatus !== 'ALL' || startDateFilter || endDateFilter) && (
             <button
               onClick={handleResetFilters}
-              className="text-xs text-[#a22055] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+              className="text-xs text-[#aa4e6e] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
             >
               <RefreshCw size={12} />
               ล้างตัวกรองทั้งหมด
@@ -584,7 +584,7 @@ export default function BookingList({
                   return (
                     <tr key={b.id} className="hover:bg-slate-50/50 transition">
                       {/* Permit Number */}
-                      <td className="py-2 px-2.5 font-mono font-bold text-[#a22055] whitespace-nowrap">
+                      <td className="py-2 px-2.5 font-mono font-bold text-[#aa4e6e] whitespace-nowrap">
                         {b.permitNumber}
                       </td>
 
@@ -606,7 +606,7 @@ export default function BookingList({
 
                       {/* Capacity */}
                       <td className="py-2 px-1.5 text-center font-bold text-slate-705 whitespace-nowrap relative group">
-                        <span className="cursor-help hover:text-[#a22055] transition border-b border-dotted border-slate-350 pb-0.5">
+                        <span className="cursor-help hover:text-[#aa4e6e] transition border-b border-dotted border-slate-350 pb-0.5">
                           👤 {b.passengersCount} คน
                         </span>
                         {b.passengersList && b.passengersList.filter(name => name.trim() !== '').length > 0 && (
@@ -631,7 +631,7 @@ export default function BookingList({
                       {/* Car & driver */}
                       <td className="py-2 px-2.5 whitespace-nowrap">
                         <div className="flex items-center gap-1 font-bold text-slate-700">
-                          <Car size={11} className="text-[#a22055]" />
+                          <Car size={11} className="text-[#aa4e6e]" />
                           {vehicle?.plateNumber || 'ไม่ระบุ'}
                         </div>
                         <div className="flex items-center gap-1 text-[10px] text-slate-450 font-medium mt-0.5 max-w-[120px] truncate">
@@ -768,7 +768,7 @@ export default function BookingList({
                                 });
                               }}
                               title="ยกเลิกคำขอใช้รถ"
-                              className="p-1 bg-rose-50 hover:bg-rose-100 text-[#a22055] rounded-md transition cursor-pointer"
+                              className="p-1 bg-rose-50 hover:bg-rose-100 text-[#aa4e6e] rounded-md transition cursor-pointer"
                             >
                               <XCircle size={13} />
                             </button>
@@ -863,7 +863,7 @@ export default function BookingList({
             <div className="bg-slate-50 border border-slate-200/50 rounded-xl p-3.5 space-y-1.5 text-xs">
               <div className="flex justify-between">
                 <span className="font-semibold text-slate-400">เลขใบขอใช้รถ:</span>
-                <span className="font-mono font-bold text-[#a22055]">{mileageModalBooking.permitNumber}</span>
+                <span className="font-mono font-bold text-[#aa4e6e]">{mileageModalBooking.permitNumber}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-slate-400">ผู้ขออนุญาต:</span>
@@ -912,7 +912,7 @@ export default function BookingList({
               {/* End Mileage */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-750 block flex justify-between">
-                  <span className="text-[#a22055] font-black">🏁 ระบุเลขไมล์สะสมหลังเสร็จงาน (กม.)</span>
+                  <span className="text-[#aa4e6e] font-black">🏁 ระบุเลขไมล์สะสมหลังเสร็จงาน (กม.)</span>
                   <span className="text-rose-600 font-extrabold text-[10px]">* จำเป็น</span>
                 </label>
                 <div className="relative">
@@ -924,10 +924,10 @@ export default function BookingList({
                       if (milError) setMilError('');
                     }}
                     placeholder="กรอกเลขกิโลเมตรล่าสุด เช่น 134590"
-                    className="w-full px-4 py-2.5 bg-white border border-[#a22055] rounded-xl text-sm text-slate-850 outline-none focus:ring-2 focus:ring-rose-100 font-mono font-black placeholder-slate-300"
+                    className="w-full px-4 py-2.5 bg-white border border-[#aa4e6e] rounded-xl text-sm text-slate-850 outline-none focus:ring-2 focus:ring-rose-100 font-mono font-black placeholder-slate-300"
                     autoFocus
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#a22055]">กม.</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black text-[#aa4e6e]">กม.</span>
                 </div>
               </div>
 
@@ -962,7 +962,7 @@ export default function BookingList({
               <button
                 type="button"
                 onClick={handleSaveMileageModal}
-                className="flex-1 py-2 bg-[#a22055] hover:bg-[#8c1c4a] text-white rounded-xl text-xs font-extrabold transition shadow-xs cursor-pointer flex items-center justify-center gap-1"
+                className="flex-1 py-2 bg-[#aa4e6e] hover:bg-[#8c1c4a] text-white rounded-xl text-xs font-extrabold transition shadow-xs cursor-pointer flex items-center justify-center gap-1"
               >
                 💾 บันทึกและสรุปงาน
               </button>

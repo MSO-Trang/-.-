@@ -881,14 +881,14 @@ export default function BookingForm({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-rose-100">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-rose-50 rounded-2xl text-[#a22055]">
+            <div className="p-2.5 bg-rose-50 rounded-2xl text-[#aa4e6e]">
               <ClipboardList size={26} />
             </div>
             <div>
               <h2 className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight flex items-center gap-2">
                 {isEditMode ? 'แก้ไขใบอนุมัติการขอใช้รถ' : 'เขียนใบสำรองขอจองรถราชการ'}
               </h2>
-              <p className="text-[#a22055] font-bold text-xs uppercase tracking-wider">
+              <p className="text-[#aa4e6e] font-bold text-xs uppercase tracking-wider">
                 สำนักงานพัฒนาสังคมและความมั่นคงของมนุษย์จังหวัดตรัง (สนง.พมจ.ตรัง)
               </p>
             </div>
@@ -940,9 +940,9 @@ export default function BookingForm({
         {(formMode === 'all' || currentStep === 1) && (
           <div className="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-xs space-y-6 transition-all" id="step-1-journey">
             <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-              <div className="h-6 w-1 rounded-full bg-[#a22055]" />
+              <div className="h-6 w-1 rounded-full bg-[#aa4e6e]" />
               <div className="flex items-center gap-2">
-                <Calendar size={18} className="text-[#a22055]" />
+                <Calendar size={18} className="text-[#aa4e6e]" />
                 <h3 className="text-base font-extrabold text-slate-800">
                   ส่วนที่ 1 : วันเวลาเดินทางปฏิบัติราชการ & ปลายทางหลัก
                 </h3>
@@ -953,7 +953,7 @@ export default function BookingForm({
               {/* Departure */}
               <div className="space-y-1.5 animate-fade-in">
                 <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Clock size={13} className="text-[#a22055]" />
+                  <Clock size={13} className="text-[#aa4e6e]" />
                   <span>วัน-เวลาเดินทางไปราชการ (วว/ดด/ปปปป(พ.ศ.) เวลา 24 น.)</span>
                 </label>
                 <div className="grid grid-cols-5 gap-2">
@@ -967,10 +967,10 @@ export default function BookingForm({
                       onBlur={() => setActiveField(null)}
                       onChange={(e) => handleStartThaiDateChange(e.target.value)}
                       className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
-                        errors.startDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                        errors.startDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#aa4e6e]'
                       } outline-none focus:ring-2`}
                     />
-                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#aa4e6e] w-6 h-6 rounded-md hover:bg-slate-100 transition">
                       <Calendar size={13} className="text-slate-450 pointer-events-none" />
                       <input
                         type="date"
@@ -995,10 +995,10 @@ export default function BookingForm({
                       onBlur={() => setActiveField(null)}
                       onChange={(e) => handleStart24TimeChange(e.target.value)}
                       className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
-                        errors.startDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                        errors.startDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#aa4e6e]'
                       } outline-none focus:ring-2`}
                     />
-                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#aa4e6e] w-6 h-6 rounded-md hover:bg-slate-100 transition">
                       <Clock size={13} className="text-slate-450 pointer-events-none" />
                       <input
                         type="time"
@@ -1020,7 +1020,7 @@ export default function BookingForm({
               {/* Arrival */}
               <div className="space-y-1.5 animate-fade-in">
                 <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                  <Clock size={13} className="text-[#a22055]" />
+                  <Clock size={13} className="text-[#aa4e6e]" />
                   <span>วัน-เวลาเดินทางกลับ (วว/ดด/ปปปป(พ.ศ.) เวลา 24 น.)</span>
                 </label>
                 <div className="grid grid-cols-5 gap-2">
@@ -1034,10 +1034,10 @@ export default function BookingForm({
                       onBlur={() => setActiveField(null)}
                       onChange={(e) => handleEndThaiDateChange(e.target.value)}
                       className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
-                        errors.endDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                        errors.endDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#aa4e6e]'
                       } outline-none focus:ring-2`}
                     />
-                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#aa4e6e] w-6 h-6 rounded-md hover:bg-slate-100 transition">
                       <Calendar size={13} className="text-slate-450 pointer-events-none" />
                       <input
                         type="date"
@@ -1062,10 +1062,10 @@ export default function BookingForm({
                       onBlur={() => setActiveField(null)}
                       onChange={(e) => handleEnd24TimeChange(e.target.value)}
                       className={`w-full pl-3 pr-8 py-2.5 border rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 ${
-                        errors.endDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#a22055]'
+                        errors.endDate ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-rose-200 focus:border-[#aa4e6e]'
                       } outline-none focus:ring-2`}
                     />
-                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#a22055] w-6 h-6 rounded-md hover:bg-slate-100 transition">
+                    <div className="absolute right-2.5 flex items-center justify-center cursor-pointer hover:text-[#aa4e6e] w-6 h-6 rounded-md hover:bg-slate-100 transition">
                       <Clock size={13} className="text-slate-450 pointer-events-none" />
                       <input
                         type="time"
@@ -1099,7 +1099,7 @@ export default function BookingForm({
                   rows={1}
                   placeholder=""
                   className={`w-full px-4 py-1.5 border rounded-xl text-sm text-slate-700 ${
-                    errors.destination ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-400 bg-white' : 'border-slate-200 focus:ring-rose-100 focus:border-[#a22055] bg-slate-50/30'
+                    errors.destination ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-400 bg-white' : 'border-slate-200 focus:ring-rose-100 focus:border-[#aa4e6e] bg-slate-50/30'
                   } outline-none focus:ring-2`}
                 />
                 {errors.destination && <p className="text-xs text-rose-500 font-semibold">{errors.destination}</p>}
@@ -1118,7 +1118,7 @@ export default function BookingForm({
                   rows={1}
                   placeholder=""
                   className={`w-full px-4 py-1.5 border rounded-xl text-sm text-slate-700 ${
-                    errors.purpose ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-400 bg-white' : 'border-slate-200 focus:ring-rose-100 focus:border-[#a22055] bg-slate-50/30'
+                    errors.purpose ? 'border-rose-400 focus:ring-rose-200 focus:border-rose-400 bg-white' : 'border-slate-200 focus:ring-rose-100 focus:border-[#aa4e6e] bg-slate-50/30'
                   } outline-none focus:ring-2`}
                 />
                 {errors.purpose && <p className="text-xs text-rose-500 font-semibold">{errors.purpose}</p>}
@@ -1133,9 +1133,9 @@ export default function BookingForm({
         {(formMode === 'all' || currentStep === 2) && (
           <div className="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-xs space-y-6 transition-all" id="step-2-requester">
             <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-              <div className="h-6 w-1 rounded-full bg-[#a22055]" />
+              <div className="h-6 w-1 rounded-full bg-[#aa4e6e]" />
               <div className="flex items-center gap-2">
-                <User size={18} className="text-[#a22055]" />
+                <User size={18} className="text-[#aa4e6e]" />
                 <h3 className="text-base font-extrabold text-slate-800">
                   ส่วนที่ 2 : ข้อมูลผู้ขออนุญาตใช้รถยนต์ & คณะเดินทางปฏิบัติงาน
                 </h3>
@@ -1154,7 +1154,7 @@ export default function BookingForm({
                     onChange={handleChange}
                     placeholder="เช่น นายมัง คุดคัด"
                     className={`w-full px-4 py-2.5 border rounded-xl text-sm text-slate-700 ${
-                      errors.requesterName ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-indigo-100 focus:border-[#a22055]'
+                      errors.requesterName ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-indigo-100 focus:border-[#aa4e6e]'
                     } outline-none focus:ring-2`}
                   />
                 </div>
@@ -1171,7 +1171,7 @@ export default function BookingForm({
                   onChange={handleChange}
                   placeholder="เช่น เจ้าพนักงานพัฒนาสังคมชำนาญงาน"
                   className={`w-full px-4 py-2.5 border rounded-xl text-sm text-slate-700 ${
-                    errors.requesterPosition ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-indigo-100 focus:border-[#a22055]'
+                    errors.requesterPosition ? 'border-rose-400 focus:ring-rose-200' : 'border-slate-200 focus:ring-indigo-100 focus:border-[#aa4e6e]'
                   } outline-none focus:ring-2`}
                 />
                 {errors.requesterPosition && <p className="text-xs text-rose-500 font-semibold">{errors.requesterPosition}</p>}
@@ -1187,7 +1187,7 @@ export default function BookingForm({
                     name="department"
                     value={formData.department}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100 focus:border-[#a22055] bg-white text-slate-700 font-medium"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-100 focus:border-[#aa4e6e] bg-white text-slate-700 font-medium"
                   >
                     {DEPARTMENTS.map((dept, idx) => (
                       <option key={idx} value={dept}>{dept}</option>
@@ -1272,7 +1272,7 @@ export default function BookingForm({
                                 listStr[idx] = e.target.value;
                                 setFormData(prev => ({ ...prev, passengersList: listStr }));
                               }}
-                              className="w-full text-xs font-semibold pl-8 pr-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-200 focus:border-[#a22055] transition text-slate-800"
+                              className="w-full text-xs font-semibold pl-8 pr-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-200 focus:border-[#aa4e6e] transition text-slate-800"
                             />
                           </div>
                         );
@@ -1291,9 +1291,9 @@ export default function BookingForm({
         {(formMode === 'all' || currentStep === 3) && (
           <div className="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-xs space-y-8 transition-all" id="step-3-vehicle">
             <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-              <div className="h-6 w-1 rounded-full bg-[#a22055]" />
+              <div className="h-6 w-1 rounded-full bg-[#aa4e6e]" />
               <div className="flex items-center gap-2">
-                <Car size={18} className="text-[#a22055]" />
+                <Car size={18} className="text-[#aa4e6e]" />
                 <h3 className="text-base font-bold text-slate-800 font-sans">
                   ส่วนที่ 3 : จัดสรรยานพาหนะและระบุพนักงานประจำรถราชการ
                 </h3>
@@ -1304,7 +1304,7 @@ export default function BookingForm({
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                 <label className="text-xs font-bold text-slate-700 uppercase tracking-widest block flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center bg-[#a22055]/10 text-[#a22055] text-[10px] w-5 h-5 rounded-full font-bold">
+                  <span className="inline-flex items-center justify-center bg-[#aa4e6e]/10 text-[#aa4e6e] text-[10px] w-5 h-5 rounded-full font-bold">
                     1
                   </span>
                   <span>เลือกยานพาหนะราชการ (6 คันในคลังส่วนกลาง)</span>
@@ -1346,17 +1346,17 @@ export default function BookingForm({
                       }}
                       className={`text-left p-4.5 rounded-2xl border-2 transition-all relative flex flex-col justify-between min-h-[145px] hover:shadow-xs active:scale-[0.98] cursor-pointer outline-none select-none ${
                         isSelected 
-                          ? 'border-[#a22055] bg-[#a22055]/5 shadow-sm ring-1 ring-[#a22055]/20 border-l-4' 
+                          ? 'border-[#aa4e6e] bg-[#aa4e6e]/5 shadow-sm ring-1 ring-[#aa4e6e]/20 border-l-4' 
                           : isConflict 
                             ? 'border-slate-100 bg-slate-50/50 opacity-80 hover:opacity-100 hover:border-rose-300' 
-                            : 'border-slate-100 hover:border-[#a22055]/30 bg-white shadow-2xs'
+                            : 'border-slate-100 hover:border-[#aa4e6e]/30 bg-white shadow-2xs'
                       }`}
                     >
                       <div className="flex justify-between items-start w-full gap-2">
                         <div className="space-y-1">
                           <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md leading-none block w-fit ${
                             isSelected 
-                              ? 'bg-[#a22055] text-white' 
+                              ? 'bg-[#aa4e6e] text-white' 
                               : 'bg-slate-100 text-slate-500'
                           }`}>
                             {translateVehicleType(v.type)}
@@ -1396,7 +1396,7 @@ export default function BookingForm({
                         )}
                         
                         {isSelected && (
-                          <span className="text-[10px] font-semibold text-[#a22055] flex items-center gap-1">
+                          <span className="text-[10px] font-semibold text-[#aa4e6e] flex items-center gap-1">
                             ✓ เลือกอยู่
                           </span>
                         )}
@@ -1432,7 +1432,7 @@ export default function BookingForm({
             <div className="space-y-4 pt-6 border-t border-slate-100/70">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                 <label className="text-xs font-black text-slate-700 uppercase tracking-widest block flex items-center gap-1.5">
-                  <span className="inline-flex items-center justify-center bg-[#a22055]/10 text-[#a22055] text-[10px] w-5 h-5 rounded-full font-black">
+                  <span className="inline-flex items-center justify-center bg-[#aa4e6e]/10 text-[#aa4e6e] text-[10px] w-5 h-5 rounded-full font-black">
                     2
                   </span>
                   <span>เลือกผู้ปฏิบัติงานขับรถยนต์ (พลขับ หรือเลือกขับขี่ตนเอง)</span>
@@ -1464,8 +1464,8 @@ export default function BookingForm({
                   }}
                   className={`text-left p-4.5 rounded-2xl border-2 transition-all relative flex flex-col justify-between min-h-[145px] hover:shadow-xs active:scale-[0.98] cursor-pointer outline-none select-none ${
                     formData.driverId === 'self-drive'
-                      ? 'border-[#a22055] bg-[#a22055]/5 shadow-sm ring-1 ring-[#a22055]/20 border-l-4'
-                      : 'border-slate-100 hover:border-[#a22055]/30 bg-white shadow-2xs'
+                      ? 'border-[#aa4e6e] bg-[#aa4e6e]/5 shadow-sm ring-1 ring-[#aa4e6e]/20 border-l-4'
+                      : 'border-slate-100 hover:border-[#aa4e6e]/30 bg-white shadow-2xs'
                   }`}
                 >
                   <div className="flex justify-between items-start w-full">
@@ -1491,7 +1491,7 @@ export default function BookingForm({
                       พร้อมขับขี่เอง
                     </span>
                     {formData.driverId === 'self-drive' && (
-                      <span className="text-[10px] font-extrabold text-[#a22055] flex items-center gap-1">
+                      <span className="text-[10px] font-extrabold text-[#aa4e6e] flex items-center gap-1">
                         ✓ เลือกอยู่
                       </span>
                     )}
@@ -1519,17 +1519,17 @@ export default function BookingForm({
                       }}
                       className={`text-left p-4.5 rounded-2xl border-2 transition-all relative flex flex-col justify-between min-h-[145px] hover:shadow-xs active:scale-[0.98] cursor-pointer outline-none select-none ${
                         isSelected 
-                          ? 'border-[#a22055] bg-[#a22055]/5 shadow-sm ring-1 ring-[#a22055]/20 border-l-4' 
+                          ? 'border-[#aa4e6e] bg-[#aa4e6e]/5 shadow-sm ring-1 ring-[#aa4e6e]/20 border-l-4' 
                           : isConflict 
                             ? 'border-slate-100 bg-slate-50/50 opacity-80 hover:opacity-100 hover:border-rose-300' 
-                            : 'border-slate-100 hover:border-[#a22055]/30 bg-white shadow-2xs'
+                            : 'border-slate-100 hover:border-[#aa4e6e]/30 bg-white shadow-2xs'
                       }`}
                     >
                       <div className="flex justify-between items-start w-full gap-2">
                         <div className="space-y-1">
                           <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md leading-none block w-fit ${
                             isSelected 
-                              ? 'bg-[#a22055] text-white' 
+                              ? 'bg-[#aa4e6e] text-white' 
                               : 'bg-slate-100 text-slate-500'
                           }`}>
                             พลขับเวรส่วนกลาง
@@ -1562,7 +1562,7 @@ export default function BookingForm({
                         )}
                         
                         {isSelected && (
-                          <span className="text-[10px] font-extrabold text-[#a22055] flex items-center gap-1">
+                          <span className="text-[10px] font-extrabold text-[#aa4e6e] flex items-center gap-1">
                             ✓ เลือกอยู่
                           </span>
                         )}
@@ -1602,11 +1602,11 @@ export default function BookingForm({
             STEP 4: caretakers and approvers 
             ======================================= */}
         {(formMode === 'all' || currentStep === 4) && (
-          <div className="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-xs space-y-6 transition-all" id="step-4-[#a22055]">
+          <div className="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 shadow-xs space-y-6 transition-all" id="step-4-[#aa4e6e]">
             <div className="flex items-center gap-2 pb-4 border-b border-slate-100">
-              <div className="h-6 w-1 rounded-full bg-[#a22055]" />
+              <div className="h-6 w-1 rounded-full bg-[#aa4e6e]" />
               <div className="flex items-center gap-2">
-                <ShieldCheck size={18} className="text-[#a22055]" />
+                <ShieldCheck size={18} className="text-[#aa4e6e]" />
                 <h3 className="text-base font-extrabold text-slate-800">
                   ส่วนที่ 4 : นายคลังจัดดูแลยานพาหนะ & ตำแหน่งผู้อนุมัติเดินทาง
                 </h3>
@@ -1624,7 +1624,7 @@ export default function BookingForm({
                     name="caretakerName"
                     value={formData.caretakerName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-150 focus:border-[#a22055] bg-white text-slate-700 font-semibold"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-150 focus:border-[#aa4e6e] bg-white text-slate-700 font-semibold"
                   >
                     {caretakers.map((caretaker, idx) => (
                       <option key={caretaker.id || idx} value={caretaker.name}>{caretaker.name}</option>
@@ -1649,7 +1649,7 @@ export default function BookingForm({
               <div className="p-5 rounded-xl bg-pink-50/10 border border-pink-100/40 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pink-100/40 pb-3">
                   <div className="space-y-0.5">
-                    <h4 className="text-sm font-bold text-[#a22055] flex items-center gap-1.5">
+                    <h4 className="text-sm font-bold text-[#aa4e6e] flex items-center gap-1.5">
                       <span>หัวหน้ากลุ่ม / ฝ่าย (ผู้เห็นควรอนุมัติ)</span>
                       <span className="text-[10px] font-semibold text-pink-600 bg-pink-50 border border-pink-100 px-1.5 py-0.5 rounded-md">ฝ่ายลงความเห็น</span>
                     </h4>
@@ -1657,12 +1657,12 @@ export default function BookingForm({
                   </div>
                   
                   {/* Toggle to sign instead */}
-                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#a22055] bg-white border border-pink-100 hover:border-pink-200 px-3 py-1.5 rounded-lg select-none shadow-sm transition">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#aa4e6e] bg-white border border-pink-100 hover:border-pink-200 px-3 py-1.5 rounded-lg select-none shadow-sm transition">
                     <input
                       type="checkbox"
                       checked={isCustomDeptHead}
                       onChange={(e) => handleCustomDeptHeadToggle(e.target.checked)}
-                      className="rounded text-[#a22055] focus:ring-[#a22055] h-4 w-4 border-slate-300"
+                      className="rounded text-[#aa4e6e] focus:ring-[#aa4e6e] h-4 w-4 border-slate-300"
                     />
                     <span>มีผู้ลงนามปฏิบัติหน้าที่แทน (เซ็นแทน)</span>
                   </label>
@@ -1678,7 +1678,7 @@ export default function BookingForm({
                         name="departmentHeadName"
                         value={formData.departmentHeadName}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-pink-150 focus:border-[#a22055] bg-white text-slate-700 font-semibold"
+                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e] bg-white text-slate-700 font-semibold"
                       >
                         {departmentHeads.map((head, idx) => (
                           <option key={head.id || idx} value={head.name}>{head.name}</option>
@@ -1695,7 +1695,7 @@ export default function BookingForm({
                         name="departmentHeadPosition"
                         value={formData.departmentHeadPosition}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none font-sans bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
+                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none font-sans bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e]"
                       />
                     </div>
 
@@ -1709,7 +1709,7 @@ export default function BookingForm({
                         value={formData.departmentHeadRank}
                         onChange={handleChange}
                         placeholder="เช่น นักพัฒนาสังคมชำนาญการพิเศษ"
-                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none font-sans bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
+                        className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none font-sans bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e]"
                       />
                     </div>
                   </div>
@@ -1727,7 +1727,7 @@ export default function BookingForm({
                         <select
                           value={selectedDeptHeadId}
                           onChange={handleCustomParentHeadClassChange}
-                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-pink-150 focus:border-[#a22055] bg-white text-slate-700 font-semibold"
+                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e] bg-white text-slate-700 font-semibold"
                         >
                           {departmentHeads.map((head, idx) => (
                             <option key={head.id || idx} value={head.id}>{head.name} ({head.position})</option>
@@ -1743,7 +1743,7 @@ export default function BookingForm({
                           value={formData.departmentHeadName}
                           onChange={(e) => handleCustomDeptHeadNameChange(e.target.value)}
                           placeholder="เช่น นายอู๊ด ใจดี"
-                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-pink-150 focus:border-[#a22055] bg-white text-slate-700 font-bold"
+                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e] bg-white text-slate-700 font-bold"
                         />
                       </div>
 
@@ -1757,7 +1757,7 @@ export default function BookingForm({
                           name="departmentHeadPosition"
                           value={formData.departmentHeadPosition}
                           onChange={handleChange}
-                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-extrabold outline-none bg-white text-rose-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
+                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-extrabold outline-none bg-white text-rose-700 focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e]"
                         />
                       </div>
 
@@ -1772,7 +1772,7 @@ export default function BookingForm({
                           value={formData.departmentHeadRank}
                           onChange={handleChange}
                           placeholder="เช่น นักพัฒนาสังคมชำนาญการพิเศษ"
-                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#a22055]"
+                          className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e]"
                         />
                       </div>
                     </div>
@@ -1792,7 +1792,7 @@ export default function BookingForm({
                     name="approvedBy"
                     value={formData.approvedBy}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-150 focus:border-[#a22055] bg-white text-slate-700 font-semibold"
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-150 focus:border-[#aa4e6e] bg-white text-slate-700 font-semibold"
                   >
                     {approvers.map((appr, idx) => (
                       <option key={appr.id || idx} value={appr.name}>{appr.name}</option>
@@ -1814,11 +1814,11 @@ export default function BookingForm({
               </div>
 
               {/* สถานะใบขอจอง */}
-              <div className="p-4 rounded-xl bg-[#a22055]/5 border border-[#a22055]/10">
+              <div className="p-4 rounded-xl bg-[#aa4e6e]/5 border border-[#aa4e6e]/10">
                 {/* Status Select (Admin restricted) */}
                 <div className="space-y-1.5 max-w-xl">
                   <label className="text-xs font-bold text-slate-700 block flex items-center justify-between">
-                    <span className="font-extrabold text-[#a22055]">สถานะใบขอจองยานพาหนะ</span>
+                    <span className="font-extrabold text-[#aa4e6e]">สถานะใบขอจองยานพาหนะ</span>
                     {!isAdmin && <span className="text-rose-600 font-black text-[10px] bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded-lg">Admin Only</span>}
                   </label>
                   <select
@@ -1829,7 +1829,7 @@ export default function BookingForm({
                     className={`w-full px-4 py-2.5 border rounded-xl text-sm outline-none focus:ring-2 font-bold ${
                       !isAdmin 
                         ? 'bg-slate-50 text-slate-400 cursor-not-allowed border-slate-200' 
-                        : 'bg-white text-[#a22055] border-[#a22055]/30 focus:ring-rose-150 focus:border-[#a22055]'
+                        : 'bg-white text-[#aa4e6e] border-[#aa4e6e]/30 focus:ring-rose-150 focus:border-[#aa4e6e]'
                     }`}
                   >
                     <option value="pending">⏳ เสนอเสนอแฟ้ม: รอการลงนามอนุมัติ (Pending)</option>
@@ -1852,14 +1852,14 @@ export default function BookingForm({
                 value={formData.remarks}
                 onChange={handleChange}
                 placeholder="ระบุข้อแนะนำเพิ่มเติม เช่น บรรทุกสัมภาระช่วยเหลือสังคม 3 กระสอบ หรือต้องการไปเส้นทางลัดด่วนพิเศษ"
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 outline-none focus:ring-2 focus:ring-rose-200 focus:border-[#a22055] bg-white"
+                className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-700 outline-none focus:ring-2 focus:ring-rose-200 focus:border-[#aa4e6e] bg-white"
               />
             </div>
 
             {/* Beautiful visual confirmation receipt ticket */}
             <div className="bg-slate-50/70 border border-slate-200/60 rounded-2xl p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-3 border-b border-dashed border-slate-200">
-                <FileText className="text-[#a22055]" size={18} />
+                <FileText className="text-[#aa4e6e]" size={18} />
                 <h4 className="text-xs font-black uppercase text-slate-700 tracking-wider">
                   🎫 ตั๋วสรุปภาพร่างบันทึกคำขอ (Journey Summary Preview)
                 </h4>
@@ -1870,7 +1870,7 @@ export default function BookingForm({
                   <p className="text-slate-800 font-black">
                     {formData.requesterName || 'ยังไม่กรอก'} ({formData.requesterPosition || 'ยังไม่ระบุตำแหน่ง'})
                   </p>
-                  <p className="text-[#a22055] text-[10px] font-bold">{formData.department}</p>
+                  <p className="text-[#aa4e6e] text-[10px] font-bold">{formData.department}</p>
                 </div>
                 <div className="space-y-1">
                   <span className="text-slate-400 font-semibold block">สถานที่ปลายทาง:</span>
@@ -1896,7 +1896,7 @@ export default function BookingForm({
                 <div className="space-y-1">
                   <span className="text-slate-400 font-semibold block">จับคู่รถราชการและพลขับ:</span>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[10px] bg-slate-100 border px-1.5 py-0.5 rounded font-extrabold text-[#a22055]">
+                    <span className="text-[10px] bg-slate-100 border px-1.5 py-0.5 rounded font-extrabold text-[#aa4e6e]">
                       🚗 {selectedVehicleObj?.name || 'ยังเลือกยานพาหนะ'} ({selectedVehicleObj?.plateNumber || 'คันชั่วคราว'})
                     </span>
                     <span className="text-[10px] bg-slate-100 border px-1.5 py-0.5 rounded font-bold text-slate-600">
@@ -1904,7 +1904,7 @@ export default function BookingForm({
                     </span>
                   </div>
                   {selectedVehicleObj && formData.passengersCount > 0 && (
-                    <span className="text-[9px] text-[#a22055] font-extrabold block mt-1">
+                    <span className="text-[9px] text-[#aa4e6e] font-extrabold block mt-1">
                       คณะผู้ร่วมทางทั้งหมด {formData.passengersCount} คน (สุทธิขีดรถนั่ง {selectedVehicleObj.capacity} ท่าน)
                     </span>
                   )}
@@ -1939,7 +1939,7 @@ export default function BookingForm({
           
           <button
             type="submit"
-            className="px-6 py-2.5 bg-[#a22055] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md shadow-[#a22055]/15 flex items-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
+            className="px-6 py-2.5 bg-[#aa4e6e] hover:bg-[#8e1b4a] text-white text-xs sm:text-sm font-black rounded-xl transition-all shadow-md shadow-[#aa4e6e]/15 flex items-center gap-1.5 cursor-pointer hover:-translate-y-0.5 active:translate-y-0"
             id="btn-save-booking"
           >
             <Save size={15} />

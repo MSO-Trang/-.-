@@ -336,10 +336,10 @@ export default function Dashboard({
         <div className="md:absolute md:top-6 md:right-6 lg:top-8 lg:right-8 z-20 mb-4 md:mb-0 flex justify-start md:justify-end">
           <button
             onClick={onCreateBooking}
-            className="w-full md:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-[#a22055] font-black rounded-xl transition flex items-center justify-center gap-2 text-xs md:text-sm shadow-md hover:shadow-lg active:scale-98 cursor-pointer transform hover:-translate-y-0.5"
+            className="w-full md:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-[#aa4e6e] font-black rounded-xl transition flex items-center justify-center gap-2 text-xs md:text-sm shadow-md hover:shadow-lg active:scale-98 cursor-pointer transform hover:-translate-y-0.5"
             id="btn-quick-book"
           >
-            <Calendar size={16} className="text-[#a22055] stroke-[2.5]" />
+            <Calendar size={16} className="text-[#aa4e6e] stroke-[2.5]" />
             เขียนจองรถยานพาหนะทันที
           </button>
         </div>
@@ -383,12 +383,12 @@ export default function Dashboard({
       <div className="bg-white border border-slate-200/70 rounded-2xl p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <Clock size={18} className="text-[#a22055]" />
+            <Clock size={18} className="text-[#aa4e6e]" />
             ตารางและกำหนดการเดินทางภารกิจวันนี้
           </h2>
           <button 
             onClick={() => onNavigate('bookings')}
-            className="text-xs text-[#a22055] font-semibold hover:underline cursor-pointer"
+            className="text-xs text-[#aa4e6e] font-semibold hover:underline cursor-pointer"
           >
             ดูทั้งหมด &rarr;
           </button>
@@ -423,7 +423,7 @@ export default function Dashboard({
                     return (
                       <tr key={b.id} className="border-b border-slate-100 hover:bg-slate-50/50 transition text-xs">
                         <td className="py-3.5 px-4">
-                          <span className="font-mono font-bold text-[#a22055]">
+                          <span className="font-mono font-bold text-[#aa4e6e]">
                             {b.permitNumber}
                           </span>
                           <div className="mt-1">
@@ -451,7 +451,7 @@ export default function Dashboard({
                           <p className="text-[10px] text-slate-400 mt-0.5">{b.endDate ? `ถึง ${formatThaiDate(b.endDate)}` : 'เป็นต้นไป'}</p>
                         </td>
                         <td className="py-3.5 px-4">
-                          <p className="text-xs font-semibold text-[#a22055]">ทะเบียน {vehicle?.plateNumber || '-'}</p>
+                          <p className="text-xs font-semibold text-[#aa4e6e]">ทะเบียน {vehicle?.plateNumber || '-'}</p>
                           <p className="text-[11px] text-slate-500 mt-0.5">{driver?.name || '-'}</p>
                         </td>
                         <td className="py-3.5 px-4 text-right">
@@ -493,12 +493,12 @@ export default function Dashboard({
       <div className="bg-slate-50/65 border border-slate-200/80 rounded-3xl p-5 md:p-6 space-y-6 shadow-2xs" id="today-resources-group">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-15 pb-4.5 border-b border-slate-200/60">
           <div className="flex items-center gap-2">
-            <div className="h-5 w-1.5 rounded-full bg-[#a22055]" />
+            <div className="h-5 w-1.5 rounded-full bg-[#aa4e6e]" />
             <h2 className="text-sm md:text-base font-extrabold text-slate-800 tracking-tight font-sans">
               แผงประเมินและติดตามความพรั่งพร้อมทรัพยากรรายวัน
             </h2>
           </div>
-          <span className="text-[10px] font-black text-[#a22055] bg-[#a22055]/5 border border-[#a22055]/10 px-2.5 py-1 rounded-md font-mono uppercase tracking-wider select-none leading-none w-fit">
+          <span className="text-[10px] font-black text-[#aa4e6e] bg-[#aa4e6e]/5 border border-[#aa4e6e]/10 px-2.5 py-1 rounded-md font-mono uppercase tracking-wider select-none leading-none w-fit">
             ⚡ LIVE OPERATIONAL STATUS
           </span>
         </div>
@@ -515,7 +515,7 @@ export default function Dashboard({
                 ณ เวลาปัจจุบัน
               </p>
             </div>
-            <div className="p-3 bg-rose-50/50 border border-rose-100/50 text-[#a22055] rounded-xl">
+            <div className="p-3 bg-rose-50/50 border border-rose-100/50 text-[#aa4e6e] rounded-xl">
               <MapPin size={22} className="stroke-[2.25]" />
             </div>
           </div>
@@ -527,10 +527,10 @@ export default function Dashboard({
           >
             <div className="space-y-1">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-sans">คำขอจองคิวรถที่รอนุมัติ</p>
-              <h3 className="text-2xl font-bold text-[#a22055] font-mono tracking-tight">{stats.pendingCount} รายการ</h3>
+              <h3 className="text-2xl font-bold text-[#aa4e6e] font-mono tracking-tight">{stats.pendingCount} รายการ</h3>
               <p className="text-xs text-slate-500">รอเลขาและหัวหน้าลงนาม</p>
             </div>
-            <div className="p-3 bg-rose-50/50 border border-[#a22055]/15 text-[#a22055] rounded-xl">
+            <div className="p-3 bg-rose-50/50 border border-[#aa4e6e]/15 text-[#aa4e6e] rounded-xl">
               <FileCheck2 size={22} className="stroke-[2.25]" />
             </div>
           </button>
@@ -620,7 +620,7 @@ export default function Dashboard({
             </div>
           ) : (
             <div className="sm:self-start md:self-auto shrink-0">
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-rose-50 border border-rose-100 text-[#a22055] px-3 py-1 rounded-full font-mono uppercase">
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-rose-50 border border-rose-100 text-[#aa4e6e] px-3 py-1 rounded-full font-mono uppercase">
                 ⚠️ NO_DRIVERS_AVAILABLE
               </span>
             </div>
@@ -634,7 +634,7 @@ export default function Dashboard({
           <div className="lg:col-span-7 bg-white border border-slate-200/70 rounded-2xl p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Car className="text-[#a22055]" size={18} />
+                <Car className="text-[#aa4e6e]" size={18} />
                 <h2 className="text-base font-bold text-slate-900">ทะเบียนรถยนต์ราชการส่วนกลาง (6 คัน)</h2>
               </div>
               <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-sans">อัปเดตอัตโนมัติ</span>
@@ -649,7 +649,7 @@ export default function Dashboard({
                       ? 'border-rose-200/60 bg-rose-50/15' 
                       : v.currentStatus === 'maintenance'
                       ? 'border-amber-205 bg-amber-50/20'
-                      : 'border-slate-200 bg-white hover:border-[#a22055]/30 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-[#aa4e6e]/30 shadow-xs'
                   }`}
                 >
                   <div>
@@ -659,8 +659,8 @@ export default function Dashboard({
                       </span>
                       
                       {v.currentStatus === 'busy' && (
-                        <span className="text-xs font-semibold px-2.5 py-0.5 bg-rose-50 text-[#a22055] rounded-full flex items-center gap-1 border border-rose-100 font-sans">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#a22055] animate-pulse"></span>
+                        <span className="text-xs font-semibold px-2.5 py-0.5 bg-rose-50 text-[#aa4e6e] rounded-full flex items-center gap-1 border border-rose-100 font-sans">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#aa4e6e] animate-pulse"></span>
                           ปฏิบัติราชการ
                         </span>
                       )}
@@ -688,10 +688,10 @@ export default function Dashboard({
                     {v.currentStatus === 'busy' && v.activeBooking ? (
                       <div 
                         onClick={() => onSelectBooking(v.activeBooking!)}
-                        className="cursor-pointer group flex items-center justify-between hover:text-[#a22055] transition font-sans"
+                        className="cursor-pointer group flex items-center justify-between hover:text-[#aa4e6e] transition font-sans"
                       >
                         <div className="flex items-center gap-1.5 text-xs text-slate-600 truncate mr-2">
-                          <MapPin size={12} className="text-[#a22055] shrink-0" />
+                          <MapPin size={12} className="text-[#aa4e6e] shrink-0" />
                           <span className="font-medium truncate text-[11px]">{v.activeBooking.destination}</span>
                         </div>
                         <ChevronRight size={12} className="text-slate-400 group-hover:translate-x-1 transition shrink-0" />
@@ -712,7 +712,7 @@ export default function Dashboard({
           <div className="lg:col-span-5 bg-white border border-slate-200/70 rounded-2xl p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <User className="text-[#a22055]" size={18} />
+                <User className="text-[#aa4e6e]" size={18} />
                 <h2 className="text-base font-bold text-slate-900">พนักงานขับรถ (5 คน)</h2>
               </div>
               <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-sans">วันนี้</span>
@@ -727,7 +727,7 @@ export default function Dashboard({
                       ? 'border-rose-200/60 bg-rose-50/15' 
                       : d.currentStatus === 'off'
                       ? 'border-slate-200 bg-slate-50 text-slate-400'
-                      : 'border-slate-200 bg-white hover:border-[#a22055]/30 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-[#aa4e6e]/30 shadow-xs'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -744,7 +744,7 @@ export default function Dashboard({
                     {d.currentStatus === 'busy' && d.activeBooking ? (
                       <button
                         onClick={() => onSelectBooking(d.activeBooking!)}
-                        className="px-2.5 py-1 text-[11px] font-semibold bg-rose-50 hover:bg-rose-100/70 text-[#a22055] rounded-lg transition whitespace-nowrap border border-rose-100 font-sans cursor-pointer"
+                        className="px-2.5 py-1 text-[11px] font-semibold bg-rose-50 hover:bg-rose-100/70 text-[#aa4e6e] rounded-lg transition whitespace-nowrap border border-rose-100 font-sans cursor-pointer"
                       >
                         ติดภารกิจ
                       </button>
@@ -770,12 +770,12 @@ export default function Dashboard({
       <div className="bg-slate-50/65 border border-slate-200/80 rounded-3xl p-5 md:p-6 space-y-6 shadow-2xs mt-8" id="analytics-dashboard-group">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-15 pb-4.5 border-b border-slate-200/60">
           <div className="flex items-center gap-2">
-            <div className="h-5 w-1.5 rounded-full bg-[#a22055]" />
+            <div className="h-5 w-1.5 rounded-full bg-[#aa4e6e]" />
             <h2 className="text-sm md:text-base font-extrabold text-slate-800 tracking-tight font-sans">
               ระบบรายงานเชิงสถิติและวิเคราะห์ข้อมูลการสัญจรสะสม
             </h2>
           </div>
-          <span className="text-[10px] font-black text-[#a22055] bg-[#a22055]/5 border border-[#a22055]/10 px-2.5 py-1 rounded-md font-mono uppercase tracking-wider select-none leading-none w-fit">
+          <span className="text-[10px] font-black text-[#aa4e6e] bg-[#aa4e6e]/5 border border-[#aa4e6e]/10 px-2.5 py-1 rounded-md font-mono uppercase tracking-wider select-none leading-none w-fit">
             📈 HISTORICAL ANALYTICS REPORT
           </span>
         </div>
@@ -785,7 +785,7 @@ export default function Dashboard({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Calendar size={16} className="text-[#a22055]" />
+                <Calendar size={16} className="text-[#aa4e6e]" />
                 ช่องการควบคุมช่วงวันที่สำหรับรายงานและสถิติวินิจฉัย
               </h3>
               <p className="text-xs text-slate-500 font-sans leading-normal">
@@ -808,7 +808,7 @@ export default function Dashboard({
                     onClick={() => handleQuickDateFilter(opt.value)}
                     className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all cursor-pointer ${
                       activeQuickFilter === opt.value
-                        ? 'bg-[#a22055] text-white shadow-xs'
+                        ? 'bg-[#aa4e6e] text-white shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
@@ -828,7 +828,7 @@ export default function Dashboard({
                       setStartDateFilter(e.target.value);
                       setActiveQuickFilter('custom');
                     }}
-                    className="bg-slate-50 border border-slate-200 hover:border-[#a22055]/30 rounded-xl px-2.5 py-1.5 focus:border-[#a22055] focus:bg-white outline-none font-sans font-bold text-slate-700"
+                    className="bg-slate-50 border border-slate-200 hover:border-[#aa4e6e]/30 rounded-xl px-2.5 py-1.5 focus:border-[#aa4e6e] focus:bg-white outline-none font-sans font-bold text-slate-700"
                     id="filter-start-date"
                   />
                 </div>
@@ -842,7 +842,7 @@ export default function Dashboard({
                       setEndDateFilter(e.target.value);
                       setActiveQuickFilter('custom');
                     }}
-                    className="bg-slate-50 border border-slate-200 hover:border-[#a22055]/30 rounded-xl px-2.5 py-1.5 focus:border-[#a22055] focus:bg-white outline-none font-sans font-bold text-slate-700"
+                    className="bg-slate-50 border border-slate-200 hover:border-[#aa4e6e]/30 rounded-xl px-2.5 py-1.5 focus:border-[#aa4e6e] focus:bg-white outline-none font-sans font-bold text-slate-700"
                     id="filter-end-date"
                   />
                 </div>
@@ -851,7 +851,7 @@ export default function Dashboard({
                   <button
                     type="button"
                     onClick={() => handleQuickDateFilter('all')}
-                    className="text-[#a22055] hover:underline font-bold text-xs shrink-0 cursor-pointer ml-1"
+                    className="text-[#aa4e6e] hover:underline font-bold text-xs shrink-0 cursor-pointer ml-1"
                   >
                     ล้างค่า
                   </button>
@@ -869,7 +869,7 @@ export default function Dashboard({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <TrendingUp size={18} className="text-[#a22055]" />
+                  <TrendingUp size={18} className="text-[#aa4e6e]" />
                   <h2 className="text-base font-bold text-slate-900">ปริมาณจองแยกรวมรายหน่วยงาน/กลุ่มงาน</h2>
                 </div>
                 <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100/40">
@@ -908,7 +908,7 @@ export default function Dashboard({
                             const strokeOffset = circumference - (startPercent * circumference);
                             
                             const colors = [
-                              'stroke-[#a22055]',
+                              'stroke-[#aa4e6e]',
                               'stroke-amber-500',
                               'stroke-emerald-500',
                               'stroke-indigo-500',
@@ -969,7 +969,7 @@ export default function Dashboard({
                     <div className="flex-1 space-y-2 w-full">
                       {(() => {
                         const colors = [
-                          'bg-[#a22055]',
+                          'bg-[#aa4e6e]',
                           'bg-amber-500',
                           'bg-emerald-500',
                           'bg-indigo-500',
@@ -996,7 +996,7 @@ export default function Dashboard({
                                 </span>
                               </div>
                               <div className="flex items-center gap-2 font-mono text-xs shrink-0 pl-2">
-                                <span className={`font-bold ${isHovered ? 'text-[#a22055]' : 'text-slate-800'}`}>{item.value} ครั้ง</span>
+                                <span className={`font-bold ${isHovered ? 'text-[#aa4e6e]' : 'text-slate-800'}`}>{item.value} ครั้ง</span>
                                 <span className="text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md text-[9px] font-bold">
                                   {item.percentage}%
                                 </span>
@@ -1026,7 +1026,7 @@ export default function Dashboard({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Car size={18} className="text-[#a22055]" />
+                  <Car size={18} className="text-[#aa4e6e]" />
                   <h2 className="text-base font-bold text-slate-900">ความถี่ในการออกวิ่งปฏิบัติราชการสะสม</h2>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100/40">
@@ -1044,7 +1044,7 @@ export default function Dashboard({
                         {/* Definitions for beautiful linear gradients */}
                         <defs>
                           <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#a22055" stopOpacity="1" />
+                            <stop offset="0%" stopColor="#aa4e6e" stopOpacity="1" />
                             <stop offset="100%" stopColor="#ec4899" stopOpacity="0.25" />
                           </linearGradient>
                           <linearGradient id="barGradientHover" x1="0" y1="0" x2="0" y2="1">
@@ -1119,7 +1119,7 @@ export default function Dashboard({
                                 rx="5"
                                 fill={isHovered ? "url(#barGradientHover)" : "url(#barGradient)"}
                                 className="transition-all duration-300"
-                                stroke={isHovered ? "#a22055" : "transparent"}
+                                stroke={isHovered ? "#aa4e6e" : "transparent"}
                                 strokeWidth={1.2}
                               />
 
@@ -1130,7 +1130,7 @@ export default function Dashboard({
                                   y={barY - 6} 
                                   textAnchor="middle" 
                                   className={`text-[10px] font-bold font-mono transition-transform duration-200 ${
-                                    isHovered ? "fill-[#a22055] scale-110 font-bold" : "fill-slate-600"
+                                    isHovered ? "fill-[#aa4e6e] scale-110 font-bold" : "fill-slate-600"
                                   }`}
                                 >
                                   {v.bookingCount}
@@ -1143,7 +1143,7 @@ export default function Dashboard({
                                 y="152" 
                                 textAnchor="middle" 
                                 className={`text-[9px] font-bold font-mono transition-colors duration-150 ${
-                                  isHovered ? "fill-[#a22055] font-black" : "fill-slate-600"
+                                  isHovered ? "fill-[#aa4e6e] font-black" : "fill-slate-600"
                                 }`}
                               >
                                 {getPlateShort(v.plateNumber)}
@@ -1160,7 +1160,7 @@ export default function Dashboard({
               {/* Hover card message context */}
               <div className="h-9 flex items-center justify-center bg-slate-50 rounded-xl px-4 text-xs font-semibold text-slate-500 font-sans border border-slate-200/50">
                 {hoveredBarIndex !== null ? (
-                  <p className="animate-fade-in text-[#a22055]">
+                  <p className="animate-fade-in text-[#aa4e6e]">
                     🚗 <span className="font-bold">{vehicleStats[hoveredBarIndex].name}</span> สถิติตลอดภารกิจจองสะสม <span className="font-extrabold text-slate-800 font-mono text-sm">{vehicleStats[hoveredBarIndex].bookingCount} ครั้ง</span>
                   </p>
                 ) : (
@@ -1178,12 +1178,12 @@ export default function Dashboard({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
             <div className="space-y-1">
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <TrendingUp size={18} className="text-[#a22055]" />
+                <TrendingUp size={18} className="text-[#aa4e6e]" />
                 <span>แผนภูมิเปรียบเทียบสถิติระยะทางการเดินทางของยานยนต์ราชการ (กม.)</span>
               </h2>
               <p className="text-xs text-slate-400 font-medium">คำนวณ and แสดงผลระยะเดินทางสะสมเชิงกราฟจากการลงบันทึกเลขไมล์สุทธิขากลับ</p>
             </div>
-            <span className="text-[10px] bg-[#a22055]/5 border border-[#a22055]/15 text-[#a22055] font-extrabold px-3 py-1 rounded-full whitespace-nowrap self-start sm:self-auto font-sans leading-none">
+            <span className="text-[10px] bg-[#aa4e6e]/5 border border-[#aa4e6e]/15 text-[#aa4e6e] font-extrabold px-3 py-1 rounded-full whitespace-nowrap self-start sm:self-auto font-sans leading-none">
               📊 สถิติระยะทางจริง (กม.)
             </span>
           </div>
@@ -1208,7 +1208,7 @@ export default function Dashboard({
                         onMouseLeave={() => setHoveredMileageIndex(null)}
                         className={`group relative flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 rounded-xl transition duration-150 border ${
                           isHovered 
-                            ? 'bg-white border-[#a22055]/20 shadow-xs' 
+                            ? 'bg-white border-[#aa4e6e]/20 shadow-xs' 
                             : 'bg-white/40 border-transparent'
                         }`}
                       >
@@ -1230,9 +1230,9 @@ export default function Dashboard({
                             transition={{ duration: 0.8, ease: "easeOut" }}
                             className={`h-full rounded-full transition-all duration-150 ${
                               isHovered 
-                                ? 'bg-gradient-to-r from-emerald-400 to-[#a22055]' 
+                                ? 'bg-gradient-to-r from-emerald-400 to-[#aa4e6e]' 
                                 : hasMil 
-                                  ? 'bg-[#a22055]/85' 
+                                  ? 'bg-[#aa4e6e]/85' 
                                   : 'bg-slate-300'
                             }`}
                           />
@@ -1240,7 +1240,7 @@ export default function Dashboard({
 
                         {/* Numeric Value */}
                         <div className="md:w-28 text-left md:text-right font-mono font-bold text-xs sm:text-sm">
-                          <span className={hasMil ? 'text-[#a22055]' : 'text-slate-400 font-normal'}>
+                          <span className={hasMil ? 'text-[#aa4e6e]' : 'text-slate-400 font-normal'}>
                             {hasMil ? `${vmObj.totalDistance.toLocaleString()} กม.` : '0 กม.'}
                           </span>
                         </div>
@@ -1253,8 +1253,8 @@ export default function Dashboard({
               {/* Hint bar */}
               <div className="h-9 flex items-center justify-center bg-slate-50 border border-slate-200/50 rounded-xl px-4 text-xs font-semibold text-slate-500 font-sans">
                 {hoveredMileageIndex !== null ? (
-                  <p className="animate-fade-in text-[#a22055]">
-                    🔋 <span className="font-bold">{vehicleMileageStats[hoveredMileageIndex].name}</span> ระยะเดินทางสะสมสุทธิ <span className="font-extrabold text-[#a22055] font-mono text-sm">{vehicleMileageStats[hoveredMileageIndex].totalDistance.toLocaleString()} กม.</span>
+                  <p className="animate-fade-in text-[#aa4e6e]">
+                    🔋 <span className="font-bold">{vehicleMileageStats[hoveredMileageIndex].name}</span> ระยะเดินทางสะสมสุทธิ <span className="font-extrabold text-[#aa4e6e] font-mono text-sm">{vehicleMileageStats[hoveredMileageIndex].totalDistance.toLocaleString()} กม.</span>
                   </p>
                 ) : (
                   <p className="text-slate-400 text-[11px]">💡 นำเมาส์วางเหนือแถบสีเพื่อดูรายละเอียดสัญจรเปรียบเทียบในแต่ละแชสซี</p>
@@ -1283,12 +1283,12 @@ export default function Dashboard({
 
               {/* Most Utilized Vehicle Card */}
               {mileageSummaryGroup.maxVehicle && mileageSummaryGroup.maxVehicle.totalDistance > 0 ? (
-                <div className="bg-[#a22055]/5 border border-[#a22055]/15 rounded-2xl p-5 flex flex-col justify-between h-1/3">
+                <div className="bg-[#aa4e6e]/5 border border-[#aa4e6e]/15 rounded-2xl p-5 flex flex-col justify-between h-1/3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-[#a22055] tracking-wider uppercase font-sans">
+                    <span className="text-[10px] font-bold text-[#aa4e6e] tracking-wider uppercase font-sans">
                       👑 ยานยนต์ที่ออกสัญจรระยะสูงสุด
                     </span>
-                    <span className="text-[10px] font-mono leading-none bg-[#a22055] text-white px-2 py-0.5 rounded font-black">
+                    <span className="text-[10px] font-mono leading-none bg-[#aa4e6e] text-white px-2 py-0.5 rounded font-black">
                       {mileageSummaryGroup.maxVehicle.plateNumber}
                     </span>
                   </div>
@@ -1311,7 +1311,7 @@ export default function Dashboard({
               )}
 
               {/* Average Kilometer / active vehicle summary */}
-              <div className="bg-slate-50 border border-[#a22055]/10 rounded-2xl p-5 flex flex-col justify-between h-1/3">
+              <div className="bg-slate-50 border border-[#aa4e6e]/10 rounded-2xl p-5 flex flex-col justify-between h-1/3">
                 <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase font-sans">
                   ระยะเฉลี่ยต่อคันทั้งหมด
                 </span>
@@ -1342,7 +1342,7 @@ export default function Dashboard({
               exit={{ scale: 0.95, opacity: 0 }}
               className="bg-white border border-slate-200 shadow-2xl rounded-2xl max-w-sm w-full overflow-hidden"
             >
-              <div className="bg-[#a22055] text-white p-5 flex justify-between items-center">
+              <div className="bg-[#aa4e6e] text-white p-5 flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <Lock size={15} />
                   <h3 className="text-xs font-black">เข้าสู่ระบบเพื่ออนุมัติคำขอ</h3>
@@ -1372,13 +1372,13 @@ export default function Dashboard({
                       setLoginError('');
                     }}
                     autoFocus
-                    className="w-full bg-slate-50 border border-slate-250 rounded-xl px-3.5 py-2.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-[#a22055]/10 focus:border-[#a22055] text-slate-800"
+                    className="w-full bg-slate-50 border border-slate-250 rounded-xl px-3.5 py-2.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-[#aa4e6e]/10 focus:border-[#aa4e6e] text-slate-800"
                   />
                   {loginError && <p className="text-[10px] text-rose-500 font-bold mt-1 text-center">{loginError}</p>}
                 </div>
 
                 <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200/50 text-[10px] text-slate-450 font-bold space-y-1 leading-normal">
-                  <p className="text-[#a22055]">💡 บัญชีสาธิตสำหรับทดสอบงานจอง:</p>
+                  <p className="text-[#aa4e6e]">💡 บัญชีสาธิตสำหรับทดสอบงานจอง:</p>
                   <p>• รหัสผ่าน Admin สำหรับยืนยัน: <span className="underline select-all font-black text-slate-700">admin1234</span></p>
                   <p>• หรือสะดวกข้ามโดยคลิกปุ่มแชร์สิทธิ์ด่วนด้านล่างได้ทันที</p>
                 </div>
@@ -1386,7 +1386,7 @@ export default function Dashboard({
                 <div className="pt-2 flex flex-col gap-1.5">
                   <button
                     type="submit"
-                    className="w-full py-2.5 bg-[#a22055] hover:bg-[#861b46] text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer"
+                    className="w-full py-2.5 bg-[#aa4e6e] hover:bg-[#8e3d5a] text-white text-xs font-black rounded-xl shadow-xs transition cursor-pointer"
                   >
                     ยืนยันตัวตนคนอนุมัติ
                   </button>

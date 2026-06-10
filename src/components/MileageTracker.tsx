@@ -241,7 +241,7 @@ export default function MileageTracker({
       {/* Page Header */}
       <div className="bg-white border border-slate-200/60 rounded-2xl p-5 md:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-pink-50 text-[#a22055] rounded-xl">
+          <div className="p-3 bg-pink-50 text-[#aa4e6e] rounded-xl">
             <Gauge size={22} className="stroke-[2.2]" />
           </div>
           <div>
@@ -258,7 +258,7 @@ export default function MileageTracker({
         <div className="flex items-center gap-3 bg-slate-50 border border-slate-150 p-2.5 rounded-xl self-start md:self-auto shrink-0">
           <div className="text-center px-3 border-r border-slate-200">
             <div className="text-xs text-slate-400 font-semibold leading-none">ค้างบันทึก</div>
-            <div className="text-sm font-black text-[#a22055] mt-1">{pendingMileageBookings.length} รายการ</div>
+            <div className="text-sm font-black text-[#aa4e6e] mt-1">{pendingMileageBookings.length} รายการ</div>
           </div>
           <div className="text-center px-2">
             <div className="text-xs text-slate-400 font-semibold leading-none">เสร็จสิ้นแล้ว</div>
@@ -279,13 +279,13 @@ export default function MileageTracker({
             }}
             className={`px-4 py-2 border-b-2 text-xs sm:text-sm font-extrabold flex items-center gap-2 cursor-pointer transition ${
               activeSubTab === 'pending'
-                ? 'border-[#a22055] text-[#a22055]'
+                ? 'border-[#aa4e6e] text-[#aa4e6e]'
                 : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
           >
             <span>⏳ ค้างลงบันทึกเลขไมล์</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold leading-none ${
-              activeSubTab === 'pending' ? 'bg-pink-100 text-[#a22055]' : 'bg-slate-100 text-slate-500'
+              activeSubTab === 'pending' ? 'bg-pink-100 text-[#aa4e6e]' : 'bg-slate-100 text-slate-500'
             }`}>
               {pendingMileageBookings.length}
             </span>
@@ -298,7 +298,7 @@ export default function MileageTracker({
             }}
             className={`px-4 py-2 border-b-2 text-xs sm:text-sm font-extrabold flex items-center gap-2 cursor-pointer transition ${
               activeSubTab === 'completed'
-                ? 'border-[#a22055] text-[#a22055]'
+                ? 'border-[#aa4e6e] text-[#aa4e6e]'
                 : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -323,7 +323,7 @@ export default function MileageTracker({
               placeholder="ค้นหาตามเลขใบขอรถ, ชื่อผู้ใช้, สถานที่ปลายทาง, หรือ พนักงานขับรถ..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-[#a22055] focus:ring-2 focus:ring-rose-50"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-[#aa4e6e] focus:ring-2 focus:ring-rose-50"
             />
           </div>
 
@@ -332,7 +332,7 @@ export default function MileageTracker({
             <select
               value={selectedVehicleFilter}
               onChange={(e) => setSelectedVehicleFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-[#a22055] appearance-none cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-[#aa4e6e] appearance-none cursor-pointer"
             >
               <option value="all">🚗 กรองตามรถทุกคัน</option>
               {vehicles.map(v => (
@@ -370,7 +370,7 @@ export default function MileageTracker({
                   key={b.id}
                   className={`bg-white border rounded-2xl shadow-xs transition-all duration-300 overflow-hidden ${
                     isCurrentlyEditing 
-                      ? 'border-[#a22055] ring-2 ring-rose-50' 
+                      ? 'border-[#aa4e6e] ring-2 ring-rose-50' 
                       : 'border-slate-200/70 hover:border-slate-350'
                   }`}
                 >
@@ -404,11 +404,11 @@ export default function MileageTracker({
                         {/* Column 1: Passengers/Purpose */}
                         <div className="space-y-1.5">
                           <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#a22055]"></span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#aa4e6e]"></span>
                             <span>{b.requesterName} ({b.department})</span>
                           </h3>
                           <div className="text-xs text-slate-500 font-medium flex items-center gap-1.5 pl-3">
-                            <MapPin size={12} className="text-[#a22055] shrink-0" />
+                            <MapPin size={12} className="text-[#aa4e6e] shrink-0" />
                             <span className="truncate" title={b.destination}>📍 {b.destination}</span>
                           </div>
                           <div className="text-xs text-slate-400 font-medium pl-3 whitespace-normal break-words">
@@ -478,14 +478,14 @@ export default function MileageTracker({
                           className={`w-full lg:w-auto px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer border ${
                             b.status === 'completed'
                               ? 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-slate-700'
-                              : 'bg-[#a22055] hover:bg-[#801440] text-white border-transparent'
+                              : 'bg-[#aa4e6e] hover:bg-[#803551] text-white border-transparent'
                           }`}
                         >
                           <Edit3 size={13} />
                           {b.status === 'completed' ? 'แก้ไขเลขไมล์' : 'บันทึกเลขไมล์เดินทาง 🏁'}
                         </button>
                       ) : (
-                        <div className="text-[11px] text-[#a22055] font-extrabold bg-pink-100/50 border border-pink-200 rounded-lg p-2 text-center w-full">
+                        <div className="text-[11px] text-[#aa4e6e] font-extrabold bg-pink-100/50 border border-pink-200 rounded-lg p-2 text-center w-full">
                           ⚙️ กำลังทำการลงกิโลเมตร
                         </div>
                       )}
@@ -503,7 +503,7 @@ export default function MileageTracker({
                         transition={{ duration: 0.25 }}
                         className="border-t border-slate-100 bg-slate-50/75 p-4 sm:p-5 space-y-4"
                       >
-                        <div className="flex border-l-4 border-[#a22055] pl-3">
+                        <div className="flex border-l-4 border-[#aa4e6e] pl-3">
                           <h4 className="text-xs font-bold text-slate-800">กรอกเลขมาตรวัดกิโลเมตรสุทธิ</h4>
                         </div>
 
@@ -533,9 +533,9 @@ export default function MileageTracker({
 
                           {/* End Mileage Form Field */}
                           <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-705 block text-[#a22055] flex items-center justify-between">
+                            <label className="text-xs font-bold text-slate-705 block text-[#aa4e6e] flex items-center justify-between">
                               <span>🏁 ระบุเลขไมล์สะสมหลังเสร็จสิ้นภารกิจ (กม.) *</span>
-                              <span className="text-[10px] bg-pink-100 text-[#a22055] px-1.5 py-0.5 rounded font-black">จำเป็น</span>
+                              <span className="text-[10px] bg-pink-100 text-[#aa4e6e] px-1.5 py-0.5 rounded font-black">จำเป็น</span>
                             </label>
                             <input
                               type="number"
@@ -545,7 +545,7 @@ export default function MileageTracker({
                                 if (inputError) setInputError('');
                               }}
                               placeholder="กรอกตัวเลขไมล์สะสมปัจจุบัน เช่น 134590"
-                              className="w-full px-4 py-3 border border-[#a22055] bg-white rounded-xl text-sm font-mono font-black leading-normal outline-none focus:ring-2 focus:ring-rose-100"
+                              className="w-full px-4 py-3 border border-[#aa4e6e] bg-white rounded-xl text-sm font-mono font-black leading-normal outline-none focus:ring-2 focus:ring-rose-100"
                               autoFocus
                             />
                             <p className="text-[10px] text-slate-400 font-medium font-sans">

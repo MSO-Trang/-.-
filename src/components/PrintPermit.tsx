@@ -92,7 +92,7 @@ export default function PrintPermit({
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10.5px] bg-[#a22055]/10 text-[#a22055] font-black px-2.5 py-0.5 rounded-full border border-[#a22055]/20 font-mono">
+              <span className="text-[10.5px] bg-[#aa4e6e]/10 text-[#aa4e6e] font-black px-2.5 py-0.5 rounded-full border border-[#aa4e6e]/20 font-mono">
                 เลขคิวจอง: {booking.permitNumber}
               </span>
               <span className="text-[10.5px] bg-sky-50 text-sky-700 font-black px-2 py-0.5 rounded border border-sky-200">
@@ -109,7 +109,7 @@ export default function PrintPermit({
             onClick={() => setActiveTemplate('permit')}
             className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition duration-150 cursor-pointer ${
               activeTemplate === 'permit'
-                ? 'bg-[#a22055] text-white shadow-xs'
+                ? 'bg-[#aa4e6e] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
             }`}
           >
@@ -120,7 +120,7 @@ export default function PrintPermit({
             onClick={() => setActiveTemplate('memo')}
             className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black transition duration-150 cursor-pointer ${
               activeTemplate === 'memo'
-                ? 'bg-[#a22055] text-white shadow-xs'
+                ? 'bg-[#aa4e6e] text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
             }`}
           >
