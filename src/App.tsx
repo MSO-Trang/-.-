@@ -575,28 +575,28 @@ export default function App() {
             <img 
               src={MSDHS_LOGO_BASE64}
               alt="โลโก้สำนักงาน พมจ.ตรัง"
-              className="w-11 h-11 object-contain shrink-0 filter drop-shadow-xs"
+              className="w-11 h-11 object-contain shrink-0 filter drop-shadow-xs transition duration-300 hover:scale-105"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
             />
-            <div>
-              <span className="text-[10px] text-[#aa4e6e] font-bold block leading-none uppercase tracking-widest font-sans">สำนักงานพมจ.ตรัง</span>
+            <div className="md:border-l md:border-slate-200/80 md:pl-3.5 py-0.5">
+              <span className="text-[10px] text-[#aa4e6e] font-extrabold block leading-none uppercase tracking-widest font-sans">สำนักงานพมจ.ตรัง</span>
               <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-normal mt-0.5">
                 ระบบควบคุมและจองใช้รถยนต์ราชการส่วนกลาง
               </h1>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 justify-center md:justify-end">
+          <div className="flex flex-wrap items-center gap-3 justify-center md:justify-end">
             {/* Quick Access Action Tabs - High Visibility Duo */}
-            <div className="flex items-center gap-1 p-1 bg-slate-50 border border-slate-200/60 rounded-xl shadow-xs shrink-0">
+            <div className="flex items-center gap-1 p-1 bg-slate-50 border border-slate-200/50 rounded-xl shadow-xs shrink-0">
               <button
                 onClick={handleStartCreateMode}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer select-none ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition duration-200 cursor-pointer select-none ${
                   activeTab === 'form' && !editingBooking
                     ? 'bg-[#aa4e6e] text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#aa4e6e]'
+                    : 'text-slate-600 hover:bg-white hover:text-[#aa4e6e] hover:shadow-2xs'
                 }`}
               >
                 <PlusCircle size={14} className={activeTab === 'form' && !editingBooking ? 'text-white' : 'text-[#aa4e6e]'} />
@@ -605,10 +605,10 @@ export default function App() {
 
               <button
                 onClick={() => setActiveTab('mileage')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer select-none ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition duration-200 cursor-pointer select-none ${
                   activeTab === 'mileage'
                     ? 'bg-[#aa4e6e] text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-200/50 hover:text-[#aa4e6e]'
+                    : 'text-slate-600 hover:bg-white hover:text-[#aa4e6e] hover:shadow-2xs'
                 }`}
               >
                 <Gauge size={14} className={activeTab === 'mileage' ? 'text-white' : 'text-[#aa4e6e]'} />
@@ -616,67 +616,70 @@ export default function App() {
               </button>
             </div>
 
-            {/* Clock Widget */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-200/60 text-slate-600 rounded-full">
-              <Clock size={13} className="text-[#aa4e6e] shrink-0 animate-pulse" />
-              <span className="text-xs font-medium font-mono whitespace-nowrap">เวลาปัจจุบัน: {currentClock || 'กำลังโหลด...'}</span>
-            </div>
-
-            {/* Google Calendar Connection Status */}
-            {isAdminLoggedIn && (
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-blue-50/50 border border-blue-150/50 rounded-full text-xs">
-                {googleToken ? (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                    <span className="text-blue-700 font-bold whitespace-nowrap">ปฏิทิน Google เชื่อมต่อแล้ว: {googleUser?.displayName || 'พมจ.ตรัง'}</span>
-                    <button 
-                      onClick={handleGoogleSignOut} 
-                      className="text-[10px] text-slate-400 hover:text-red-500 font-bold underline ml-1 cursor-pointer"
-                      title="ยกเลิกการซิงค์ตาราง"
-                    >
-                      ยกเลิก
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-slate-250"></span>
-                    <button 
-                      onClick={handleGoogleSignIn}
-                      disabled={isSignGoogleLoading}
-                      className="text-slate-600 font-bold hover:text-[#1a73e8] flex items-center gap-1 cursor-pointer"
-                    >
-                      <span>🔄 ซิงค์ Google Calendar</span>
-                    </button>
-                  </>
-                )}
+            {/* Status Pills Container - Grouped for Orderliness */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Clock Widget */}
+              <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200/50 text-slate-600 rounded-xl text-xs font-medium font-sans">
+                <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse shrink-0"></span>
+                <span className="font-mono whitespace-nowrap">เวลาปัจจุบัน: {currentClock || 'กำลังโหลด...'}</span>
               </div>
-            )}
 
-            {/* Admin Session Badge / Action Button */}
-            {isAdminLoggedIn ? (
-              <div className="flex items-center gap-2">
-                <span className="hidden md:inline-flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-800 border border-emerald-250 font-bold px-3 py-1.5 rounded-full shadow-xs">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  ผู้ตรวจสอบระบบ (Admin)
-                </span>
+              {/* Google Calendar Connection Status */}
+              {isAdminLoggedIn && (
+                <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200/50 text-slate-600 rounded-xl text-xs font-medium">
+                  {googleToken ? (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0"></span>
+                      <span className="font-bold text-slate-700 whitespace-nowrap">ปฏิทินสำเร็จ: {googleUser?.displayName || 'พมจ.ตรัง'}</span>
+                      <button 
+                        onClick={handleGoogleSignOut} 
+                        className="text-[10px] text-rose-500 hover:text-rose-700 font-bold underline ml-1 cursor-pointer transition"
+                        title="ยกเลิกการซิงค์ตาราง"
+                      >
+                        ยกเลิก
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-350 shrink-0"></span>
+                      <button 
+                        onClick={handleGoogleSignIn}
+                        disabled={isSignGoogleLoading}
+                        className="font-bold hover:text-[#aa4e6e] flex items-center gap-1 cursor-pointer transition duration-200"
+                      >
+                        <span>🔄 ซิงค์ Google Calendar</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Admin Session Badge / Action Button */}
+              {isAdminLoggedIn ? (
+                <div className="flex items-center gap-2">
+                  <span className="hidden md:inline-flex items-center gap-1.5 text-xs bg-slate-50 text-slate-600 border border-slate-200/50 font-bold px-3 py-1.5 rounded-xl shadow-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                    ผู้ตรวจสอบระบบ (Admin)
+                  </span>
+                  <button
+                    onClick={handleAdminLogout}
+                    className="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-[#aa4e6e] border border-rose-200/80 text-xs font-bold rounded-xl transition duration-200 shrink-0 cursor-pointer shadow-2xs"
+                    title="ออกจากระบบผู้ดูแล"
+                  >
+                    ออกจากระบบ
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={handleAdminLogout}
-                  className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-250 hover:text-[#aa4e6e] hover:border-[#aa4e6e] text-xs font-semibold rounded-lg transition shrink-0 cursor-pointer"
-                  title="ออกจากระบบผู้ดูแล"
+                  onClick={() => {
+                    setActiveTab('admin');
+                  }}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 hover:bg-white text-slate-600 hover:text-[#aa4e6e] border border-slate-200/50 hover:border-pink-200 text-xs font-bold rounded-xl transition duration-200 shrink-0 cursor-pointer shadow-3xs hover:shadow-2xs"
                 >
-                  ออกจากระบบ
+                  🔐 เข้าสู่ระบบ Admin
                 </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setActiveTab('admin');
-                }}
-                className="flex items-center gap-1 px-3 py-1.5 bg-pink-50 hover:bg-pink-100 text-[#aa4e6e] border border-pink-205 text-xs font-extrabold rounded-lg transition shrink-0 cursor-pointer shadow-xs"
-              >
-                🔐 เข้าสู่ระบบ Admin
-              </button>
-            )}
+              )}
+            </div>
           </div>
 
         </div>
