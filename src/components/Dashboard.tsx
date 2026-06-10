@@ -454,7 +454,10 @@ export default function Dashboard({
                         </td>
                         <td className="py-3.5 px-4">
                           <p className="text-xs font-semibold text-[#aa4e6e]">ทะเบียน {vehicle?.plateNumber || '-'}</p>
-                          <p className="text-[11px] text-slate-500 mt-0.5">{driver?.name || '-'}</p>
+                          <p className="text-[11px] text-slate-700 font-bold mt-0.5 flex items-center gap-1">
+                            <span>👤</span>
+                            <span className="truncate">{driver?.name || '⚠️ รอมอบหมายพลขับ'}</span>
+                          </p>
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           <div className="inline-flex items-center gap-1.5 justify-end">

@@ -1742,13 +1742,15 @@ export default function AdminPanel({
                           {/* คนขับหลังสุด */}
                           <td className="p-3 align-middle font-sans whitespace-nowrap">
                             <div className="space-y-1">
-                              <span className="font-bold text-slate-700 block">
+                              <span className="font-bold text-slate-700 block text-xs">
                                 {matchedDriver ? (
                                   matchedDriver.name
-                                ) : b.driverId === 'self' ? (
-                                  'ผู้มีสิทธิ์ขับเอง'
+                                ) : b.driverId === 'self-drive' ? (
+                                  '🚗 ขับรถยนต์ด้วยตนเอง'
+                                ) : b.driverId === 'passenger-drive' ? (
+                                  `👥 ผู้ร่วมเดินทางขับ (${b.customDriverName || 'ไม่ระบุชื่อ'})`
                                 ) : (
-                                  'ไม่พบข้อมูลคนขับ'
+                                  'รอมอบหมายพนักงาน'
                                 )}
                               </span>
                               {matchedDriver?.phone && (

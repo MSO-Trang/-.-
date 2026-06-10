@@ -644,9 +644,9 @@ export default function BookingList({
                           <Car size={11} className="text-[#aa4e6e]" />
                           {vehicle?.plateNumber || 'ไม่ระบุ'}
                         </div>
-                        <div className="flex items-center gap-1 text-[10px] text-slate-450 font-medium mt-0.5 max-w-[120px] truncate">
-                          <User size={10} />
-                          <span className="truncate">{driver?.name || 'ไม่มีคนขับ'}</span>
+                        <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 mt-0.5 max-w-[150px] truncate">
+                          <User size={11} className="text-slate-500 shrink-0" />
+                          <span className="truncate">{driver?.name || '⚠️ รอมอบหมายพลขับ'}</span>
                         </div>
                         {b.startMileage !== undefined && b.startMileage !== null && (
                           <div className="text-[9px] font-mono font-bold text-slate-500 mt-1 flex items-center gap-1 bg-slate-100/70 border border-slate-200/50 px-1 py-0.5 rounded w-fit leading-none" title={`เลขไมล์: ${b.startMileage} - ${b.endMileage || 'ยังไม่ระบุ'}`}>
