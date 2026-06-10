@@ -29,6 +29,7 @@ export interface Booking {
   purpose: string; // วัตถุประสงค์
   passengersCount: number;
   passengersList?: string[]; // รายชื่อผู้เดินทางร่วม
+  passengersPositionsList?: string[]; // ตำแหน่งผู้เดินทางร่วม
   startDate: string; // ISO DateTime
   endDate: string; // ISO DateTime
   vehicleId: string;

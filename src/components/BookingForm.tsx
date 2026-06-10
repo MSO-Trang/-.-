@@ -72,6 +72,7 @@ export default function BookingForm({
     purpose: '',
     passengersCount: 1,
     passengersList: [] as string[],
+    passengersPositionsList: [] as string[],
     startDate: '',
     endDate: '',
     vehicleId: '',
@@ -455,6 +456,7 @@ export default function BookingForm({
         purpose: bookingToEdit.purpose,
         passengersCount: bookingToEdit.passengersCount,
         passengersList: bookingToEdit.passengersList || [],
+        passengersPositionsList: bookingToEdit.passengersPositionsList || [],
         startDate: formatForInput(bookingToEdit.startDate),
         endDate: formatForInput(bookingToEdit.endDate),
         vehicleId: bookingToEdit.vehicleId,
@@ -864,6 +866,7 @@ export default function BookingForm({
       purpose: formData.purpose,
       passengersCount: formData.passengersCount,
       passengersList: formData.passengersList || [],
+      passengersPositionsList: formData.passengersPositionsList || [],
       startDate: new Date(formData.startDate).toISOString(),
       endDate: formData.endDate ? new Date(formData.endDate).toISOString() : '',
       vehicleId: formData.vehicleId,
@@ -1268,27 +1271,47 @@ export default function BookingForm({
                 {formData.passengersCount > 1 && (
                   <div className="mt-4 pt-4 border-t border-slate-100 animate-fade-in">
                     <h5 className="text-xs font-bold text-slate-700 flex items-center gap-1.5 mb-2.5">
-                      👥 รายชื่อผู้เข้าร่วมเดินทางร่วม ({Math.min(13, formData.passengersCount - 1)} คน)
+                      👥 รายชื่อและตำแหน่งผู้เข้าร่วมเดินทางร่วม ({Math.min(13, formData.passengersCount - 1)} คน)
                     </h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-3">
                       {Array.from({ length: Math.min(13, formData.passengersCount - 1) }).map((_, idx) => {
                         const val = formData.passengersList?.[idx] || '';
+                        const posVal = formData.passengersPositionsList?.[idx] || '';
                         return (
-                          <div key={idx} className="relative">
-                            <span className="absolute left-3 top-2.5 text-[10px] text-slate-400 font-bold font-mono">
-                              {idx + 1}.
-                            </span>
-                            <input
-                              type="text"
-                              placeholder={`ชื่อ-นามสกุล ผู้ร่วมเดินทางคนที่ ${idx + 1}`}
-                              value={val}
-                              onChange={(e) => {
-                                const listStr = [...(formData.passengersList || [])];
-                                listStr[idx] = e.target.value;
-                                setFormData(prev => ({ ...prev, passengersList: listStr }));
-                              }}
-                              className="w-full text-xs font-semibold pl-8 pr-3 py-2 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-200 focus:border-[#aa4e6e] transition text-slate-800"
-                            />
+                          <div key={idx} className="flex flex-col sm:flex-row gap-3 p-3 bg-slate-50/60 border border-slate-100 rounded-2xl">
+                            <div className="flex-1 relative">
+                              <span className="absolute left-3 top-1.5 text-[8.5px] text-slate-400 font-extrabold uppercase tracking-wide leading-none">
+                                ผู้ร่วมเดินทางคนที่ {idx + 1}
+                              </span>
+                              <input
+                                type="text"
+                                placeholder="ระบุ ชื่อ-นามสกุล จริง"
+                                value={val}
+                                onChange={(e) => {
+                                  const listStr = [...(formData.passengersList || [])];
+                                  listStr[idx] = e.target.value;
+                                  setFormData(prev => ({ ...prev, passengersList: listStr }));
+                                }}
+                                className="w-full text-xs font-bold px-3 pt-4.5 pb-1.5 border border-slate-200/80 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-rose-100 focus:border-[#aa4e6e] transition text-slate-800 placeholder-slate-300"
+                              />
+                            </div>
+
+                            <div className="flex-1 relative">
+                              <span className="absolute left-3 top-1.5 text-[8.5px] text-emerald-650 font-extrabold uppercase tracking-wide leading-none">
+                                ตำแหน่งผู้เดินทางคนที่ {idx + 1}
+                              </span>
+                              <input
+                                type="text"
+                                placeholder="เช่น นว.คอมพิวเตอร์ / นักวิเคราห์ฯ / อื่นๆ"
+                                value={posVal}
+                                onChange={(e) => {
+                                  const listPos = [...(formData.passengersPositionsList || [])];
+                                  listPos[idx] = e.target.value;
+                                  setFormData(prev => ({ ...prev, passengersPositionsList: listPos }));
+                                }}
+                                className="w-full text-xs font-semibold px-3 pt-4.5 pb-1.5 border border-slate-200/80 rounded-xl bg-white focus:outline-none focus:ring-1 focus:ring-emerald-55/40 focus:border-emerald-500 transition text-slate-800 placeholder-slate-300"
+                              />
+                            </div>
                           </div>
                         );
                       })}
@@ -1682,25 +1705,28 @@ export default function BookingForm({
                     <div className="space-y-2 pt-2 border-t border-slate-100/50">
                       <span className="text-[10px] font-bold text-slate-450 block">หรือคลิกเลือกดึงรายชื่อจาก ผู้ร่วมเดินทางร่วมหลัก ที่แอดไว้ในส่วนที่ 2:</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {formData.passengersList.filter(name => name && name.trim()).map((pName, pIdx) => (
-                          <button
-                            key={pIdx}
-                            type="button"
-                            onClick={() => {
-                              setFormData(prev => ({ ...prev, customDriverName: pName }));
-                              if (errors.customDriverName) {
-                                setErrors(prev => {
-                                  const copy = { ...prev };
-                                  delete copy.customDriverName;
-                                  return copy;
-                                });
-                              }
-                            }}
-                            className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-[10px] font-bold text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-250 rounded-xl cursor-pointer transition duration-150 shadow-3xs"
-                          >
-                            👤 {pName}
-                          </button>
-                        ))}
+                        {formData.passengersList.filter(name => name && name.trim()).map((pName, pIdx) => {
+                          const pPos = formData.passengersPositionsList?.[pIdx];
+                          return (
+                            <button
+                              key={pIdx}
+                              type="button"
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, customDriverName: pName }));
+                                if (errors.customDriverName) {
+                                  setErrors(prev => {
+                                    const copy = { ...prev };
+                                    delete copy.customDriverName;
+                                    return copy;
+                                  });
+                                }
+                              }}
+                              className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-[10px] font-bold text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-250 rounded-xl cursor-pointer transition duration-150 shadow-3xs"
+                            >
+                              👤 {pName}{pPos ? ` (${pPos})` : ''}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   ) : (

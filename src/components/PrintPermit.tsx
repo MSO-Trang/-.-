@@ -355,12 +355,17 @@ export default function PrintPermit({
                     <p className="font-bold text-slate-800 mb-1.5 flex items-center gap-1.5">
                       <span> รายชื่อผู้เข้าร่วมเดินทาง ({booking.passengersList.filter(name => name.trim() !== '').length} คน):</span>
                     </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-slate-700 font-medium">
-                      {booking.passengersList.filter(name => name.trim() !== '').map((name, idx) => (
-                        <div key={idx} className="truncate">
-                           <span className="font-bold text-slate-400 font-mono mr-1">{idx + 1}.</span> {name}
-                        </div>
-                      ))}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-slate-755 font-medium">
+                      {booking.passengersList.filter(name => name.trim() !== '').map((name, idx) => {
+                        const position = booking.passengersPositionsList?.[idx] || '';
+                        return (
+                          <div key={idx} className="leading-snug text-[13.5pt]">
+                            <span className="font-bold text-slate-400 font-mono mr-1">{idx + 1}.</span>
+                            <span className="text-slate-800">{name}</span>
+                            {position && <span className="text-slate-500 font-normal"> ({position})</span>}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -435,7 +440,10 @@ export default function PrintPermit({
               {/* Paragraph details with indent */}
               <div className="space-y-2 text-justify flex-grow" style={{ fontSize: '14.5pt', lineHeight: '1.25' }}>
                 <p className="leading-relaxed" style={{ textIndent: '2.5em' }}>
-                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-black px-1.5">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-black px-1.5">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-black px-1.5">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-black px-1.5">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-black px-1.5">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-black px-1.5">{booking.passengersCount}</span> คน คือ <span className="font-semibold border-b border-dotted border-black px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').join(', ')}` : 'ข้าพเจ้าลำพัง'}</span> ในวันที่ <span className="font-bold border-b border-dotted border-black px-1.5">{startDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-black px-1">{formatTime(booking.startDate)} น.</span> {booking.endDate ? (
+                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-black px-1.5">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-black px-1.5">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-black px-1.5">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-black px-1.5">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-black px-1.5">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-black px-1.5">{booking.passengersCount}</span> คน คือ <span className="font-semibold border-b border-dotted border-black px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').map((n, idx) => {
+                    const pos = booking.passengersPositionsList?.[idx];
+                    return `${n}${pos ? ` (${pos})` : ''}`;
+                  }).join(', ')}` : 'ข้าพเจ้าลำพัง'}</span> ในวันที่ <span className="font-bold border-b border-dotted border-black px-1.5">{startDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-black px-1">{formatTime(booking.startDate)} น.</span> {booking.endDate ? (
                     <>
                       ถึงวันที่ <span className="font-bold border-b border-dotted border-black px-1.5">{endDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-black px-1">{formatTime(booking.endDate)} น.</span>
                     </>
