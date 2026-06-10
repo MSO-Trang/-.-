@@ -624,35 +624,7 @@ export default function App() {
                 <span className="font-mono whitespace-nowrap">เวลาปัจจุบัน: {currentClock || 'กำลังโหลด...'}</span>
               </div>
 
-              {/* Google Calendar Connection Status */}
-              {isAdminLoggedIn && (
-                <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200/50 text-slate-600 rounded-xl text-xs font-medium">
-                  {googleToken ? (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0"></span>
-                      <span className="font-bold text-slate-700 whitespace-nowrap">ปฏิทินสำเร็จ: {googleUser?.displayName || 'พมจ.ตรัง'}</span>
-                      <button 
-                        onClick={handleGoogleSignOut} 
-                        className="text-[10px] text-rose-500 hover:text-rose-700 font-bold underline ml-1 cursor-pointer transition"
-                        title="ยกเลิกการซิงค์ตาราง"
-                      >
-                        ยกเลิก
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-350 shrink-0"></span>
-                      <button 
-                        onClick={handleGoogleSignIn}
-                        disabled={isSignGoogleLoading}
-                        className="font-bold hover:text-[#aa4e6e] flex items-center gap-1 cursor-pointer transition duration-200"
-                      >
-                        <span>🔄 ซิงค์ Google Calendar</span>
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+
 
               {/* Admin Session Badge / Action Button */}
               {isAdminLoggedIn ? (

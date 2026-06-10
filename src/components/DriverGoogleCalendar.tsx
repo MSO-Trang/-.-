@@ -375,11 +375,11 @@ export default function DriverGoogleCalendar({
           </div>
           <div>
             <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-1.5 leading-tight">
-              <span>ตาราง Google Calendar พนักงานขับรถ</span>
-              <span className="text-[10px] bg-[#1a73e8] text-white px-2 py-0.5 rounded-full font-sans tracking-wide">GOOGLE SYNC ACTIVE</span>
+              <span>ตารางเวลาและกำหนดการพนักงานขับรถ</span>
+              <span className="text-[10px] bg-[#aa4e6e] text-white px-2 py-0.5 rounded-full font-sans tracking-wide">INTERNAL CALENDAR</span>
             </h2>
-            <p className="text-xs text-slate-405 font-medium mt-0.5">
-              ติดตามสัญจรตารางงานรายสัปดาห์/เดือน ของคุณสมคิด และทีมขับ สนง.พมจ.ตรัง
+            <p className="text-xs text-slate-400 font-medium mt-0.5">
+              ติดตามสัญจรตารางงานรายสัปดาห์/เดือน ของพนักงานขับรถยนต์ สนง.พมจ.ตรัง
             </p>
           </div>
         </div>
@@ -422,7 +422,7 @@ export default function DriverGoogleCalendar({
             </button>
           </div>
 
-          {/* Sync Button */}
+          {/* Refresh Button */}
           <button
             type="button"
             onClick={handleGoogleCalendarSync}
@@ -430,23 +430,23 @@ export default function DriverGoogleCalendar({
             className={`px-3.5 py-2 rounded-xl text-xs font-bold border flex items-center gap-1.5 shadow-2xs transition-all duration-150 ease-out cursor-pointer ${
               syncSuccess 
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-250' 
-                : 'bg-white text-[#1a73e8] border-slate-200 hover:bg-slate-50'
+                : 'bg-white text-[#aa4e6e] border-slate-200 hover:bg-slate-50'
             }`}
           >
             {isSyncing ? (
               <>
                 <RefreshCw size={14} className="animate-spin text-slate-400" />
-                <span>กำลังกรองและตรวจแถว...</span>
+                <span>กำลังโหลดข้อมูลล่าสุด...</span>
               </>
             ) : syncSuccess ? (
               <>
                 <CheckCircle2 size={14} className="text-emerald-500" />
-                <span>ผสาน Google Calendar สำเร็จ!</span>
+                <span>รีเฟรชข้อมูลเสร็จสิ้น!</span>
               </>
             ) : (
               <>
-                <RefreshCw size={14} className="text-[#1a73e8]" />
-                <span>ลิงก์ซิงค์ Google Calendar</span>
+                <RefreshCw size={14} className="text-[#aa4e6e]" />
+                <span>รีเฟรชตารางเวลา</span>
               </>
             )}
           </button>
@@ -1157,23 +1157,11 @@ export default function DriverGoogleCalendar({
               </div>
 
               {/* Action columns footer */}
-              <div className="bg-slate-50 border-t border-slate-150 px-5 py-3 flex justify-between gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const calcEndDate = selectedEvent.endDate || new Date(new Date(selectedEvent.startDate).getTime() + (4 * 60 * 60 * 1000)).toISOString();
-                    const gUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('จองรถราชการ: ' + selectedEvent.destination)}&details=${encodeURIComponent(selectedEvent.purpose + ' - ขอโดย ' + selectedEvent.requesterName)}&dates=${encodeURIComponent(selectedEvent.startDate.replace(/[-:]/g, ''))}/${encodeURIComponent(calcEndDate.replace(/[-:]/g, ''))}`;
-                    window.open(gUrl, '_blank');
-                  }}
-                  className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-[10px] font-bold rounded-xl text-slate-600 transition flex items-center gap-1 cursor-pointer"
-                >
-                  <ExternalLink size={11} />
-                  เปิดใน Google Calendar
-                </button>
+              <div className="bg-slate-50 border-t border-slate-150 px-5 py-3 flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setSelectedEvent(null)}
-                  className="px-3 py-1.5 bg-slate-850 hover:bg-slate-900 text-white text-[10px] font-bold rounded-xl transition cursor-pointer"
+                  className="px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition cursor-pointer"
                 >
                   ปิดหน้าต่าง
                 </button>

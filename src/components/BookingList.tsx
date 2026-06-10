@@ -680,29 +680,14 @@ export default function BookingList({
                           {/* Quick approval toggles if pending */}
                           {b.status === 'pending' && (
                             isAdmin ? (
-                              <div className="flex items-center gap-1">
-                                <button
-                                  onClick={() => onUpdateStatus(b.id, 'approved')}
-                                  title="อนุมัติทันที"
-                                  className="p-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-md transition cursor-pointer"
-                                >
-                                  <CheckCircle size={13} />
-                                </button>
-                                
-                                <button
-                                  disabled={syncingBookingId !== null}
-                                  onClick={() => handleApproveAndSyncToGoogleCalendar(b)}
-                                  title="อนุมัติและซิงค์ตารางลง Google Calendar"
-                                  className="p-1 px-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-150/50 rounded-md transition cursor-pointer flex items-center gap-1 font-bold text-[10px]"
-                                >
-                                  {syncingBookingId === b.id ? (
-                                    <RefreshCw size={11} className="animate-spin text-blue-505" />
-                                  ) : (
-                                    <CalendarDays size={12} className="text-[#1a73e8]" />
-                                  )}
-                                  <span>อนุมัติ & ซิงค์ 📅</span>
-                                </button>
-                              </div>
+                              <button
+                                onClick={() => onUpdateStatus(b.id, 'approved')}
+                                title="อนุมัติยานพาหนะราชการ"
+                                className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 border border-emerald-250 text-emerald-700 rounded-md transition cursor-pointer flex items-center gap-1 font-bold text-[10.5px]"
+                              >
+                                <CheckCircle size={13} className="text-emerald-600" />
+                                <span>อนุมัติ</span>
+                              </button>
                             ) : (
                               <button
                                 disabled
@@ -712,23 +697,6 @@ export default function BookingList({
                                 <CheckCircle size={13} />
                               </button>
                             )
-                          )}
-
-                          {/* Sync existing approved event to Google Calendar for Admin */}
-                          {b.status === 'approved' && isAdmin && localStorage.getItem(`pmj_sync_calendar_${b.id}`) !== 'true' && (
-                            <button
-                              disabled={syncingBookingId !== null}
-                              onClick={() => handleApproveAndSyncToGoogleCalendar(b)}
-                              title="ซิงค์ลง Google Calendar"
-                              className="px-1.5 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-[10px] font-bold rounded-md transition flex items-center gap-1 cursor-pointer"
-                            >
-                              {syncingBookingId === b.id ? (
-                                <RefreshCw size={11} className="animate-spin text-blue-500" />
-                              ) : (
-                                <CalendarDays size={12} className="text-[#1a73e8]" />
-                              )}
-                              <span>ซิงค์ Google 📅</span>
-                            </button>
                           )}
 
                           {/* Complete trip with mileage */}
