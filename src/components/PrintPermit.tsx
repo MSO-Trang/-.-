@@ -439,7 +439,7 @@ export default function PrintPermit({
 
               {/* Paragraph details with indent */}
               <div className="space-y-2 text-justify flex-grow" style={{ fontSize: '14.5pt', lineHeight: '1.25' }}>
-                <p className="leading-relaxed" style={{ textIndent: '2.5em' }}>
+                <p className="leading-relaxed text-justify" style={{ textIndent: '2.5em', marginBottom: '8px', paddingLeft: '0px', lineHeight: '27.2333px', textAlign: 'justify' }}>
                   ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-black px-1.5">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-black px-1.5">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-black px-1.5">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-black px-1.5">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-black px-1.5">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-black px-1.5">{booking.passengersCount}</span> คน คือ <span className="font-semibold border-b border-dotted border-black px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').map((n, idx) => {
                     const pos = booking.passengersPositionsList?.[idx];
                     return `${n}${pos ? ` (${pos})` : ''}`;
@@ -462,10 +462,10 @@ export default function PrintPermit({
                       <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
                       <span className="w-24 text-left pl-1 shrink-0 font-sans">ผู้ขออนุญาต</span>
                     </p>
-                    <div className="font-bold mt-1 text-black leading-tight">
+                    <div className="font-bold mt-1 text-black" style={{ lineHeight: '20.2333px' }}>
                       ( {booking.requesterName} )
                       <br />
-                      <span className="text-[14.5pt] text-slate-600 font-semibold">ตำแหน่ง: {booking.requesterPosition}</span>
+                      <span className="text-[14.5pt] text-slate-600 font-semibold" style={{ marginTop: '0px' }}>ตำแหน่ง: {booking.requesterPosition}</span>
                     </div>
                   </div>
                 </div>
@@ -475,11 +475,11 @@ export default function PrintPermit({
                   <div className="pl-4 flex justify-between items-end">
                     <div className="text-[14.5pt] text-slate-500 font-medium font-sans">
                     </div>
-                    <div className="w-80 leading-normal text-center ml-auto" style={{ fontSize: '14.5pt' }}>
+                    <div className="w-[457px] leading-normal text-center mx-auto" style={{ fontSize: '14.5pt' }}>
                       <p className="font-bold text-black mb-2 text-center">เห็นควรอนุญาต</p>
                       <p className="flex items-baseline justify-center">
-                        <span className="w-16 text-right pr-1 shrink-0 select-none">(ลงชื่อ)</span>
-                        <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
+                        <span className="w-16 text-right pr-1 shrink-0 select-none" style={{ marginLeft: '60px' }}>(ลงชื่อ)</span>
+                        <span className="w-[320px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">............................................................................................................................................</span>
                         <span className="text-left pl-1 shrink-0 font-sans min-w-24">
                           {(booking.departmentHeadPosition?.startsWith('แทน') || booking.departmentHeadPosition?.includes('แทน'))
                             ? (booking.department ? `แทนหัวหน้า${booking.department}` : 'แทนหัวหน้ากลุ่ม/ฝ่าย')
@@ -490,7 +490,7 @@ export default function PrintPermit({
                       <p className="font-bold mt-1 text-black">
                         ( {booking.departmentHeadName || '......................................................................'} )
                       </p>
-                      <p className="text-[14.5pt] text-slate-500 mt-0.5">
+                      <p className="text-[14.5pt] text-slate-500 mt-0" style={{ marginTop: '0px' }}>
                         ตำแหน่ง {displayPosition ? (displayPosition.startsWith('ตำแหน่ง') ? displayPosition.replace(/^ตำแหน่ง\s*/, '') : displayPosition) : '...................................................'}
                       </p>
                     </div>
@@ -539,29 +539,29 @@ export default function PrintPermit({
                     {/* Left side caretaker */}
                     <div className="text-center leading-normal">
                       <p className="flex items-baseline justify-center">
-                        <span className="w-12 text-right pr-1 shrink-0 select-none">ลงชื่อ</span>
-                        <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
-                        <span className="w-24 text-left pl-1 shrink-0 truncate font-sans text-[14.5pt]">ผู้ควบคุมใช้รถ</span>
+                        <span className="w-10 text-right pr-1 shrink-0 select-none">ลงชื่อ</span>
+                        <span className="w-[143px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
+                        <span className="text-left shrink-0 font-sans text-[14.5pt]" style={{ width: '101px', marginLeft: '1px', paddingLeft: '4px', paddingRight: '0px', paddingTop: '0px', paddingBottom: '0px' }}>ผู้ควบคุมใช้รถ</span>
                       </p>
-                      <p className="font-bold mt-1 text-black" style={{ fontSize: '14.5pt' }}>
+                      <p className="font-bold mt-1 text-black" style={{ fontSize: '14.5pt', paddingRight: '48px' }}>
                         ( {booking.caretakerName || '..........................................................'} )
                       </p>
-                      <p className="text-[14.5pt] text-slate-500 mt-0.5">
+                      <p className="text-[14.5pt] text-slate-500 mt-0" style={{ marginTop: '-1px', paddingRight: '41px' }}>
                         {booking.caretakerPosition || 'นักวิชาการจัดดูแลยานพาหนะ'}
                       </p>
                     </div>
 
                     {/* Right side General division manager */}
                     <div className="text-center leading-normal border-l border-dotted border-black/25">
-                      <p className="flex items-baseline justify-center">
-                        <span className="w-12 text-right pr-1 shrink-0 select-none">ลงชื่อ</span>
-                        <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
-                        <span className="w-24 text-left pl-1 shrink-0 truncate font-sans text-[14.5pt]">หน.ฝ่ายบริหารทั่วไป</span>
+                      <p className="flex items-baseline justify-center" style={{ width: '343.812px', marginLeft: '0px', marginRight: '0px', paddingRight: '1px' }}>
+                        <span className="w-10 text-right pr-1 shrink-0 select-none">ลงชื่อ</span>
+                        <span className="w-[110px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
+                        <span className="w-[140px] text-left pl-1 shrink-0 font-sans text-[14.5pt]">หัวหน้าฝ่ายบริหารทั่วไป</span>
                       </p>
-                      <p className="font-bold mt-1 text-black">
+                      <p className="font-bold mt-1 text-black" style={{ marginLeft: '-43px' }}>
                         ( นางดาลินี   ศรีสุข )
                       </p>
-                      <p className="text-[14.5pt] text-slate-500 mt-0.5 font-sans">
+                      <p className="text-[14.5pt] text-slate-500 mt-0 font-sans" style={{ marginTop: '0px', marginLeft: '-24px', paddingLeft: '0px', paddingRight: '20px' }}>
                         ตำแหน่ง นักพัฒนาสังคมชำนาญการ
                       </p>
                     </div>
@@ -585,15 +585,15 @@ export default function PrintPermit({
 
                   {/* Final authority signature block */}
                   <div className="pt-3 text-center leading-normal max-w-sm mx-auto mt-1">
-                    <p className="flex items-baseline justify-center">
+                    <p className="flex items-baseline justify-center" style={{ paddingRight: '0px', paddingLeft: '57px' }}>
                       <span className="w-12 text-right pr-1 shrink-0 select-none">ลงชื่อ</span>
-                      <span className="w-[140px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none">......................................................................</span>
-                      <span className="w-24 text-left pl-1 shrink-0 truncate font-sans">ผู้มีอำนาจสั่งใช้รถ</span>
+                      <span className="overflow-hidden whitespace-nowrap text-center text-slate-400 select-none" style={{ width: '161px' }}>......................................................................</span>
+                      <span className="text-left shrink-0 font-sans" style={{ paddingLeft: '5px', width: '116.9896px' }}>ผู้มีอำนาจสั่งใช้รถ</span>
                     </p>
-                    <p className="font-bold mt-1 text-black" style={{ fontSize: '14.5pt' }}>
+                    <p className="font-bold text-black" style={{ fontSize: '14.5pt', marginTop: '3px' }}>
                       ( {booking.approvedBy} )
                     </p>
-                    <p className="text-[14.5pt] text-slate-600 mt-0.5 font-bold leading-tight">
+                    <p className="text-[14.5pt] text-slate-600 font-bold leading-tight" style={{ lineHeight: '19.2333px', marginTop: '-1px' }}>
                       {booking.approvedByPosition === 'พัฒนาสังคมและความมั่นคงของมนุษย์จังหวัดตรัง' ? (
                         <>
                           พัฒนาสังคมและความมั่นคงของมนุษย์จังหวัดตรัง ปฏิบัติราชการแทน
