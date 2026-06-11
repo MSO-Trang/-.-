@@ -174,11 +174,11 @@ export default function PrintPermit({
         
         {/* Actual A4 Page Style Document (TH Sarabun setup) */}
         <div 
-          className="bg-white w-[210mm] min-h-[297mm] p-[18mm] text-black border border-slate-300 shadow-md relative overflow-hidden font-sarabun leading-tight print:shadow-none print:border-none print:p-0 print:w-full print:min-h-[297mm] flex flex-col"
+          className="bg-white w-[210mm] h-[297mm] pt-[10mm] pb-[12mm] px-[18mm] text-black border border-slate-300 shadow-md relative overflow-hidden font-sarabun leading-tight print:shadow-none print:border-none print:m-0 flex flex-col"
           style={{ 
             fontFamily: '"TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif',
             fontSize: '14.5pt',
-            lineHeight: '1.25'
+            lineHeight: '1.15'
           }}
           id="government-form-paper"
         >

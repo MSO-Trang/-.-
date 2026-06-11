@@ -12,10 +12,54 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Force TH Sarabun font family on the entire government form page and all its descendants to override other font utilities */
-#government-form-paper,
+/* Force TH Sarabun font family on the entire government form page and all its descendants to override other font utilities, and ensure exact A4 dimensions */
+#government-form-paper {
+  font-family: "TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif !important;
+  width: 210mm !important;
+  height: 297mm !important;
+  min-width: 210mm !important;
+  max-width: 210mm !important;
+  min-height: 297mm !important;
+  max-height: 297mm !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+  padding: 10mm 18mm 12mm 18mm !important;
+  line-height: 1.15 !important;
+}
+
 #government-form-paper * {
   font-family: "TH Sarabun New", "TH SarabunPSK", "Sarabun", sans-serif !important;
+  line-height: 1.15 !important;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+  #government-form-paper {
+    width: 210mm !important;
+    height: 297mm !important;
+    min-width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    padding: 10mm 18mm 12mm 18mm !important;
+    border: none !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    line-height: 1.15 !important;
+  }
 }
 
 /* Custom Scrollbar for a premium feeling */
