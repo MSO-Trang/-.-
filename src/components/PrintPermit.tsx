@@ -439,7 +439,7 @@ export default function PrintPermit({
 
               {/* Paragraph details with indent */}
               <div className="space-y-2 text-justify flex-grow" style={{ fontSize: '14.5pt', lineHeight: '1.25' }}>
-                <p className="leading-relaxed text-justify" style={{ textIndent: '2.5em', marginBottom: '8px', paddingLeft: '0px', lineHeight: '36px', height: 'auto', textAlign: 'justify', textDecoration: 'none' }}>
+                <p className="leading-relaxed text-justify" style={{ textIndent: '2.5em', marginBottom: '8px', paddingLeft: '0px', lineHeight: '28.2333px', height: '80.6562px', textAlign: 'justify', textDecoration: 'none' }}>
                   ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.passengersCount}</span> คน คือ <span className="font-semibold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').map((n, idx) => {
                     const pos = booking.passengersPositionsList?.[idx];
                     return `${n}${pos ? ` (${pos})` : ''}`;
@@ -555,14 +555,19 @@ export default function PrintPermit({
                     <div className="text-center leading-normal border-l border-dotted border-black/25">
                       <p className="flex items-baseline justify-center" style={{ width: '343.812px', marginLeft: '0px', marginRight: '0px', paddingRight: '1px' }}>
                         <span className="w-10 text-right pr-1 shrink-0 select-none">ลงชื่อ</span>
-                        <span className="w-[110px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none" style={{ position: 'relative', top: '1.5px' }}>......................................................................</span>
-                        <span className="w-[140px] text-left pl-1 shrink-0 font-sans text-[14.5pt]">หัวหน้าฝ่ายบริหารทั่วไป</span>
+                        <span className="overflow-hidden whitespace-nowrap text-center text-slate-400 select-none" style={{ width: booking.isGeneralAdminOnLeave ? '120px' : '110px', position: 'relative', top: '1.5px' }}>......................................................................</span>
+                        <span className="text-left pl-1 shrink-0 font-sans leading-tight" style={{ 
+                          width: booking.isGeneralAdminOnLeave ? '173px' : '140px',
+                          fontSize: booking.isGeneralAdminOnLeave ? '13pt' : '14.5pt'
+                        }}>
+                          {booking.isGeneralAdminOnLeave ? 'แทนหัวหน้ากลุ่มงานบริหารทั่วไป' : 'หัวหน้าฝ่ายบริหารทั่วไป'}
+                        </span>
                       </p>
                       <p className="font-bold mt-1 text-black" style={{ marginLeft: '-43px' }}>
-                        ( นางดาลินี   ศรีสุข )
+                        ( {booking.generalAdminName || 'นางดาลินี   ศรีสุข'} )
                       </p>
                       <p className="text-[14.5pt] text-slate-500 font-sans" style={{ marginTop: '-3px', marginLeft: '-24px', paddingLeft: '0px', paddingRight: '20px', paddingTop: '0px' }}>
-                        ตำแหน่ง นักพัฒนาสังคมชำนาญการ
+                        {booking.generalAdminPosition ? (booking.generalAdminPosition.startsWith('ตำแหน่ง') ? booking.generalAdminPosition : `ตำแหน่ง ${booking.generalAdminPosition}`) : 'ตำแหน่ง นักพัฒนาสังคมชำนาญการ'}
                       </p>
                     </div>
                   </div>

@@ -43,6 +43,9 @@ export interface Booking {
   departmentHeadName?: string;
   departmentHeadPosition?: string;
   departmentHeadRank?: string;
+  generalAdminName?: string;
+  generalAdminPosition?: string;
+  isGeneralAdminOnLeave?: boolean;
   remarks?: string;
   startMileage?: number;
   endMileage?: number;

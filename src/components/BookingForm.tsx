@@ -86,6 +86,9 @@ export default function BookingForm({
     departmentHeadName: '',
     departmentHeadPosition: '',
     departmentHeadRank: '',
+    generalAdminName: 'นางดาลินี   ศรีสุข',
+    generalAdminPosition: 'นักพัฒนาสังคมชำนาญการ',
+    isGeneralAdminOnLeave: false,
     remarks: '',
     startMileage: '',
     endMileage: ''
@@ -470,6 +473,9 @@ export default function BookingForm({
         departmentHeadName: bookingToEdit.departmentHeadName || (departmentHeads[0]?.name || ''),
         departmentHeadPosition: bookingToEdit.departmentHeadPosition || (departmentHeads[0]?.position || ''),
         departmentHeadRank: bookingToEdit.departmentHeadRank || (foundHead?.rank || (departmentHeads[0]?.rank || '')),
+        generalAdminName: bookingToEdit.generalAdminName || 'นางดาลินี   ศรีสุข',
+        generalAdminPosition: bookingToEdit.generalAdminPosition || 'นักพัฒนาสังคมชำนาญการ',
+        isGeneralAdminOnLeave: bookingToEdit.isGeneralAdminOnLeave || false,
         remarks: bookingToEdit.remarks || '',
         startMileage: bookingToEdit.startMileage !== undefined ? String(bookingToEdit.startMileage) : String(getLastVehicleMileage(bookingToEdit.vehicleId)),
         endMileage: bookingToEdit.endMileage !== undefined ? String(bookingToEdit.endMileage) : ''
@@ -500,6 +506,9 @@ export default function BookingForm({
         departmentHeadName: departmentHeads[0]?.name || '',
         departmentHeadPosition: departmentHeads[0]?.position || '',
         departmentHeadRank: departmentHeads[0]?.rank || '',
+        generalAdminName: 'นางดาลินี   ศรีสุข',
+        generalAdminPosition: 'นักพัฒนาสังคมชำนาญการ',
+        isGeneralAdminOnLeave: false,
         startMileage: autoStartMileage > 0 ? String(autoStartMileage) : '0',
         endMileage: ''
       }));
@@ -880,6 +889,9 @@ export default function BookingForm({
       departmentHeadName: formData.departmentHeadName,
       departmentHeadPosition: formData.departmentHeadPosition,
       departmentHeadRank: formData.departmentHeadRank,
+      generalAdminName: formData.generalAdminName,
+      generalAdminPosition: formData.generalAdminPosition,
+      isGeneralAdminOnLeave: formData.isGeneralAdminOnLeave,
       remarks: formData.remarks,
       startMileage: formData.startMileage ? parseInt(formData.startMileage, 10) : undefined,
       endMileage: formData.endMileage ? parseInt(formData.endMileage, 10) : undefined,
@@ -1759,10 +1771,8 @@ export default function BookingForm({
                 </div>
               )}
             </div>
-
-
-            </div>
-          )}
+          </div>
+        )}
 
         {/* =======================================
             STEP 4: caretakers and approvers 
@@ -1781,36 +1791,6 @@ export default function BookingForm({
 
             <div className="space-y-6">
               
-              {/* เจ้าหน้าที่จัดดูแลยานพาหนะ */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 rounded-xl bg-slate-50/50 border border-slate-100">
-                {/* Caretaker */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 block">เจ้าหน้าที่จัดดูแลยานพาหนะ (นายทะเบียนพัสดุ)</label>
-                  <select
-                    name="caretakerName"
-                    value={formData.caretakerName}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-150 focus:border-[#aa4e6e] bg-white text-slate-700 font-semibold"
-                  >
-                    {caretakers.map((caretaker, idx) => (
-                      <option key={caretaker.id || idx} value={caretaker.name}>{caretaker.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Caretaker Position */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700 block">ตำแหน่งนายทะเบียนคุมรถ</label>
-                  <input
-                    type="text"
-                    name="caretakerPosition"
-                    value={formData.caretakerPosition}
-                    disabled
-                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-400 font-bold outline-none"
-                  />
-                </div>
-              </div>
-
               {/* หัวหน้ากลุ่ม/ฝ่าย */}
               <div className="p-5 rounded-xl bg-pink-50/10 border border-pink-100/40 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pink-100/40 pb-3">
@@ -1828,7 +1808,7 @@ export default function BookingForm({
                       type="checkbox"
                       checked={isCustomDeptHead}
                       onChange={(e) => handleCustomDeptHeadToggle(e.target.checked)}
-                      className="rounded text-[#aa4e6e] focus:ring-[#aa4e6e] h-4 w-4 border-slate-300"
+                      className="rounded text-[#aa4e6e] focus:ring-[#aa4e6e] h-4 w-4 border-slate-350"
                     />
                     <span>มีผู้ลงนามปฏิบัติหน้าที่แทน (เซ็นแทน)</span>
                   </label>
@@ -1941,6 +1921,116 @@ export default function BookingForm({
                           className="w-full px-4 py-2.5 border border-pink-200 rounded-xl text-sm font-bold outline-none bg-white text-slate-700 focus:ring-2 focus:ring-pink-150 focus:border-[#aa4e6e]"
                         />
                       </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* เจ้าหน้าที่จัดดูแลยานพาหนะ */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 rounded-xl bg-slate-50/50 border border-slate-100">
+                {/* Caretaker */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 block">เจ้าหน้าที่จัดดูแลยานพาหนะ (นายทะเบียนพัสดุ)</label>
+                  <select
+                    name="caretakerName"
+                    value={formData.caretakerName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-150 focus:border-[#aa4e6e] bg-white text-slate-700 font-semibold"
+                  >
+                    {caretakers.map((caretaker, idx) => (
+                      <option key={caretaker.id || idx} value={caretaker.name}>{caretaker.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Caretaker Position */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 block">ตำแหน่งนายทะเบียนคุมรถ</label>
+                  <input
+                    type="text"
+                    name="caretakerPosition"
+                    value={formData.caretakerPosition}
+                    disabled
+                    className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-400 font-bold outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* หัวหน้ากลุ่มงานบริหารทั่วไป (ผู้บันทึกจัดยานพาหนะและลงความเห็นควรอนุญาต) */}
+              <div className="p-5 rounded-xl bg-orange-50/10 border border-orange-100/40 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-orange-100/40 pb-3">
+                  <div className="space-y-0.5">
+                    <h4 className="text-sm font-bold text-amber-700 flex items-center gap-1.5">
+                      <span>หัวหน้ากลุ่มงานบริหารทั่วไป (ผู้บันทึกจัดยานพาหนะ)</span>
+                      <span className="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-md">ส่วนลงเห็นควร</span>
+                    </h4>
+                    <p className="text-[11px] text-slate-500 font-medium">ระบุผู้ควบคุมตรวจสอบเห็นควรอนุญาตใช้รถในช่อง "บันทึกการใช้ยานพาหนะและการอนุญาต"</p>
+                  </div>
+                  
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-700 bg-white border border-amber-100 hover:border-amber-200 px-3 py-1.5 rounded-lg select-none shadow-sm transition">
+                    <input
+                      type="checkbox"
+                      name="isGeneralAdminOnLeave"
+                      checked={formData.isGeneralAdminOnLeave}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData(prev => ({
+                          ...prev,
+                          isGeneralAdminOnLeave: checked,
+                          generalAdminName: checked ? '' : 'นางดาลินี   ศรีสุข',
+                          generalAdminPosition: checked ? 'นักพัฒนาสังคมชำนาญการ' : 'นักพัฒนาสังคมชำนาญการ'
+                        }));
+                      }}
+                      className="rounded text-amber-600 focus:ring-amber-500 h-4 w-4 border-slate-300"
+                    />
+                    <span>หัวหน้ากลุ่มบริหารฯ ลากิจ/ลาพักผ่อน (มีผู้เซ็นแทน)</span>
+                  </label>
+                </div>
+
+                {!formData.isGeneralAdminOnLeave ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 block">ชื่อ-นามสกุล หัวหน้ากลุ่มงานบริหารทั่วไป</label>
+                      <input
+                        type="text"
+                        value="นางดาลินี   ศรีสุข"
+                        disabled
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-400 font-bold outline-none"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-500 block">ตำแหน่งเดิม</label>
+                      <input
+                        type="text"
+                        value="ตำแหน่ง นักพัฒนาสังคมชำนาญการ"
+                        disabled
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-400 font-bold outline-none"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-700 block">ชื่อ-นามสกุล ผู้ปฏิบัติราชการแทน</label>
+                      <input
+                        type="text"
+                        name="generalAdminName"
+                        value={formData.generalAdminName}
+                        onChange={handleChange}
+                        placeholder="เช่น นางสาวอัญชลี แก้วแกมหาญ"
+                        className="w-full px-4 py-2.5 border border-amber-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-150 focus:border-amber-500 bg-white text-slate-700 font-bold"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-bold text-slate-750 block">ตำแหน่งของผู้รับผิดชอบแทน (เช่น นักพัฒนาสังคมชำนาญการ)</label>
+                      <input
+                        type="text"
+                        name="generalAdminPosition"
+                        value={formData.generalAdminPosition}
+                        onChange={handleChange}
+                        placeholder="เช่น นักพัฒนาสังคมชำนาญการ"
+                        className="w-full px-4 py-2.5 border border-amber-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-amber-150 focus:border-amber-500 bg-white text-slate-700 font-bold"
+                      />
                     </div>
                   </div>
                 )}
