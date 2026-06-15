@@ -503,10 +503,10 @@ export default function PrintPermit({
                   {/* Absolute box item right-corner info card */}
                   <div className="absolute right-3 top-3 border border-black p-2 w-44 leading-normal text-left shrink-0 rounded font-sans" style={{ fontSize: '11pt' }}>
                     <p className="flex items-center overflow-hidden w-full">
-                      <span className="shrink-0">เลขที่รับ</span>
-                      <span className="text-slate-400 ml-1 select-none overflow-hidden whitespace-nowrap flex-grow">................................................</span>
-                      <span className="shrink-0 text-slate-400">/</span>
-                      <span className="text-slate-400 select-none overflow-hidden whitespace-nowrap w-12">............................</span>
+                      <span className="shrink-0 font-bold">เลขที่รับ</span>
+                      <span className="text-slate-400 ml-1 select-none overflow-hidden whitespace-nowrap flex-grow" style={{ width: '45.484399999999994px' }}>................................................</span>
+                      <span className="shrink-0 text-slate-400 font-bold">/</span>
+                      <span className="text-slate-400 select-none overflow-hidden whitespace-nowrap w-12" style={{ width: '60px' }}>............................</span>
                     </p>
                     <p className="flex items-center overflow-hidden w-full mt-1">
                       <span className="shrink-0">ว.ด.ป.</span>
