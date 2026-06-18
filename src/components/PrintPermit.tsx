@@ -75,6 +75,11 @@ export default function PrintPermit({
     return numStr.toString().split('').map(char => mapping[char] || char).join('');
   };
 
+  // Helper to format time with . instead of :
+  const formatPrintTime = (dateStr: string): string => {
+    return formatTime(dateStr).replace(':', '.');
+  };
+
   const triggerPrint = () => {
     if (isInIframe) {
       alert("⚠️ เนื่องจากคุณกำลังเข้าใช้งานผ่านเฟรมตัวอย่าง (Sandbox iFrame) ของ AI Studio แอลกอริทึมของเบราว์เซอร์ล็อคไม่ให้ใช้คำสั่งพิมพ์โดยตรง\n\nโปรดคลิกปุ่มสีส้ม 'เปิดในแท็บใหม่เพื่อพิมพ์คำขอใช้รถ' ด้านบนเพื่อเปิดหน้าต่างแยกเต็มจอ แล้วคุณจะสามารถพิมพ์คำขอรถยนต์ใบราชการนี้ได้ทันที!");
@@ -250,12 +255,12 @@ export default function PrintPermit({
                   โดยมีช่วงระยะเวลากำหนดการเดินทาง นับตั้งแต่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{startDateThaiOnly}</span> เวลา{' '}
                   {booking.endDate ? (
                     <>
-                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.startDate)} น.</span> และเดินทางกลับถึงวันที่{' '}
+                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatPrintTime(booking.startDate)} น.</span> และเดินทางกลับถึงวันที่{' '}
                       <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{endDateThaiOnly}</span> เวลา{' '}
-                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.endDate)} น.</span>
+                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatPrintTime(booking.endDate)} น.</span>
                     </>
                   ) : (
-                    <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.startDate)} น. เป็นต้นไป</span>
+                    <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatPrintTime(booking.startDate)} น. เป็นต้นไป</span>
                   )}
                 </p>
 
@@ -427,7 +432,7 @@ export default function PrintPermit({
                   <div className="flex items-baseline">
                     <span className="font-bold shrink-0">วันที่</span>
                     <span className="ml-2 font-normal border-b border-dotted border-slate-400/80 flex-grow pl-1 pb-0">
-                      {createdDateThai}
+                      {toThaiNumerals(createdDateThai)}
                     </span>
                   </div>
                 </div>
@@ -447,12 +452,12 @@ export default function PrintPermit({
               {/* Paragraph details with indent */}
               <div className="space-y-2 text-justify flex-grow" style={{ fontSize: '14.5pt', lineHeight: '1.25' }}>
                 <p className="leading-relaxed text-justify" style={{ textIndent: '2.5em', marginBottom: '17px', paddingLeft: '0px', lineHeight: '36px', height: 'auto', textAlign: 'justify', textDecoration: 'none' }}>
-                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.passengersCount}</span> คน คือ <span className="font-semibold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').map((n, idx) => {
+                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{toThaiNumerals(booking.passengersCount?.toString())}</span> คน คือ <span className="font-semibold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').map((n, idx) => {
                     const pos = booking.passengersPositionsList?.[idx];
                     return `${n}${pos ? ` (${pos})` : ''}`;
-                  }).join(', ')}` : 'ข้าพเจ้าลำพัง'}</span> ในวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{startDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.startDate)} น.</span> {booking.endDate ? (
+                  }).join(', ')}` : 'ข้าพเจ้าลำพัง'}</span> ในวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{toThaiNumerals(startDateThaiOnly)}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{toThaiNumerals(formatPrintTime(booking.startDate))} น.</span> {booking.endDate ? (
                     <>
-                      ถึงวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{endDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.endDate)} น.</span>
+                      ถึงวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{toThaiNumerals(endDateThaiOnly)}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{toThaiNumerals(formatPrintTime(booking.endDate))} น.</span>
                     </>
                   ) : 'เป็นต้นไป'}
                 </p>
