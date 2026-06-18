@@ -271,7 +271,11 @@ export function watchDepartmentHeads(callback: (heads: DepartmentHead[]) => void
   return onSnapshot(collection(db, 'departmentHeads'), (snapshot) => {
     const list: DepartmentHead[] = [];
     snapshot.forEach((doc) => {
-      list.push(doc.data() as DepartmentHead);
+      const data = doc.data() as DepartmentHead;
+      if (data.position === 'หัวหน้าศูนย์บริการคนพิการ') {
+        data.position = 'ผู้ช่วย ผอ.ศูนย์บริการคนพิการ';
+      }
+      list.push(data);
     });
     callback(list);
   }, (error) => {

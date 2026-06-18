@@ -26,7 +26,14 @@ export default function PrintPermit({
   // Find the department head to get their rank configured in admin panel
   const matchedHead = departmentHeads?.find(h => h.name === booking.departmentHeadName);
   const headRank = booking.departmentHeadRank || matchedHead?.rank || '';
-  const headPos = booking.departmentHeadPosition || matchedHead?.position || '';
+  let headPos = booking.departmentHeadPosition || matchedHead?.position || '';
+  
+  if (headPos === 'หัวหน้าศูนย์บริการคนพิการ') {
+    headPos = 'ผู้ช่วย ผอ.ศูนย์บริการคนพิการ';
+  } else if (headPos === 'แทนหัวหน้าศูนย์บริการคนพิการ') {
+    headPos = 'แทนผู้ช่วย ผอ.ศูนย์บริการคนพิการ';
+  }
+  
   // Show only civil service rank (e.g. 'นักพัฒนาสังคมชำนาญการพิเศษ') if available, otherwise fallback to group position title
   const displayPosition = headRank || headPos || '...................................................';
 
@@ -216,44 +223,44 @@ export default function PrintPermit({
                 <p className="font-bold leading-normal" style={{ fontSize: '14.5pt' }}>เรียน ผู้ว่าราชการจังหวัดตรัง</p>
                 
                 <p className="indent-12 text-justify leading-normal">
-                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.department}</span> มีความประสงค์จะใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติหน้าที่ราชการ ดังมีตารางกำหนดการดังนี้:-
+                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.department}</span> มีความประสงค์จะใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติหน้าที่ราชการ ดังมีตารางกำหนดการดังนี้:-
                 </p>
 
                 <div className="pl-6 space-y-1.5">
                   <div>
                     <strong className="text-black">๑. วัตถุประสงค์ในการปฏิบัติหน้าที่ครั้งนี้:</strong>
-                    <p className="pl-6 text-justify border-b border-dotted border-slate-400/80 pb-[1px] leading-normal italic text-slate-800">
+                    <p className="pl-6 text-justify border-b border-dotted border-slate-400/80 pb-0 leading-normal italic text-slate-800">
                       {booking.purpose}
                     </p>
                   </div>
 
                   <div>
                     <strong className="text-black">๒. จุดหมาย:</strong>
-                    <p className="pl-6 text-justify border-b border-dotted border-slate-400/80 pb-[1px] font-bold text-black leading-normal">
+                    <p className="pl-6 text-justify border-b border-dotted border-slate-400/80 pb-0 font-bold text-black leading-normal">
                        {booking.destination}
                     </p>
                   </div>
                 </div>
 
                 <p className="indent-12 leading-normal">
-                  ผู้เดินทางทั้งสิ้นจำนวน <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.passengersCount}</span> คน รวมเจ้าหน้าที่ผู้ควบคุมการประสานเดินทางความร่วมมือ
+                  ผู้เดินทางทั้งสิ้นจำนวน <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.passengersCount}</span> คน รวมเจ้าหน้าที่ผู้ควบคุมการประสานเดินทางความร่วมมือ
                 </p>
 
                 <p className="indent-12 text-justify leading-normal font-medium">
-                  โดยมีช่วงระยะเวลากำหนดการเดินทาง นับตั้งแต่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{startDateThaiOnly}</span> เวลา{' '}
+                  โดยมีช่วงระยะเวลากำหนดการเดินทาง นับตั้งแต่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{startDateThaiOnly}</span> เวลา{' '}
                   {booking.endDate ? (
                     <>
-                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{formatTime(booking.startDate)} น.</span> และเดินทางกลับถึงวันที่{' '}
-                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{endDateThaiOnly}</span> เวลา{' '}
-                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{formatTime(booking.endDate)} น.</span>
+                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.startDate)} น.</span> และเดินทางกลับถึงวันที่{' '}
+                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{endDateThaiOnly}</span> เวลา{' '}
+                      <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.endDate)} น.</span>
                     </>
                   ) : (
-                    <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{formatTime(booking.startDate)} น. เป็นต้นไป</span>
+                    <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.startDate)} น. เป็นต้นไป</span>
                   )}
                 </p>
 
                 <p className="indent-12 text-justify leading-normal font-medium">
-                  ในการเดินทางขอความเห็นชอบจัดรถยนต์ส่วนกลางราชการ หมายเลขทะเบียน <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{vehicle?.plateNumber || '.............................'}</span> ชนิด/ยี่ห้อ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{vehicle?.name || '...........................................'}</span> พร้อมด้วยพนักงานขับรถควบคุมดูแลความปลอดภัยที่ได้รับมอบหมาย คือ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{driver?.name || '...................................................'}</span> เบอร์โทรติดต่อของคนขับรถ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{driver?.phone || '................................'}</span>
+                  ในการเดินทางขอความเห็นชอบจัดรถยนต์ส่วนกลางราชการ หมายเลขทะเบียน <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{vehicle?.plateNumber || '.............................'}</span> ชนิด/ยี่ห้อ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{vehicle?.name || '...........................................'}</span> พร้อมด้วยพนักงานขับรถควบคุมดูแลความปลอดภัยที่ได้รับมอบหมาย คือ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{driver?.name || '...................................................'}</span> เบอร์โทรติดต่อของคนขับรถ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{driver?.phone || '................................'}</span>
                 </p>
 
                 {booking.remarks && (
@@ -439,18 +446,18 @@ export default function PrintPermit({
 
               {/* Paragraph details with indent */}
               <div className="space-y-2 text-justify flex-grow" style={{ fontSize: '14.5pt', lineHeight: '1.25' }}>
-                <p className="leading-relaxed text-justify" style={{ textIndent: '2.5em', marginBottom: '8px', paddingLeft: '0px', lineHeight: '28.2333px', height: '80.6562px', textAlign: 'justify', textDecoration: 'none' }}>
-                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.passengersCount}</span> คน คือ <span className="font-semibold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').map((n, idx) => {
+                <p className="leading-relaxed text-justify" style={{ textIndent: '2.5em', marginBottom: '17px', paddingLeft: '0px', lineHeight: '36px', height: 'auto', textAlign: 'justify', textDecoration: 'none' }}>
+                  ด้วยข้าพเจ้า <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterName}</span> ตำแหน่ง <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.requesterPosition}</span> สังกัดกลุ่มงาน <span className="font-semibold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.department}</span> มีความประสงค์ขอใช้รถยนต์ส่วนกลาง/ราชการ เพื่อเดินทางไปปฏิบัติราชการพื้นที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.destination}</span> เพื่อ <span className="font-medium border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.purpose}</span> โดยมีคนนั่งจำนวน <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.passengersCount}</span> คน คือ <span className="font-semibold border-b border-dotted border-slate-400/80 pb-0 px-1">{booking.passengersList && booking.passengersList.filter(n => n.trim() !== '').length > 0 ? `ข้าพเจ้าและผู้ร่วมทาง ได้แก่ ${booking.passengersList.filter(n => n.trim() !== '').map((n, idx) => {
                     const pos = booking.passengersPositionsList?.[idx];
                     return `${n}${pos ? ` (${pos})` : ''}`;
-                  }).join(', ')}` : 'ข้าพเจ้าลำพัง'}</span> ในวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{startDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{formatTime(booking.startDate)} น.</span> {booking.endDate ? (
+                  }).join(', ')}` : 'ข้าพเจ้าลำพัง'}</span> ในวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{startDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.startDate)} น.</span> {booking.endDate ? (
                     <>
-                      ถึงวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{endDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{formatTime(booking.endDate)} น.</span>
+                      ถึงวันที่ <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{endDateThaiOnly}</span> เวลา <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{formatTime(booking.endDate)} น.</span>
                     </>
                   ) : 'เป็นต้นไป'}
                 </p>
 
-                <p className="leading-normal" style={{ textIndent: '2.5em' }}>
+                <p className="leading-normal" style={{ textIndent: '2.5em', marginBottom: '8px' }}>
                   จึงเรียนมาเพื่อโปรดพิจารณา
                 </p>
 
@@ -482,8 +489,8 @@ export default function PrintPermit({
                         <span className="w-[320px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none" style={{ position: 'relative', top: '1.5px' }}>............................................................................................................................................</span>
                         <span className="text-left pl-1 shrink-0 font-sans min-w-24">
                           {(booking.departmentHeadPosition?.startsWith('แทน') || booking.departmentHeadPosition?.includes('แทน'))
-                            ? (booking.department ? `แทนหัวหน้า${booking.department}` : 'แทนหัวหน้ากลุ่ม/ฝ่าย')
-                            : (booking.department ? `หัวหน้า${booking.department}` : 'หัวหน้ากลุ่ม/ฝ่าย')
+                            ? (booking.department ? (booking.department === 'ศูนย์บริการคนพิการ' ? 'แทนผู้ช่วย ผอ.ศูนย์บริการคนพิการ' : `แทนหัวหน้า${booking.department}`) : 'แทนหัวหน้ากลุ่ม/ฝ่าย')
+                            : (booking.department ? (booking.department === 'ศูนย์บริการคนพิการ' ? 'ผู้ช่วย ผอ.ศูนย์บริการคนพิการ' : `หัวหน้า${booking.department}`) : 'หัวหน้ากลุ่ม/ฝ่าย')
                           }
                         </span>
                       </p>
@@ -527,10 +534,10 @@ export default function PrintPermit({
                   {/* Allocations */}
                   <div className="space-y-0.5 pl-3 leading-normal font-medium">
                     <p>
-                      เห็นควรอนุญาตให้ใช้รถยนต์ส่วนกลางหมายเลขทะเบียน <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{vehicle?.plateNumber || '...................................................'}</span>
+                      เห็นควรอนุญาตให้ใช้รถยนต์ส่วนกลางหมายเลขทะเบียน <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{vehicle?.plateNumber || '...................................................'}</span>
                     </p>
                     <p>
-                      โดยมี <span className="font-bold border-b border-dotted border-slate-400/80 pb-[1px] px-1">{driver?.name || '................................................................................'}</span> เป็นพนักงานขับรถยนต์
+                      โดยมี <span className="font-bold border-b border-dotted border-slate-400/80 pb-0 px-1">{driver?.name || '................................................................................'}</span> เป็นพนักงานขับรถยนต์
                     </p>
                   </div>
 

@@ -122,7 +122,7 @@ export const INITIAL_CARETAKERS: Caretaker[] = [
 export const INITIAL_DEPARTMENT_HEADS: DepartmentHead[] = [
   { id: 'H1', name: 'นางเสาวลักษณ์ มลสวัสดิ์', position: 'หัวหน้ากลุ่มการพัฒนาสังคมและสวัสดิการ' },
   { id: 'H2', name: 'นายชัยยศ ศุภโชค', position: 'หัวหน้ากลุ่มนโยบายและวิชาการ' },
-  { id: 'H3', name: 'นางกนกพร สัจจารักษ์', position: 'หัวหน้าศูนย์บริการคนพิการ' },
+  { id: 'H3', name: 'นางกนกพร สัจจารักษ์', position: 'ผู้ช่วย ผอ.ศูนย์บริการคนพิการ' },
   { id: 'H4', name: 'นายสุมิตร นิรันดร์', position: 'หัวหน้าฝ่ายบริหารทั่วไป' }
 ];
 
@@ -252,13 +252,21 @@ export const getStoredData = () => {
     return { ...b, department: dept };
   });
   
+  const rawDepartmentHeads: DepartmentHead[] = savedDepartmentHeads ? JSON.parse(savedDepartmentHeads) : INITIAL_DEPARTMENT_HEADS;
+  const migratedDepartmentHeads = rawDepartmentHeads.map(h => {
+    if (h.position === 'หัวหน้าศูนย์บริการคนพิการ') {
+      return { ...h, position: 'ผู้ช่วย ผอ.ศูนย์บริการคนพิการ' };
+    }
+    return h;
+  });
+  
   return {
     bookings: migratedBookings,
     vehicles: savedVehicles ? JSON.parse(savedVehicles) : INITIAL_VEHICLES,
     drivers: savedDrivers ? JSON.parse(savedDrivers) : INITIAL_DRIVERS,
     approvers: savedApprovers ? JSON.parse(savedApprovers) : INITIAL_APPROVERS,
     caretakers: savedCaretakers ? JSON.parse(savedCaretakers) : INITIAL_CARETAKERS,
-    departmentHeads: savedDepartmentHeads ? JSON.parse(savedDepartmentHeads) : INITIAL_DEPARTMENT_HEADS
+    departmentHeads: migratedDepartmentHeads
   };
 };
 
