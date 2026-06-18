@@ -608,7 +608,7 @@ export default function DriverGoogleCalendar({
                             title={`${formatTime(b.startDate)} - ${b.destination}`}
                           >
                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${bulletColor}`} />
-                            <span className="font-mono font-bold shrink-0">{formatTime(b.startDate)}</span>
+                            <span className="font-mono font-bold shrink-0">{formatTime(b.startDate)}{b.endDate ? `-${formatTime(b.endDate)}` : ''}</span>
                             <span className="truncate flex-1 font-bold">{b.destination.split(' ')[0]}</span>
                           </div>
                         );
@@ -629,86 +629,207 @@ export default function DriverGoogleCalendar({
         {/* VIEW 2: WEEK VIEW */}
         {viewMode === 'week' && (
           <div className="space-y-1 animate-fade-in duration-300">
-            {/* Days header column */}
-            <div className="grid grid-cols-7 gap-2 text-center">
-              {weekDays.map(cell => {
-                const isToday = cell.isoStr === todayStr;
-                return (
-                  <div 
-                    key={cell.isoStr} 
-                    className={`p-2.5 rounded-xl border ${
-                      isToday 
-                        ? 'bg-blue-50 border-[#1a73e8]/30 shadow-xs' 
-                        : 'bg-slate-50 border-slate-150'
-                    }`}
-                  >
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{cell.name}</div>
-                    <div className={`text-base font-black font-mono mt-0.5 ${isToday ? 'text-[#1a73e8]' : 'text-slate-700'}`}>
-                      {cell.dayNum}
-                    </div>
-                    {isToday && (
-                      <span className="text-[8px] bg-[#1a73e8] text-white px-1.5 py-0.5 rounded font-bold uppercase tracking-tight">Today</span>
-                    )}
+            {/* Scrollable Container with synchronized header + grid columns */}
+            <div className="overflow-x-auto scrollbar-thin rounded-2xl border border-slate-200 bg-white shadow-xs">
+              <div className="min-w-[960px] flex flex-col">
+                
+                {/* 1. Header Row (X-axis) */}
+                <div className="flex border-b border-slate-200 bg-slate-50 select-none divide-x divide-slate-150">
+                  {/* Time column spacer */}
+                  <div className="w-[70px] shrink-0 flex flex-col items-center justify-center text-[10px] uppercase font-black text-slate-500 py-3 bg-slate-100/50">
+                    <div>เวลา</div>
+                    <div className="text-[9px] text-slate-400 font-mono">(น.)</div>
                   </div>
-                );
-              })}
-            </div>
 
-            {/* Main Hourly Timeline Columns styled like Google Calendar */}
-            <div className="grid grid-cols-7 gap-2 mt-4 bg-slate-50/50 p-2.5 rounded-2xl border border-slate-200/60 min-h-[350px]">
-              {weekDays.map(cell => {
-                const dayBookings = getDayBookings(cell.isoStr);
-                const isToday = cell.isoStr === todayStr;
-
-                return (
-                  <div key={cell.isoStr} className={`space-y-2.5 min-h-[300px] flex flex-col justify-start rounded-xl p-1.5 relative ${
-                    isToday ? 'bg-blue-50/15' : ''
-                  }`}>
-                    {dayBookings.length === 0 ? (
-                      <div className="flex-1 border border-dashed border-slate-200 rounded-lg flex items-center justify-center text-[10px] text-slate-350 font-bold p-2 text-center select-none bg-white">
-                        ไม่มีงานปฏิทิน
+                  {/* 7 Day Columns headers */}
+                  {weekDays.map(cell => {
+                    const isToday = cell.isoStr === todayStr;
+                    return (
+                      <div 
+                        key={cell.isoStr} 
+                        className={`flex-1 py-2 px-3 flex flex-col items-center justify-center gap-0.5 ${
+                          isToday ? 'bg-blue-50/40' : 'bg-slate-50'
+                        }`}
+                      >
+                        <div className="text-[10px] font-extrabold text-slate-450 uppercase tracking-widest">{cell.name}</div>
+                        <div className="flex items-center gap-1">
+                          <span className={`text-sm font-black font-mono leading-none ${isToday ? 'text-[#1a73e8]' : 'text-slate-700'}`}>
+                            {cell.dayNum}
+                          </span>
+                          {isToday && (
+                            <span className="text-[7px] font-sans bg-[#1a73e8] text-white px-1 py-0.5 rounded-sm font-black uppercase leading-none">TODAY</span>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      dayBookings.map(b => {
-                        const driver = b.driverId === 'self-drive' 
-                          ? { name: 'ขับเอง' } 
-                          : b.driverId === 'passenger-drive'
-                            ? { name: b.customDriverName ? `ผู้ร่วมเดินทางขับ (${b.customDriverName})` : 'ผู้ร่วมคณะขับ' }
-                            : drivers.find(d => d.id === b.driverId);
-                        const v = vehicles.find(veh => veh.id === b.vehicleId);
-                        return (
-                          <div
-                            key={b.id}
-                            onClick={() => setSelectedEvent(b)}
-                            className={`p-2.5 rounded-xl border flex flex-col justify-between gap-1.5 transition duration-150 hover:shadow-xs text-xs cursor-pointer ${getEventBadgeColor(b.status, b.driverId)}`}
-                          >
-                            <div className="space-y-0.5">
-                              <div className="flex items-center gap-1 text-[10px] font-extrabold font-mono">
-                                <Clock size={11} className="shrink-0" />
-                                <span>{b.endDate ? `${formatTime(b.startDate)} - ${formatTime(b.endDate)}` : `${formatTime(b.startDate)} น. เป็นต้นไป`}</span>
-                              </div>
-                              <h4 className="font-extrabold text-slate-850 line-clamp-2 leading-tight" title={b.destination}>
-                                {b.destination}
-                              </h4>
-                            </div>
+                    );
+                  })}
+                </div>
 
-                            <div className="pt-1.5 border-t border-slate-100 text-[10px] font-bold text-slate-500 space-y-0.5">
-                              <div className="flex items-center gap-1.5">
-                                <User size={10} className="shrink-0 text-slate-400" />
-                                <span className="truncate">{driver?.name}</span>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <Car size={10} className="shrink-0 text-slate-400" />
-                                <span className="font-mono text-[9px] uppercase leading-none bg-white/50 px-1 py-0.5 rounded border border-slate-200">{v?.plateNumber || '-'}</span>
-                              </div>
+                {/* 2. Scrollable Hour Grid Section */}
+                {(() => {
+                  const HOUR_HEIGHT = 55; // pixels per hour
+                  const START_HOUR = 6;
+                  const END_HOUR = 20;
+                  const HOURS_COUNT = END_HOUR - START_HOUR; // 14 hours
+                  const TOTAL_GRID_HEIGHT = HOURS_COUNT * HOUR_HEIGHT;
+
+                  return (
+                    <div className="flex relative divide-x divide-slate-150" style={{ height: `${TOTAL_GRID_HEIGHT}px` }}>
+                      
+                      {/* Grid Background Horizontal lines */}
+                      <div className="absolute inset-0 pointer-events-none flex flex-col justify-start z-0">
+                        {Array.from({ length: HOURS_COUNT }).map((_, i) => (
+                          <div 
+                            key={i} 
+                            className="border-b border-dashed border-slate-150 w-full" 
+                            style={{ height: `${HOUR_HEIGHT}px` }} 
+                          />
+                        ))}
+                      </div>
+
+                      {/* Left Y-axis Time column */}
+                      <div className="w-[70px] shrink-0 flex flex-col bg-slate-50/70 select-none relative z-1 font-mono text-[10px] font-black text-slate-400">
+                        {Array.from({ length: HOURS_COUNT }).map((_, i) => {
+                          const hr = START_HOUR + i;
+                          return (
+                            <div 
+                              key={hr} 
+                              className="flex items-start justify-center pt-1 border-r border-slate-200/35 bg-slate-100/10" 
+                              style={{ height: `${HOUR_HEIGHT}px` }}
+                            >
+                              {String(hr).padStart(2, '0')}:00
                             </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* 7 Lanes corresponding to Days */}
+                      {weekDays.map(cell => {
+                        const dayBookings = getDayBookings(cell.isoStr);
+                        const isToday = cell.isoStr === todayStr;
+
+                        // Red Today timeline indicator
+                        const now = new Date();
+                        const currentHourDecimal = now.getHours() + now.getMinutes() / 60;
+                        const showRedLine = isToday && currentHourDecimal >= START_HOUR && currentHourDecimal <= END_HOUR;
+                        const redLineTop = (currentHourDecimal - START_HOUR) * HOUR_HEIGHT;
+
+                        // Calculate column event positions with overlap prevention
+                        const computedBookings = dayBookings.map((b) => {
+                          const start = new Date(b.startDate);
+                          const end = b.endDate ? new Date(b.endDate) : new Date(start.getTime() + 4 * 60 * 60 * 1000);
+                          const startDecimal = start.getHours() + start.getMinutes() / 60;
+                          const endDecimal = end.getHours() + end.getMinutes() / 60;
+
+                          const clampedStart = Math.max(startDecimal, START_HOUR);
+                          const clampedEnd = Math.min(endDecimal, END_HOUR);
+
+                          // Find overlapping bookings
+                          const overlaps = dayBookings.filter(other => {
+                            if (other.id === b.id) return false;
+                            const oStart = new Date(other.startDate);
+                            const oEnd = other.endDate ? new Date(other.endDate) : new Date(oStart.getTime() + 4 * 60 * 60 * 1000);
+                            const oStartDecimal = oStart.getHours() + oStart.getMinutes() / 60;
+                            const oEndDecimal = oEnd.getHours() + oEnd.getMinutes() / 60;
+
+                            const oClampedStart = Math.max(oStartDecimal, START_HOUR);
+                            const oClampedEnd = Math.min(oEndDecimal, END_HOUR);
+
+                            return (clampedStart < oClampedEnd && clampedEnd > oClampedStart);
+                          });
+
+                          let left = 2;
+                          let width = 96;
+
+                          if (overlaps.length > 0) {
+                            const allIds = [b.id, ...overlaps.map(o => o.id)].sort();
+                            const myPos = allIds.indexOf(b.id);
+                            const count = allIds.length;
+                            width = 96 / count;
+                            left = 2 + myPos * (96 / count);
+                          }
+
+                          return {
+                            booking: b,
+                            clampedStart,
+                            clampedEnd,
+                            left,
+                            width
+                          };
+                        });
+
+                        return (
+                          <div 
+                            key={cell.isoStr} 
+                            className={`flex-1 relative h-full bg-transparent z-1 ${
+                              isToday ? 'bg-blue-50/10' : ''
+                            }`}
+                          >
+                            {/* Today vertical current time ribbon inside lane */}
+                            {showRedLine && (
+                              <div
+                                className="absolute left-0 right-0 h-0.5 bg-rose-500 z-10 pointer-events-none"
+                                style={{ top: `${redLineTop}px` }}
+                              >
+                                <div className="absolute -left-1 -translate-y-1/2 w-2 h-2 rounded-full bg-rose-500 border border-white shadow-sm" />
+                              </div>
+                            )}
+
+                            {/* Booking Cards inside day lane */}
+                            {computedBookings.map(({ booking: b, clampedStart, clampedEnd, left, width }) => {
+                              if (clampedStart >= clampedEnd) return null;
+
+                              const topOffset = (clampedStart - START_HOUR) * HOUR_HEIGHT;
+                              const eventHeight = Math.max((clampedEnd - clampedStart) * HOUR_HEIGHT, 34); // minimum size
+
+                              const badgeColor = getEventBadgeColor(b.status, b.driverId);
+                              const driver = b.driverId === 'self-drive' 
+                                ? { name: 'ขับเอง' } 
+                                : b.driverId === 'passenger-drive'
+                                  ? { name: b.customDriverName ? `ผู้ร่วมขับ (${b.customDriverName})` : 'ขับเอง' }
+                                  : drivers.find(d => d.id === b.driverId);
+
+                              const v = vehicles.find(veh => veh.id === b.vehicleId);
+
+                              return (
+                                <div
+                                  key={b.id}
+                                  onClick={() => setSelectedEvent(b)}
+                                  title={`${formatTime(b.startDate)} - ${b.endDate ? formatTime(b.endDate) : ''} | ${b.destination} | พนักงานขับ: ${driver?.name || '-'}`}
+                                  className={`absolute rounded-xl border p-1 text-[9px] shadow-3xs cursor-pointer select-none transition-all group/bar hover:scale-[1.01] hover:z-20 overflow-hidden flex flex-col justify-between leading-normal ${badgeColor}`}
+                                  style={{
+                                    top: `${topOffset + 2}px`,
+                                    height: `${eventHeight - 4}px`,
+                                    left: `${left}%`,
+                                    width: `${width}%`
+                                  }}
+                                >
+                                  <div className="font-black text-slate-800 line-clamp-2 leading-tight">
+                                    📍 {b.destination.split(' ')[0]}
+                                  </div>
+                                  <div className="flex flex-col gap-0.5 mt-1 border-t border-slate-400/20 pt-1 text-[8px] font-extrabold text-slate-600">
+                                    <div className="truncate flex items-center gap-0.5" title={driver?.name}>
+                                      👤 {driver?.name ? (driver.name.startsWith('นาย') || driver.name.startsWith('นาง') ? driver.name.replace(/^(นาย|นางสาว|นาง)\s*/, '') : driver.name.split(' ')[0]) : '-'}
+                                    </div>
+                                    <div className="truncate flex items-center gap-0.5">
+                                      🚗 {v?.plateNumber || '-'}
+                                    </div>
+                                    <div className="font-mono text-[8.5px] scale-95 origin-left tracking-normal opacity-85 shrink-0">
+                                      ⏱️ {formatTime(b.startDate)}-{b.endDate ? formatTime(b.endDate) : ''}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         );
-                      })
-                    )}
-                  </div>
-                );
-              })}
+                      })}
+
+                    </div>
+                  );
+                })()}
+
+              </div>
             </div>
           </div>
         )}
@@ -744,6 +865,17 @@ export default function DriverGoogleCalendar({
                           {b.destination}
                         </h4>
                         <p className="text-xs text-slate-450 line-clamp-1">{b.purpose}</p>
+                        
+                        {/* Date and Time period (ช่วงเวลา) */}
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1.5 text-[11px] text-slate-500 font-semibold">
+                          <span className="bg-[#1a73e8]/10 text-[#1a73e8] px-2 py-0.5 rounded-md text-[10px]">
+                            วันที่ {formatThaiDate(b.startDate, false)}
+                          </span>
+                          <span className="flex items-center gap-1 font-mono text-xs text-slate-650 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-150">
+                            <Clock size={11} className="text-slate-400" />
+                            <span>{b.endDate ? `${formatTime(b.startDate)} - ${formatTime(b.endDate)} น.` : `${formatTime(b.startDate)} น. เป็นต้นไป`}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -793,6 +925,184 @@ export default function DriverGoogleCalendar({
               </button>
             </div>
 
+            {/* Custom Google Calendar Vertical Hour-Timeline (เวลาบนแกน Y แบบ Google Calendar) */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 overflow-hidden shadow-3xs">
+              <div className="flex items-center justify-between mb-3 border-b border-slate-150 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-2 w-2 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1a73e8] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1a73e8]"></span>
+                  </span>
+                  <h5 className="text-xs font-black text-slate-700 uppercase tracking-wider">
+                    แผนผังเวลาปฏิบัติงานรายชั่วโมง (Daily Hourly Timeline Table)
+                  </h5>
+                </div>
+                <span className="text-[10px] font-bold text-slate-400 font-mono">แกน Y บ่งชี้ชั่วโมงการปฏิบัติงาน (06:00 - 20:00 น.)</span>
+              </div>
+
+              {/* Scrollable grid area for hours on Y-axis and columns on X-axis */}
+              <div className="overflow-x-auto scrollbar-thin rounded-2xl border border-slate-200 bg-white">
+                <div className="min-w-[760px] flex flex-col">
+                  
+                  {/* Column Headers (X-axis) */}
+                  <div className="flex border-b border-slate-200 bg-slate-50 select-none divide-x divide-slate-150">
+                    {/* Time cell spacer */}
+                    <div className="w-[64px] shrink-0 flex items-center justify-center text-[10px] font-black text-slate-500 py-2.5 font-mono uppercase bg-slate-100/50">
+                      เวลา (น.)
+                    </div>
+                    {/* Drivers column headers */}
+                    {(() => {
+                      const dayIsoStr = currentDate.toISOString().substring(0, 10);
+                      const dayBookings = getDayBookings(dayIsoStr);
+                      const timelineColumns = [
+                        ...drivers.map(d => ({ id: d.id, name: d.name, type: 'driver' })),
+                        { id: 'self-drive', name: 'ขับเอง (ไม่มีคนขับกลาง)', type: 'self' },
+                        { id: 'passenger-drive', name: 'ผู้ร่วมคณะขับขี่', type: 'passenger' }
+                      ];
+
+                      const filteredColumns = selectedDriverId === 'ALL'
+                        ? timelineColumns.filter(col => {
+                            if (col.type === 'driver') return true;
+                            return dayBookings.some(b => b.driverId === col.id);
+                          })
+                        : timelineColumns.filter(col => col.id === selectedDriverId);
+
+                      return filteredColumns.map(col => (
+                        <div key={col.id} className="flex-1 min-w-[140px] px-3 py-2 flex items-center justify-center gap-1.5 bg-slate-50">
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${getEventBulletColor(col.id)}`} />
+                          <span className="text-xs font-extrabold text-slate-700 truncate" title={col.name}>
+                            {col.name.startsWith('นาย') || col.name.startsWith('นาง') ? col.name.replace(/^(นาย|นางสาว|นาง)\s*/, '') : col.name}
+                          </span>
+                        </div>
+                      ));
+                    })()}
+                  </div>
+
+                  {/* Main Grid: Y-axis time labels on the left & Multi-column vertical content lanes */}
+                  {(() => {
+                    const dayIsoStr = currentDate.toISOString().substring(0, 10);
+                    const dayBookings = getDayBookings(dayIsoStr);
+                    const timelineColumns = [
+                      ...drivers.map(d => ({ id: d.id, name: d.name, type: 'driver' })),
+                      { id: 'self-drive', name: 'ขับเอง (ไม่มีคนขับกลาง)', type: 'self' },
+                      { id: 'passenger-drive', name: 'ผู้ร่วมคณะขับขี่', type: 'passenger' }
+                    ];
+
+                    const filteredColumns = selectedDriverId === 'ALL'
+                      ? timelineColumns.filter(col => {
+                          if (col.type === 'driver') return true;
+                          return dayBookings.some(b => b.driverId === col.id);
+                        })
+                      : timelineColumns.filter(col => col.id === selectedDriverId);
+
+                    const HOUR_HEIGHT = 50; // pixels per hour
+                    const START_HOUR = 6;
+                    const END_HOUR = 20;
+                    const HOURS_COUNT = END_HOUR - START_HOUR; // 14 hours total
+                    const TOTAL_GRID_HEIGHT = HOURS_COUNT * HOUR_HEIGHT;
+
+                    // Calculate current time line positioning
+                    const now = new Date();
+                    const currentHourDecimal = now.getHours() + now.getMinutes() / 60;
+                    const isTodayFocus = dayIsoStr === now.toISOString().substring(0, 10);
+                    const showRedLine = isTodayFocus && currentHourDecimal >= START_HOUR && currentHourDecimal <= END_HOUR;
+                    const redLineTop = (currentHourDecimal - START_HOUR) * HOUR_HEIGHT;
+
+                    return (
+                      <div className="flex relative divide-x divide-slate-150" style={{ height: `${TOTAL_GRID_HEIGHT}px` }}>
+                        
+                        {/* Background Grid Lines across the entire container */}
+                        <div className="absolute inset-0 pointer-events-none flex flex-col justify-start z-0">
+                          {Array.from({ length: HOURS_COUNT }).map((_, i) => (
+                            <div 
+                              key={i} 
+                              className="border-b border-dashed border-slate-150 w-full" 
+                              style={{ height: `${HOUR_HEIGHT}px` }} 
+                            />
+                          ))}
+                        </div>
+
+                        {/* Red Current Time horizontal indicator ribbon */}
+                        {showRedLine && (
+                          <div
+                            className="absolute left-[64px] right-0 h-0.5 bg-rose-500 z-10 pointer-events-none"
+                            style={{ top: `${redLineTop}px` }}
+                          >
+                            <div className="absolute -left-1 -translate-y-1/2 w-2 h-2 rounded-full bg-rose-500 border-2 border-white shadow-sm" />
+                          </div>
+                        )}
+
+                        {/* Left column: Y-axis hour labels */}
+                        <div className="w-[64px] shrink-0 flex flex-col bg-slate-50/70 select-none relative z-1 font-mono text-[9px] font-bold text-slate-400">
+                          {Array.from({ length: HOURS_COUNT }).map((_, i) => {
+                            const hr = START_HOUR + i;
+                            return (
+                              <div 
+                                key={hr} 
+                                className="flex items-start justify-center pt-1 border-r border-slate-200/40 bg-slate-100/10" 
+                                style={{ height: `${HOUR_HEIGHT}px` }}
+                              >
+                                {String(hr).padStart(2, '0')}:00
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Columns ( Lanes ) for bookings */}
+                        {filteredColumns.map(col => {
+                          const colBookings = dayBookings.filter(b => b.driverId === col.id);
+
+                          return (
+                            <div key={col.id} className="flex-1 min-w-[140px] relative h-full bg-transparent z-1">
+                              {colBookings.map(b => {
+                                const start = new Date(b.startDate);
+                                const end = b.endDate ? new Date(b.endDate) : new Date(start.getTime() + 4 * 60 * 60 * 1000);
+
+                                const startHr = start.getHours() + start.getMinutes() / 60;
+                                const endHr = end.getHours() + end.getMinutes() / 60;
+
+                                const clampedStart = Math.max(startHr, START_HOUR);
+                                const clampedEnd = Math.min(endHr, END_HOUR);
+
+                                if (clampedStart >= clampedEnd) return null;
+
+                                const topOffset = (clampedStart - START_HOUR) * HOUR_HEIGHT;
+                                const eventHeight = Math.max((clampedEnd - clampedStart) * HOUR_HEIGHT, 30); // secure min height
+
+                                const badgeColor = getEventBadgeColor(b.status, b.driverId);
+
+                                return (
+                                  <div
+                                    key={b.id}
+                                    onClick={() => setSelectedEvent(b)}
+                                    title={`${formatTime(b.startDate)} - ${b.endDate ? formatTime(b.endDate) : 'เป็นต้นไป'} | ไป: ${b.destination}`}
+                                    className={`absolute left-1 right-1 rounded-lg border text-[10px] p-1.5 shadow-3xs cursor-pointer select-none transition-all group/bar hover:scale-[1.01] hover:z-20 overflow-hidden flex flex-col justify-between leading-normal ${badgeColor}`}
+                                    style={{
+                                      top: `${topOffset + 2}px`,
+                                      height: `${eventHeight - 4}px`
+                                    }}
+                                  >
+                                    <div className="font-black text-slate-800 truncate leading-tight">
+                                      📍 {b.destination}
+                                    </div>
+                                    <div className="text-[8px] font-black opacity-85 truncate leading-none mt-1">
+                                      ⏱️ {formatTime(b.startDate)} - {b.endDate ? formatTime(b.endDate) : ''} น.
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+
+                      </div>
+                    );
+                  })()}
+
+                </div>
+              </div>
+            </div>
+
             {/* List of day bookings */}
             <div className="space-y-3 min-h-[250px]">
               {getDayBookings(currentDate.toISOString().substring(0, 10)).length === 0 ? (
@@ -815,9 +1125,21 @@ export default function DriverGoogleCalendar({
                       className={`p-4 rounded-2xl border transition duration-150 hover:shadow-xs cursor-pointer flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${getEventBadgeColor(b.status, b.driverId)}`}
                     >
                       <div className="flex items-start gap-4 min-w-0">
-                        <div className="p-2 bg-white/85 rounded-xl text-slate-800 border shadow-3xs shrink-0 mt-0.5 flex flex-col items-center justify-center min-w-[65px] h-[55px] border-slate-150">
-                          <Clock size={13} className="text-[#1a73e8] mb-0.5" />
-                          <span className="text-xs font-black font-mono text-slate-800">{formatTime(b.startDate)}</span>
+                        <div className="p-2.5 bg-white/85 rounded-xl text-slate-800 border shadow-3xs shrink-0 mt-0.5 flex flex-col items-center justify-center min-w-[80px] min-h-[55px] border-slate-150 py-2 px-1">
+                          <Clock size={13} className="text-[#1a73e8] mb-1" />
+                          <span className="text-xs font-bold font-mono text-slate-800 text-center leading-tight">
+                            {formatTime(b.startDate)}
+                          </span>
+                          {b.endDate ? (
+                            <>
+                              <span className="text-[9px] text-[#1a73e8] font-bold leading-none my-0.5 scale-90">ถึง</span>
+                              <span className="text-xs font-bold font-mono text-slate-800 text-center leading-tight">
+                                {formatTime(b.endDate)}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-[9px] text-slate-400 font-medium block text-center leading-none mt-0.5">เป็นต้นไป</span>
+                          )}
                         </div>
                         <div className="min-w-0">
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase ${
