@@ -509,7 +509,7 @@ export default function AdminPanel({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* List of Vehicles */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`${vehicleForm ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-4`}>
             <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-slate-950 flex items-center gap-2">
@@ -605,8 +605,8 @@ export default function AdminPanel({
           </div>
 
           {/* Form Side panel */}
-          <div className="lg:col-span-1">
-            {vehicleForm ? (
+          {vehicleForm && (
+            <div className="lg:col-span-1">
               <form onSubmit={handleVehicleSubmit} className="bg-pink-50/55 text-slate-850 border border-pink-100 rounded-lg p-5 shadow-sm space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-pink-100 pb-3">
                   <h3 className="text-sm font-bold text-pink-700 flex items-center gap-1.5 font-sans">
@@ -739,16 +739,8 @@ export default function AdminPanel({
                   </button>
                 </div>
               </form>
-            ) : (
-              <div className="bg-pink-50/10 border border-pink-100 rounded-lg p-6 text-center space-y-3 shadow-none">
-                <Truck className="text-pink-400 mx-auto animate-pulse" size={42} />
-                <h4 className="text-sm font-bold text-slate-900 font-sans">แก้ไขหรือเพิ่มส่วนคลัง</h4>
-                <p className="text-xs text-slate-500 leading-relaxed md:max-w-[250px] mx-auto font-sans">
-                  คลิกที่ปุ่มเพิ่มด้านบน หรือกดปุ่มแก้ไขยานพาหนะแต่ละคัน เพื่อกรอกฟอร์มหรือปรับเปลี่ยนทรัพยากร
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
         </div>
       )}
@@ -757,7 +749,7 @@ export default function AdminPanel({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* List of Drivers */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`${driverForm ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-4`}>
             <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-slate-950 flex items-center gap-2">
@@ -855,8 +847,8 @@ export default function AdminPanel({
           </div>
 
           {/* Form Side panel */}
-          <div className="lg:col-span-1">
-            {driverForm ? (
+          {driverForm && (
+            <div className="lg:col-span-1">
               <form onSubmit={handleDriverSubmit} className="bg-pink-50/55 text-slate-850 border border-pink-100 rounded-lg p-5 shadow-sm space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-pink-100 pb-3">
                   <h3 className="text-sm font-bold text-pink-700 flex items-center gap-1.5 font-sans">
@@ -944,16 +936,8 @@ export default function AdminPanel({
                   </button>
                 </div>
               </form>
-            ) : (
-              <div className="bg-pink-50/10 border border-pink-100 rounded-lg p-6 text-center space-y-3 shadow-none">
-                <Users className="text-pink-400 mx-auto animate-pulse" size={42} />
-                <h4 className="text-sm font-bold text-slate-900 font-sans">แก้ไขหรือเพิ่มพลขับ</h4>
-                <p className="text-xs text-slate-500 leading-relaxed md:max-w-[250px] mx-auto font-sans">
-                  คลิกที่ปุ่มเพิ่มด้านบน หรือกดปุ่มแก้ไขพนักงานเพื่อกรอกแบบฟอร์มตรวจสอบความชำนาญการ
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
         </div>
       )}
@@ -962,7 +946,7 @@ export default function AdminPanel({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* List of Approvers */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`${approverForm ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-4`}>
             <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-slate-950 flex items-center gap-2">
@@ -1041,8 +1025,8 @@ export default function AdminPanel({
           </div>
 
           {/* Form Side panel */}
-          <div className="lg:col-span-1">
-            {approverForm ? (
+          {approverForm && (
+            <div className="lg:col-span-1">
               <form onSubmit={handleApproverSubmit} className="bg-pink-50/55 text-slate-850 border border-pink-100 rounded-lg p-5 shadow-sm space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-pink-100 pb-3">
                   <h3 className="text-sm font-bold text-pink-700 flex items-center gap-1.5 font-sans">
@@ -1115,16 +1099,8 @@ export default function AdminPanel({
                   </button>
                 </div>
               </form>
-            ) : (
-              <div className="bg-pink-50/10 border border-pink-100 rounded-lg p-6 text-center space-y-3 shadow-none">
-                <Award className="text-pink-400 mx-auto animate-pulse" size={42} />
-                <h4 className="text-sm font-bold text-slate-900 font-sans">จัดการรายชื่อผู้อนุมัติโครงการ</h4>
-                <p className="text-xs text-slate-500 leading-relaxed md:max-w-[250px] mx-auto font-sans">
-                  คุณสามารถเพิ่มหรือแก้ไขข้อมูลผู้อนุมัติ เพื่อสลับสิทธิ์การเซ็นอนุมัติผ่านใบจองได้อย่างยืดหยุ่นทางอิเล็กทรอนิกส์
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
         </div>
       )}
@@ -1133,7 +1109,7 @@ export default function AdminPanel({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* List of Caretakers */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`${caretakerForm ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-4`}>
             <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-slate-950 flex items-center gap-2">
@@ -1212,8 +1188,8 @@ export default function AdminPanel({
           </div>
 
           {/* Form Side panel */}
-          <div className="lg:col-span-1">
-            {caretakerForm ? (
+          {caretakerForm && (
+            <div className="lg:col-span-1">
               <form onSubmit={handleCaretakerSubmit} className="bg-pink-50/55 text-slate-850 border border-pink-100 rounded-lg p-5 shadow-sm space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-pink-100 pb-3">
                   <h3 className="text-sm font-bold text-pink-700 flex items-center gap-1.5 font-sans">
@@ -1286,16 +1262,8 @@ export default function AdminPanel({
                   </button>
                 </div>
               </form>
-            ) : (
-              <div className="bg-pink-50/10 border border-pink-100 rounded-lg p-6 text-center space-y-3 shadow-none">
-                <FileSignature className="text-pink-400 mx-auto animate-pulse" size={42} />
-                <h4 className="text-sm font-bold text-slate-900 font-sans">จัดการเจ้าหน้าที่จัดดูแลยานพาหนะ</h4>
-                <p className="text-xs text-slate-500 leading-relaxed md:max-w-[250px] mx-auto font-sans">
-                  คุณสามารถเพิ่มหรือสลับหน้าที่ นายทะเบียนผู้จัดดูแลรถ คอยตรวจสอบคุณภาพรถและคนขับได้ทันที
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
         </div>
       )}
@@ -1304,7 +1272,7 @@ export default function AdminPanel({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
           
           {/* List of Department Heads */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className={`${departmentHeadForm ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-4`}>
             <div className="bg-white border border-pink-100 rounded-lg p-5 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-slate-950 flex items-center gap-2 font-sans">
@@ -1387,8 +1355,8 @@ export default function AdminPanel({
           </div>
 
           {/* Form Side panel */}
-          <div className="lg:col-span-1">
-            {departmentHeadForm ? (
+          {departmentHeadForm && (
+            <div className="lg:col-span-1">
               <form onSubmit={handleDepartmentHeadSubmit} className="bg-pink-50/55 text-slate-850 border border-pink-100 rounded-lg p-5 shadow-sm space-y-4 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-pink-100 pb-3">
                   <h3 className="text-sm font-bold text-[#aa4e6e] flex items-center gap-1.5 font-sans">
@@ -1473,16 +1441,8 @@ export default function AdminPanel({
                   </button>
                 </div>
               </form>
-            ) : (
-              <div className="bg-pink-50/10 border border-pink-100 rounded-lg p-6 text-center space-y-3 shadow-none">
-                <User className="text-[#aa4e6e] mx-auto animate-pulse" size={42} />
-                <h4 className="text-sm font-bold text-slate-900 font-sans">จัดการหัวหน้ากลุ่มงาน/ฝ่าย</h4>
-                <p className="text-xs text-slate-500 leading-relaxed md:max-w-[250px] mx-auto font-sans">
-                  คุณสามารถเพิ่มหรือแก้ไข รายชื่อหัวหน้ากลุ่มงาน/ฝ่าย เพื่อลงความเห็นเห็นควรอนุญาตในใบขอยานพาหนะได้อย่างง่ายดาย
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
         </div>
       )}
