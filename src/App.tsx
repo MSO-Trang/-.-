@@ -564,7 +564,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50/75 flex flex-col font-sans antialiased text-slate-800">
+    <div className="min-h-screen bg-slate-300 flex flex-col font-sans antialiased text-slate-800">
       
       {/* Top Professional Header Bar - Hidden during A4 Printing */}
       <header className="bg-white border-b border-slate-100 shrink-0 sticky top-0 z-40 print:hidden shadow-xs">
