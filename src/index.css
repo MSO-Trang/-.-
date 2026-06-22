@@ -13,7 +13,7 @@ html {
 }
 
 body {
-  background-color: #cbd5e1; /* Slate 300 - Even darker elegant light gray */
+  background-color: #e0dedf; /* Exact light gray requested by user */
 }
 
 /* Force TH Sarabun font family on the entire government form page and all its descendants to override other font utilities, and ensure exact A4 dimensions */
