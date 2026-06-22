@@ -130,7 +130,8 @@ export default function App() {
     return localStorage.getItem('pmj_trang_sidebar_collapsed') === 'true';
   });
   const [sidebarTheme, setSidebarTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('pmj_trang_sidebar_theme') as 'light' | 'dark') || 'light';
+    localStorage.removeItem('pmj_trang_sidebar_theme');
+    return 'light';
   });
   const [sidebarSearch, setSidebarSearch] = useState<string>('');
 
@@ -684,7 +685,7 @@ export default function App() {
         
         {/* Navigation Sidebar (Vertical collapsible on Desktop, Horizontal ribbon on Mobile) */}
         <div className={`shrink-0 print:hidden transition-all duration-300 ease-in-out w-full
-          ${isSidebarCollapsed ? 'md:w-20' : 'md:w-72'}
+          ${isSidebarCollapsed ? 'md:w-20' : 'md:w-60'}
         `}>
           
           {/* Desktop Collapsible Navigation Card */}
@@ -881,39 +882,6 @@ export default function App() {
                 </button>
               )}
 
-              {/* Theme toggler switch layout */}
-              <button
-                onClick={toggleSidebarTheme}
-                className={`flex items-center justify-between w-full px-3 py-3 mt-2 rounded-xl transition duration-200 ${
-                  sidebarTheme === 'dark' 
-                    ? 'bg-[#222326] text-slate-300' 
-                    : 'bg-slate-50 text-slate-600'
-                } cursor-pointer`}
-                title={sidebarTheme === 'dark' ? 'โหมดสว่าง' : 'โหมดมืด'}
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  {sidebarTheme === 'dark' ? (
-                    <>
-                      <Sun size={15} className="text-amber-500 shrink-0" />
-                      {!isSidebarCollapsed && <span className="text-xs font-bold font-sans truncate">โหมดกลางวัน</span>}
-                    </>
-                  ) : (
-                    <>
-                      <Moon size={15} className="text-slate-500 shrink-0" />
-                      {!isSidebarCollapsed && <span className="text-xs font-bold font-sans truncate">โหมดกลางคืน</span>}
-                    </>
-                  )}
-                </div>
-                {!isSidebarCollapsed && (
-                  <div className={`w-8 h-4.5 rounded-full flex items-center p-0.5 transition-colors duration-200 ${
-                    sidebarTheme === 'dark' ? 'bg-[#aa4e6e]' : 'bg-slate-300'
-                  }`}>
-                    <div className={`bg-white w-3.5 h-3.5 rounded-full shadow-xs transform transition-transform duration-200 ${
-                      sidebarTheme === 'dark' ? 'translate-x-3.5' : 'translate-x-0'
-                    }`} />
-                  </div>
-                )}
-              </button>
             </div>
 
           </div>

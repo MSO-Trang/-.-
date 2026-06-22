@@ -889,7 +889,7 @@ export default function Dashboard({
               ) : (
                 <div className="space-y-6">
                   {/* SVG Donut and Horizontal Legend Split */}
-                  <div className="flex flex-col sm:flex-row items-center gap-6 justify-center md:justify-around py-2">
+                  <div className="flex flex-col xl:flex-row items-center gap-6 justify-center xl:justify-around py-2 min-w-0 w-full overflow-hidden">
                     
                     {/* Interactive SVG Donut */}
                     <div className="relative flex items-center justify-center shrink-0">
@@ -971,7 +971,7 @@ export default function Dashboard({
                     </div>
 
                     {/* Interactive Legend Items */}
-                    <div className="flex-1 space-y-2 w-full">
+                    <div className="flex-1 space-y-2 w-full min-w-0">
                       {(() => {
                         const colors = [
                           'bg-[#aa4e6e]',
@@ -988,21 +988,21 @@ export default function Dashboard({
                               key={idx}
                               onMouseEnter={() => setHoveredSliceIndex(idx)}
                               onMouseLeave={() => setHoveredSliceIndex(null)}
-                              className={`flex items-center justify-between p-2 rounded-xl transition duration-150 border cursor-pointer ${
+                              className={`flex items-center justify-between p-2 rounded-xl transition duration-150 border cursor-pointer min-w-0 ${
                                 isHovered 
                                   ? 'bg-rose-50/40 border-rose-100/80 shadow-2xs translate-x-1' 
                                   : 'border-transparent hover:bg-slate-50/85'
                               }`}
                             >
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${bgColorClass}`}></span>
-                                <span className={`text-xs font-semibold text-slate-700 truncate ${isHovered ? 'text-slate-900 font-bold' : ''}`}>
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <span className={`w-2 h-2 rounded-full shrink-0 ${bgColorClass}`}></span>
+                                <span className={`text-xs font-semibold text-slate-700 truncate ${isHovered ? 'text-slate-900 font-bold' : ''}`} title={item.name}>
                                   {item.name}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2 font-mono text-xs shrink-0 pl-2">
+                              <div className="flex items-center gap-1.5 font-mono text-xs shrink-0 pl-2">
                                 <span className={`font-bold ${isHovered ? 'text-[#aa4e6e]' : 'text-slate-800'}`}>{item.value} ครั้ง</span>
-                                <span className="text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md text-[9px] font-bold">
+                                <span className="text-slate-400 bg-slate-100 px-1 py-0.5 rounded text-[9px] font-bold shrink-0">
                                   {item.percentage}%
                                 </span>
                               </div>
