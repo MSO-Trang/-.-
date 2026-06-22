@@ -488,7 +488,7 @@ export default function PrintPermit({
                     <div className="text-[14.5pt] text-slate-500 font-medium font-sans">
                     </div>
                     <div className="w-[457px] leading-normal text-center mx-auto" style={{ fontSize: '14.5pt' }}>
-                      <p className="font-bold text-black mb-2 text-center">เห็นควรอนุญาต</p>
+                      <p className="font-bold text-black mb-2 text-center" style={{ marginLeft: '0px', width: '410px' }}>เห็นควรอนุญาต</p>
                       <p className="flex items-baseline justify-center">
                         <span className="w-16 text-right pr-1 shrink-0 select-none" style={{ marginLeft: '60px' }}>(ลงชื่อ)</span>
                         <span className="w-[320px] overflow-hidden whitespace-nowrap text-center text-slate-400 select-none" style={{ position: 'relative', top: '1.5px' }}>............................................................................................................................................</span>
@@ -499,10 +499,10 @@ export default function PrintPermit({
                           }
                         </span>
                       </p>
-                      <p className="font-bold mt-1 text-black">
+                      <p className="font-bold mt-1 text-black" style={{ width: '418px' }}>
                         ( {booking.departmentHeadName || '......................................................................'} )
                       </p>
-                      <p className="text-[14.5pt] text-slate-500 mt-0" style={{ marginTop: '-3px' }}>
+                      <p className="text-[14.5pt] text-slate-500 mt-0" style={{ marginTop: '-3px', width: '418px' }}>
                         ตำแหน่ง {displayPosition ? (displayPosition.startsWith('ตำแหน่ง') ? displayPosition.replace(/^ตำแหน่ง\s*/, '') : displayPosition) : '...................................................'}
                       </p>
                     </div>
@@ -624,7 +624,7 @@ export default function PrintPermit({
                 </div>
 
                 {/* Footer status line inside printed form */}
-                <div className="pt-3 mt-1 text-center text-[14.5pt] text-slate-400 font-mono border-t border-slate-100 flex justify-between items-center print:pt-2">
+                <div className="pt-3 mt-1 text-center text-[10.5pt] text-slate-400 font-mono border-t border-slate-100 flex justify-between items-center print:pt-2">
                   <span>พมจ.ตรัง แบบ ๓: บันทึกขอใช้รถราชการ</span>
                   <span className="font-bold">ID: {booking.id.toUpperCase().substring(0, 8)}</span>
                 </div>
