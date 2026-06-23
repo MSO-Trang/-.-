@@ -598,12 +598,21 @@ export default function App() {
   // Helper formatting for global clock
   const [currentClock, setCurrentClock] = useState('');
   useEffect(() => {
+    const daysThai = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+    const monthsThai = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
     const updateClock = () => {
       const now = new Date();
+      const dayName = daysThai[now.getDay()];
+      const date = now.getDate();
+      const monthName = monthsThai[now.getMonth()];
+      const yearBE = now.getFullYear() + 543;
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
-      setCurrentClock(`${hours}:${minutes}:${seconds} น.`);
+      setCurrentClock(`${dayName}ที่ ${date} ${monthName} พ.ศ. ${yearBE} • ${hours}:${minutes}:${seconds} น.`);
     };
     updateClock();
     const interval = setInterval(updateClock, 1000);
@@ -874,9 +883,9 @@ export default function App() {
               {/* Status Pills Container - Grouped for Orderliness */}
               <div className="flex flex-wrap items-center gap-2">
                 {/* Clock Widget */}
-                <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200/50 text-slate-600 rounded-xl text-xs font-medium font-sans">
-                  <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse shrink-0"></span>
-                  <span className="font-mono whitespace-nowrap">เวลาปัจจุบัน: {currentClock || 'กำลังโหลด...'}</span>
+                <div className="hidden md:inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#aa4e6e]/5 border border-[#aa4e6e]/15 text-slate-700 rounded-xl text-xs font-bold font-sans">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#aa4e6e] animate-pulse shrink-0"></span>
+                  <span className="font-sans whitespace-nowrap">{currentClock || 'กำลังโหลด...'}</span>
                 </div>
               </div>
             </div>
