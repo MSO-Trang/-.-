@@ -13,7 +13,12 @@ import {
   XCircle,
   FileText,
   CalendarDays,
-  Sparkles
+  Sparkles,
+  MapPin,
+  Users,
+  Calendar,
+  AlertCircle,
+  Gauge
 } from 'lucide-react';
 import { Booking, Vehicle, Driver } from '../types';
 import { DEPARTMENTS } from '../data/initialData';
@@ -409,7 +414,7 @@ export default function BookingList({
             onChange={(e) => setSelectedVehicle(e.target.value)}
             className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
           >
-            <option value="ALL">🚗 คัดกรองตามรถยนต์</option>
+            <option value="ALL">คัดกรองตามรถยนต์</option>
             {vehicles.map((v) => (
               <option key={v.id} value={v.id}>{v.plateNumber} ({v.name.split(' ')[0]})</option>
             ))}
@@ -421,9 +426,9 @@ export default function BookingList({
             onChange={(e) => setSelectedDriver(e.target.value)}
             className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none font-medium focus:ring-1 focus:ring-[#aa4e6e] focus:border-[#aa4e6e]"
           >
-            <option value="ALL">👤 คัดกรองตามคนขับ</option>
-            <option value="self-drive" className="font-semibold text-[#aa4e6e]">🚙 ขับรถยนต์ด้วยตนเอง (ผู้ขอ)</option>
-            <option value="passenger-drive" className="font-semibold text-emerald-700">👥 ผู้ร่วมเดินทางเป็นคนขับ</option>
+            <option value="ALL">คัดกรองตามคนขับ</option>
+            <option value="self-drive" className="font-semibold text-[#aa4e6e]">ขับรถยนต์ด้วยตนเอง (ผู้ขอ)</option>
+            <option value="passenger-drive" className="font-semibold text-emerald-700">ผู้ร่วมเดินทางเป็นคนขับ</option>
             {drivers.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
             ))}
@@ -514,9 +519,10 @@ export default function BookingList({
                 setStartDateFilter(todayStr);
                 setEndDateFilter(todayStr);
               }}
-              className="px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-lg text-[10px] font-bold transition duration-150 cursor-pointer shadow-2xs"
+              className="px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-lg text-[10px] font-bold transition duration-150 cursor-pointer shadow-2xs flex items-center gap-1"
             >
-              📅 เฉพาะวันนี้
+              <Calendar size={11} className="text-slate-400 shrink-0" />
+              <span>เฉพาะวันนี้</span>
             </button>
             <button
               type="button"
@@ -608,8 +614,9 @@ export default function BookingList({
 
                       {/* Destination / Purpose */}
                       <td className="py-2 px-2.5 max-w-[150px] lg:max-w-[200px] truncate">
-                        <div className="font-bold text-slate-800 truncate" title={b.destination}>
-                          📍 {b.destination}
+                        <div className="font-bold text-slate-800 truncate flex items-center gap-1" title={b.destination}>
+                          <MapPin size={11} className="text-[#aa4e6e] shrink-0" />
+                          <span>{b.destination}</span>
                         </div>
                         <div className="text-[10px] text-slate-400 truncate mt-0.5" title={b.purpose}>
                           {b.purpose}
@@ -618,8 +625,9 @@ export default function BookingList({
 
                       {/* Capacity */}
                       <td className="py-2 px-1.5 text-center font-bold text-slate-705 whitespace-nowrap relative group">
-                        <span className="cursor-help hover:text-[#aa4e6e] transition border-b border-dotted border-slate-350 pb-0.5">
-                          👤 {b.passengersCount} คน
+                        <span className="cursor-help hover:text-[#aa4e6e] transition border-b border-dotted border-slate-350 pb-0.5 inline-flex items-center gap-1">
+                          <Users size={11} className="text-slate-400 shrink-0" />
+                          <span>{b.passengersCount} คน</span>
                         </span>
                         {b.passengersList && b.passengersList.filter(name => name.trim() !== '').length > 0 && (
                           <div className="absolute z-60 hidden group-hover:block bg-slate-900 text-white text-[11px] p-2.5 rounded-xl shadow-xl -top-1 left-1/2 -translate-x-1/2 -translate-y-full min-w-[200px] text-left border border-slate-700 pointer-events-none">
@@ -653,14 +661,22 @@ export default function BookingList({
                         </div>
                         <div className="flex items-center gap-1 text-[11px] font-bold text-slate-700 mt-0.5 max-w-[150px] truncate">
                           <User size={11} className="text-slate-500 shrink-0" />
-                          <span className="truncate">{driver?.name || '⚠️ รอมอบหมายพลขับ'}</span>
+                          <span className="truncate">
+                            {driver ? driver.name : (
+                              <span className="text-amber-600 font-sans font-bold inline-flex items-center gap-0.5">
+                                <AlertCircle size={10} className="text-amber-500 shrink-0" />
+                                <span>รอมอบหมายพลขับ</span>
+                              </span>
+                            )}
+                          </span>
                         </div>
                         {b.startMileage !== undefined && b.startMileage !== null && (
                           <div className="text-[9px] font-mono font-bold text-slate-500 mt-1 flex items-center gap-1 bg-slate-100/70 border border-slate-200/50 px-1 py-0.5 rounded w-fit leading-none" title={`เลขไมล์: ${b.startMileage} - ${b.endMileage || 'ยังไม่ระบุ'}`}>
-                            <span>⏱️ {b.startMileage.toLocaleString()}</span>
+                            <Gauge size={10} className="text-slate-400 shrink-0" />
+                            <span>{b.startMileage.toLocaleString()}</span>
                             <span>→</span>
                             <span className={b.status === 'completed' ? 'text-emerald-700 font-extrabold' : 'text-slate-455 font-medium'}>
-                              {b.endMileage !== undefined && b.endMileage !== null ? `${b.endMileage.toLocaleString()}` : 'วิ่งอยู...'}
+                              {b.endMileage !== undefined && b.endMileage !== null ? `${b.endMileage.toLocaleString()}` : 'วิ่งอยู่...'}
                             </span>
                           </div>
                         )}
@@ -773,7 +789,7 @@ export default function BookingList({
                               onClick={() => {
                                 setConfirmState({
                                   isOpen: true,
-                                  title: '⚠️ ลบประวัติการจองถาวร (สิทธิ์เฉพาะ Admin)',
+                                  title: 'ลบประวัติการจองถาวร (สิทธิ์เฉพาะ Admin)',
                                   message: `ยืนยันการลบประวัติคำขอใช้รถยนต์เลขที่นำส่ง "${b.permitNumber}" ออกจากสารระบบถาวร?\n\nการลบนี้จะถูกเคลียร์ออกจากคิวความสิ้นสุดถาวรและไม่สามารถย้อนคืนค่าข้อมูลได้`,
                                   confirmText: 'ลบออกจากระบบอย่างปลอดภัยถาวร',
                                   type: 'danger',
@@ -862,8 +878,9 @@ export default function BookingList({
               </div>
               <div className="flex justify-between">
                 <span className="font-semibold text-slate-400">สถานที่ปลายทาง:</span>
-                <span className="font-bold text-slate-800 text-right truncate max-w-48" title={mileageModalBooking.destination}>
-                  📍 {mileageModalBooking.destination}
+                <span className="font-bold text-slate-800 text-right truncate max-w-48 flex items-center gap-0.5 justify-end" title={mileageModalBooking.destination}>
+                  <MapPin size={11} className="text-[#aa4e6e] shrink-0" />
+                  <span>{mileageModalBooking.destination}</span>
                 </span>
               </div>
             </div>
@@ -874,7 +891,10 @@ export default function BookingList({
               {/* Start Mileage (Always editable to handle out-of-order logs) */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-750 block flex justify-between">
-                  <span className="text-indigo-805 font-bold">📟 เลขไมล์ออกเดินทาง (กม.)</span>
+                  <span className="text-indigo-805 font-bold flex items-center gap-1">
+                    <Gauge size={12} className="text-indigo-500 shrink-0" />
+                    <span>เลขไมล์ออกเดินทาง (กม.)</span>
+                  </span>
                   <span className="text-[9px] bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded font-black">
                     แก้ไขได้ (กรณีสลับคิวบันทึก)
                   </span>
@@ -897,7 +917,10 @@ export default function BookingList({
               {/* End Mileage */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-750 block flex justify-between">
-                  <span className="text-[#aa4e6e] font-black">🏁 ระบุเลขไมล์สะสมหลังเสร็จงาน (กม.)</span>
+                  <span className="text-[#aa4e6e] font-black flex items-center gap-1">
+                    <Gauge size={12} className="text-[#aa4e6e] shrink-0" />
+                    <span>ระบุเลขไมล์สะสมหลังเสร็จงาน (กม.)</span>
+                  </span>
                   <span className="text-rose-600 font-extrabold text-[10px]">* จำเป็น</span>
                 </label>
                 <div className="relative">
@@ -919,8 +942,11 @@ export default function BookingList({
               {/* Difference breakdown if valid */}
               {parseInt(startMilInput, 10) >= 0 && parseInt(endMilInput, 10) > parseInt(startMilInput, 10) && (
                 <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-[11px] flex justify-between items-center font-bold">
-                  <span>⚡ คำนวณระยะทางสุทธิ:</span>
-                  <span className="font-mono text-xs underline font-black">
+                  <span className="flex items-center gap-1">
+                    <Sparkles size={11} className="text-emerald-500 shrink-0 animate-pulse" />
+                    <span>คำนวณระยะทางสุทธิ:</span>
+                  </span>
+                  <span className="font-mono text-xs underline font-black text-emerald-950">
                     {(parseInt(endMilInput, 10) - parseInt(startMilInput, 10)).toLocaleString()} กม.
                   </span>
                 </div>
@@ -928,8 +954,9 @@ export default function BookingList({
 
               {/* Error readout */}
               {milError && (
-                <div className="p-3 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs font-semibold leading-tight">
-                  ⚠️ {milError}
+                <div className="p-3 bg-rose-50 border border-rose-100 text-rose-700 rounded-xl text-xs font-semibold leading-tight flex items-center gap-1.5">
+                  <AlertCircle size={13} className="text-rose-500 shrink-0" />
+                  <span>{milError}</span>
                 </div>
               )}
 
@@ -949,7 +976,8 @@ export default function BookingList({
                 onClick={handleSaveMileageModal}
                 className="flex-1 py-2 bg-[#aa4e6e] hover:bg-[#8c1c4a] text-white rounded-xl text-xs font-extrabold transition shadow-xs cursor-pointer flex items-center justify-center gap-1"
               >
-                💾 บันทึกและสรุปงาน
+                <FileText size={12} className="shrink-0" />
+                <span>บันทึกและสรุปงาน</span>
               </button>
             </div>
 

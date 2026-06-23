@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Printer, ArrowLeft, ShieldCheck, FileCheck2 } from 'lucide-react';
+import { Printer, ArrowLeft, ShieldCheck, FileCheck2, Lightbulb } from 'lucide-react';
 import { Booking, Vehicle, Driver, DepartmentHead } from '../types';
 import { formatThaiDate, formatTime } from '../utils/bookingUtils';
 import { MSDHS_LOGO_BASE64 } from '../data/logoBase64';
@@ -82,7 +82,7 @@ export default function PrintPermit({
 
   const triggerPrint = () => {
     if (isInIframe) {
-      alert("⚠️ เนื่องจากคุณกำลังเข้าใช้งานผ่านเฟรมตัวอย่าง (Sandbox iFrame) ของ AI Studio แอลกอริทึมของเบราว์เซอร์ล็อคไม่ให้ใช้คำสั่งพิมพ์โดยตรง\n\nโปรดคลิกปุ่มสีส้ม 'เปิดในแท็บใหม่เพื่อพิมพ์คำขอใช้รถ' ด้านบนเพื่อเปิดหน้าต่างแยกเต็มจอ แล้วคุณจะสามารถพิมพ์คำขอรถยนต์ใบราชการนี้ได้ทันที!");
+      alert("เนื่องจากคุณกำลังเข้าใช้งานผ่านเฟรมตัวอย่าง (Sandbox iFrame) ของ AI Studio แอลกอริทึมของเบราว์เซอร์ล็อคไม่ให้ใช้คำสั่งพิมพ์โดยตรง\n\nโปรดคลิกปุ่มสีส้ม 'เปิดในแท็บใหม่เพื่อพิมพ์คำขอใช้รถ' ด้านบนเพื่อเปิดหน้าต่างแยกเต็มจอ แล้วคุณจะสามารถพิมพ์คำขอรถยนต์ใบราชการนี้ได้ทันที!");
     } else {
       window.print();
     }
@@ -172,7 +172,10 @@ export default function PrintPermit({
             <Printer size={16} className="animate-pulse" />
           </div>
           <div className="space-y-0.5 my-auto">
-            <h4 className="font-extrabold text-amber-950">💡 คำแนะนำสำหรับการพิมพ์เอกสารใบขอใช้รถยนต์ราชการ</h4>
+            <h4 className="font-extrabold text-amber-950 flex items-center gap-1">
+              <Lightbulb size={14} className="text-amber-600 shrink-0" />
+              <span>คำแนะนำสำหรับการพิมพ์เอกสารใบขอใช้รถยนต์ราชการ</span>
+            </h4>
             <p className="text-slate-650 leading-relaxed font-semibold">
               เนื่องจากแอปพลิเคชันทำงานอยู่ในหน้าต่างจำลอง (iFrame) ฟังก์ชั่นของเจ้าของเบราว์เซอร์จะป้องกันคำสั่งพิมพ์โดยตรง 
               กรุณากดปุ่ม <strong>"เปิดในแท็บใหม่เพื่อพิมพ์คำขอ"</strong> ด้านบน เพื่อการสั่งพิมพ์และบันทึก PDF แบบจัดเต็มความคมชัด!

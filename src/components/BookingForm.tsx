@@ -23,7 +23,8 @@ import {
   ShieldCheck,
   FileText,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Lightbulb
 } from 'lucide-react';
 import { Booking, Vehicle, Driver, BookingStatus, Approver, Caretaker, DepartmentHead } from '../types';
 import { DEPARTMENTS, generateNextPermitNumber } from '../data/initialData';
@@ -1735,15 +1736,16 @@ export default function BookingForm({
                               }}
                               className="px-3 py-1.5 bg-white hover:bg-emerald-50 text-[10px] font-bold text-slate-700 hover:text-emerald-700 border border-slate-200 hover:border-emerald-250 rounded-xl cursor-pointer transition duration-150 shadow-3xs"
                             >
-                              👤 {pName}{pPos ? ` (${pPos})` : ''}
+                              {pName}{pPos ? ` (${pPos})` : ''}
                             </button>
                           );
                         })}
                       </div>
                     </div>
                   ) : (
-                    <p className="text-[10px] text-amber-600 font-semibold bg-amber-50/70 border border-amber-100/50 p-2 rounded-lg leading-snug">
-                      ℹ️ หากย้อนกลับไปในขั้นตอนก่อนหน้าเพื่อพิมพ์ระบุชื่อ "ผู้ร่วมเดินทางร่วมคณะ" คุณจะดึงชื่อมาคลิกเลือกเป็นคนขับตรงนี้ได้ง่ายทันทีอย่างสะดวกรวดเร็ว
+                    <p className="text-[10px] text-amber-600 font-semibold bg-amber-50/70 border border-amber-100/50 p-2 rounded-lg leading-snug flex items-start gap-1">
+                      <Info size={12} className="text-amber-500 shrink-0 mt-0.5" />
+                      <span>หากย้อนกลับไปในขั้นตอนก่อนหน้าเพื่อพิมพ์ระบุชื่อ "ผู้ร่วมเดินทางร่วมคณะ" คุณจะดึงชื่อมาคลิกเลือกเป็นคนขับตรงนี้ได้ง่ายทันทีอย่างสะดวกรวดเร็ว</span>
                     </p>
                   )}
                 </div>
@@ -1862,8 +1864,9 @@ export default function BookingForm({
                 ) : (
                   /* SIGNING INSTEAD (CUSTOM) MODE */
                   <div className="space-y-4">
-                    <div className="p-3 bg-pink-50/30 rounded-lg text-xs font-semibold text-pink-700 border border-pink-100/30 flex items-center gap-1.5">
-                      💡 <span>ระบบจะช่วยพิมพ์คำว่า <strong>"แทน"</strong> นำหน้าชื่อตำแหน่งเดิมเพื่อความถูกต้องตามแบบฟอร์มกฎหมายราชการให้โดยอัตโนมัติ</span>
+                    <div className="p-3 bg-pink-50/30 rounded-lg text-xs font-semibold text-pink-705 border border-pink-100/30 flex items-center gap-2">
+                      <Lightbulb size={13} className="text-[#aa4e6e] shrink-0" />
+                      <span>ระบบจะช่วยพิมพ์คำว่า <strong>"แทน"</strong> นำหน้าชื่อตำแหน่งเดิมเพื่อความถูกต้องตามแบบฟอร์มกฎหมายราชการให้โดยอัตโนมัติ</span>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -2151,12 +2154,14 @@ export default function BookingForm({
                 </div>
                 <div className="space-y-1">
                   <span className="text-slate-400 font-semibold block">จับคู่รถราชการและพลขับ:</span>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[10px] bg-slate-100 border px-1.5 py-0.5 rounded font-extrabold text-[#aa4e6e]">
-                      🚗 {selectedVehicleObj?.name || 'ยังเลือกยานพาหนะ'} ({selectedVehicleObj?.plateNumber || 'คันชั่วคราว'})
+                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                    <span className="text-[10px] bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded font-bold text-[#aa4e6e] flex items-center gap-1">
+                      <Car size={11} className="shrink-0 text-[#aa4e6e]" />
+                      <span>{selectedVehicleObj?.name || 'ยังไม่ได้เลือกยานพาหนะ'} ({selectedVehicleObj?.plateNumber || 'คันชั่วคราว'})</span>
                     </span>
-                    <span className="text-[10px] bg-slate-100 border px-1.5 py-0.5 rounded font-bold text-slate-600">
-                      👨‍✈️ {selectedDriverObj?.name || 'ยังไม่เลือกพลขับ'}
+                    <span className="text-[10px] bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded font-bold text-slate-600 flex items-center gap-1">
+                      <User size={11} className="shrink-0 text-slate-500" />
+                      <span>{selectedDriverObj?.name || 'ยังไม่เลือกพลขับ'}</span>
                     </span>
                   </div>
                   {selectedVehicleObj && formData.passengersCount > 0 && (

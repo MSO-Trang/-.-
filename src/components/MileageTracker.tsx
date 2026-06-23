@@ -13,7 +13,11 @@ import {
   TrendingUp, 
   RotateCcw,
   RefreshCw,
-  Info
+  Info,
+  Fuel,
+  Coins,
+  Droplet,
+  Tag
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Booking, Vehicle, Driver } from '../types';
@@ -363,7 +367,7 @@ export default function MileageTracker({
               onChange={(e) => setSelectedVehicleFilter(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-[#aa4e6e] appearance-none cursor-pointer"
             >
-              <option value="all">🚗 กรองตามรถทุกคัน</option>
+              <option value="all">กรองตามรถทุกคัน</option>
               {vehicles.map(v => (
                 <option key={v.id} value={v.id}>
                   {v.plateNumber} ({v.name})
@@ -438,7 +442,7 @@ export default function MileageTracker({
                           </h3>
                           <div className="text-xs text-slate-500 font-medium flex items-center gap-1.5 pl-3">
                             <MapPin size={12} className="text-[#aa4e6e] shrink-0" />
-                            <span className="truncate" title={b.destination}>📍 {b.destination}</span>
+                            <span className="truncate" title={b.destination}>{b.destination}</span>
                           </div>
                           <div className="text-xs text-slate-400 font-medium pl-3 whitespace-normal break-words">
                             วัตถุประสงค์: <span className="text-slate-500 font-bold">{b.purpose}</span>
@@ -497,9 +501,10 @@ export default function MileageTracker({
                           )}
 
                           {b.fuelCost !== undefined && b.fuelCost !== null && (
-                            <div className="bg-amber-50 border border-amber-250/50 rounded-xl p-2 px-3 flex flex-wrap items-center gap-1.5 text-xs text-amber-900">
-                              <span className="font-medium">⛽ ค่าน้ำมัน:</span>
-                              <span className="font-mono font-black">{b.fuelCost.toLocaleString()} บาท</span>
+                            <div className="bg-amber-50/70 border border-amber-200/50 rounded-xl p-2 px-3 flex flex-wrap items-center gap-1.5 text-xs">
+                              <Fuel size={13} className="text-amber-600 shrink-0" />
+                              <span className="font-medium text-amber-800">ค่าน้ำมัน:</span>
+                              <span className="font-mono font-black text-amber-900">{b.fuelCost.toLocaleString()} บาท</span>
                               {b.fuelLiters !== undefined && b.fuelLiters !== null && b.fuelLiters > 0 && (
                                 <span className="text-[10px] text-slate-500 font-sans font-medium">
                                   ({b.fuelLiters.toLocaleString()} ลิตร · {(b.fuelCost / b.fuelLiters).toFixed(2)} บาท/ลิตร)
@@ -509,9 +514,10 @@ export default function MileageTracker({
                           )}
 
                           {b.fuelType && (
-                            <div className="bg-sky-50 border border-sky-200/50 rounded-xl p-2 px-3 flex items-center gap-1 text-xs text-sky-850">
-                              <span className="font-medium">ชนิด:</span>
-                              <span className="font-bold">{b.fuelType}</span>
+                            <div className="bg-sky-50 border border-sky-200/50 rounded-xl p-2 px-3 flex items-center gap-1.5 text-xs">
+                              <Tag size={12} className="text-sky-600 shrink-0" />
+                              <span className="font-medium text-slate-500">ชนิดเชื้อเพลิง:</span>
+                              <span className="font-bold text-sky-900">{b.fuelType}</span>
                             </div>
                           )}
                         </div>
@@ -605,15 +611,17 @@ export default function MileageTracker({
                         {/* Fuel Expense Subsection */}
                         <div className="pt-4 border-t border-dashed border-slate-200">
                           <h5 className="text-xs font-black text-slate-700 flex items-center gap-1.5 mb-3">
-                            <span>⛽ ข้อมูลการเติมน้ำมันเชื้อเพลิง (ถ้ามี)</span>
+                            <Fuel size={14} className="text-slate-500 shrink-0" />
+                            <span>ข้อมูลการเติมน้ำมันเชื้อเพลิง (ถ้ามี)</span>
                             <span className="text-[10px] font-normal text-slate-400 leading-none">(เว้นว่างไว้หากไม่มีการเติมในทริปนี้)</span>
                           </h5>
                           
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             {/* Fuel Cost Input */}
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-slate-600 block">
-                                💰 ค่าน้ำมันเชื้อเพลิง (บาท)
+                              <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
+                                <Coins size={12} className="text-slate-500 shrink-0" />
+                                <span>ค่าน้ำมันเชื้อเพลิง (บาท)</span>
                               </label>
                               <input
                                 type="number"
@@ -630,8 +638,9 @@ export default function MileageTracker({
 
                             {/* Fuel Liters Input */}
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-slate-600 block">
-                                🧪 ปริมาณน้ำมัน (ลิตร)
+                              <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
+                                <Droplet size={12} className="text-slate-500 shrink-0" />
+                                <span>ปริมาณน้ำมัน (ลิตร)</span>
                               </label>
                               <input
                                 type="number"
@@ -648,8 +657,9 @@ export default function MileageTracker({
 
                             {/* Fuel Type Dropdown */}
                             <div className="space-y-1.5">
-                              <label className="text-xs font-bold text-slate-600 block">
-                                🏷️ ชนิดน้ำมันเชื้อเพลิง
+                              <label className="text-xs font-bold text-slate-600 flex items-center gap-1">
+                                <Tag size={12} className="text-slate-500 shrink-0" />
+                                <span>ชนิดน้ำมันเชื้อเพลิง</span>
                               </label>
                               <select
                                 value={fuelTypeInput}

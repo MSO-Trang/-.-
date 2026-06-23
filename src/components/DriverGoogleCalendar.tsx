@@ -13,7 +13,8 @@ import {
   ExternalLink,
   Plus,
   Info,
-  Car
+  Car,
+  Phone
 } from 'lucide-react';
 import { Booking, Driver, Vehicle } from '../types';
 import { formatThaiDate, formatTime } from '../utils/bookingUtils';
@@ -515,12 +516,12 @@ export default function DriverGoogleCalendar({
             onChange={(e) => setSelectedDriverId(e.target.value)}
             className="w-full sm:w-56 px-3 py-1.5 bg-white border border-slate-250 rounded-xl text-xs font-semibold outline-none focus:ring-1 focus:ring-[#1a73e8] focus:border-[#1a73e8] text-slate-700"
           >
-            <option value="ALL">👤 เลือกพนักงานคนขับทั้งหมด (รวม)</option>
-            <option value="self-drive">🚗 ขับรถยนต์ด้วยตนเอง</option>
-            <option value="passenger-drive">👥 ผู้ร่วมเดินทางเป็นคนขับ</option>
+            <option value="ALL">เลือกพนักงานคนขับทั้งหมด (รวม)</option>
+            <option value="self-drive">ขับรถยนต์ด้วยตนเอง</option>
+            <option value="passenger-drive">ผู้ร่วมเดินทางเป็นคนขับ</option>
             {drivers.map(d => (
               <option key={d.id} value={d.id}>
-                👨‍✈️ {d.name} {d.status === 'busy' ? '(งานชุก)' : '(ว่าง)'}
+                {d.name} {d.status === 'busy' ? '(ติดงาน)' : '(ว่าง)'}
               </option>
             ))}
           </select>
@@ -811,18 +812,22 @@ export default function DriverGoogleCalendar({
                                     width: `${width}%`
                                   }}
                                 >
-                                  <div className="font-black text-slate-800 line-clamp-2 leading-tight">
-                                    📍 {b.destination.split(' ')[0]}
+                                  <div className="font-black text-slate-800 line-clamp-2 leading-tight flex items-center gap-0.5">
+                                    <MapPin size={8} className="text-[#aa4e6e] shrink-0" />
+                                    <span>{b.destination.split(' ')[0]}</span>
                                   </div>
                                   <div className="flex flex-col gap-0.5 mt-1 border-t border-slate-400/20 pt-1 text-[8px] font-extrabold text-slate-600">
                                     <div className="truncate flex items-center gap-0.5" title={driver?.name}>
-                                      👤 {driver?.name ? (driver.name.startsWith('นาย') || driver.name.startsWith('นาง') ? driver.name.replace(/^(นาย|นางสาว|นาง)\s*/, '') : driver.name.split(' ')[0]) : '-'}
+                                      <User size={8} className="text-slate-500 shrink-0" />
+                                      <span>{driver?.name ? (driver.name.startsWith('นาย') || driver.name.startsWith('นาง') ? driver.name.replace(/^(นาย|นางสาว|นาง)\s*/, '') : driver.name.split(' ')[0]) : '-'}</span>
                                     </div>
                                     <div className="truncate flex items-center gap-0.5">
-                                      🚗 {v?.plateNumber || '-'}
+                                      <Car size={8} className="text-[#aa4e6e] shrink-0" />
+                                      <span>{v?.plateNumber || '-'}</span>
                                     </div>
-                                    <div className="font-mono text-[8.5px] scale-95 origin-left tracking-normal opacity-85 shrink-0">
-                                      ⏱️ {formatTime(b.startDate)}-{b.endDate ? formatTime(b.endDate) : ''}
+                                    <div className="font-mono text-[8.5px] scale-95 origin-left tracking-normal opacity-85 shrink-0 flex items-center gap-0.5">
+                                      <Clock size={8} className="text-slate-400 shrink-0" />
+                                      <span>{formatTime(b.startDate)}-{b.endDate ? formatTime(b.endDate) : ''}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -1089,11 +1094,13 @@ export default function DriverGoogleCalendar({
                                       height: `${eventHeight - 4}px`
                                     }}
                                   >
-                                    <div className="font-black text-slate-800 truncate leading-tight">
-                                      📍 {b.destination}
+                                    <div className="font-black text-slate-800 truncate leading-tight flex items-center gap-0.5">
+                                      <MapPin size={9} className="text-[#aa4e6e] shrink-0" />
+                                      <span>{b.destination}</span>
                                     </div>
-                                    <div className="text-[8px] font-black opacity-85 truncate leading-none mt-1">
-                                      ⏱️ {formatTime(b.startDate)} - {b.endDate ? formatTime(b.endDate) : ''} น.
+                                    <div className="text-[8px] font-black opacity-85 truncate leading-none mt-1 flex items-center gap-0.5">
+                                      <Clock size={8} className="text-slate-400 shrink-0" />
+                                      <span>{formatTime(b.startDate)} - {b.endDate ? formatTime(b.endDate) : ''} น.</span>
                                     </div>
                                   </div>
                                 );
@@ -1240,8 +1247,9 @@ export default function DriverGoogleCalendar({
                             : drivers.find(d => d.id === selectedEvent.driverId)?.name || 'รอมอบหมาย'}
                       </p>
                       {selectedEvent.driverId !== 'self-drive' && selectedEvent.driverId !== 'passenger-drive' && drivers.find(d => d.id === selectedEvent.driverId)?.phone && (
-                        <p className="text-[#1a73e8] text-[9px] font-black mt-0.5 truncate">
-                          📞 {drivers.find(d => d.id === selectedEvent.driverId)?.phone}
+                        <p className="text-[#1a73e8] text-[9.3px] font-bold mt-1.5 truncate flex items-center gap-1">
+                          <Phone size={10} className="text-[#1a73e8] shrink-0" />
+                          <span>{drivers.find(d => d.id === selectedEvent.driverId)?.phone}</span>
                         </p>
                       )}
                     </div>

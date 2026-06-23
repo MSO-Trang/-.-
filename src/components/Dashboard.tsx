@@ -14,7 +14,14 @@ import {
   FileCheck2,
   CheckCircle2,
   Lock,
-  Gauge
+  Gauge,
+  Fuel,
+  Coins,
+  Droplet,
+  Tag,
+  BarChart3,
+  Lightbulb,
+  Leaf
 } from 'lucide-react';
 import { Booking, Vehicle, Driver } from '../types';
 import { formatThaiDate, translateVehicleType } from '../utils/bookingUtils';
@@ -550,10 +557,19 @@ export default function Dashboard({
                         </td>
                         <td className="py-3.5 px-4">
                           <p className="text-xs font-semibold text-[#aa4e6e]">ทะเบียน {vehicle?.plateNumber || '-'}</p>
-                          <p className="text-[11px] text-slate-700 font-bold mt-0.5 flex items-center gap-1">
-                            <span>👤</span>
-                            <span className="truncate">{driver?.name || '⚠️ รอมอบหมายพลขับ'}</span>
-                          </p>
+                          <div className="text-[11px] text-slate-700 font-bold mt-0.5 flex items-center gap-1">
+                            {driver ? (
+                              <>
+                                <User size={11} className="text-slate-400 shrink-0" />
+                                <span className="truncate">{driver.name}</span>
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle size={11} className="text-amber-500 shrink-0" />
+                                <span className="truncate text-amber-600">รอมอบหมายพลขับ</span>
+                              </>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           <div className="inline-flex items-center gap-1.5 justify-end">
@@ -1202,11 +1218,15 @@ export default function Dashboard({
               {/* Hover card message context */}
               <div className="h-9 flex items-center justify-center bg-slate-50 rounded-xl px-4 text-xs font-semibold text-slate-500 font-sans border border-slate-200/50">
                 {hoveredBarIndex !== null ? (
-                  <p className="animate-fade-in text-[#aa4e6e]">
-                    🚗 <span className="font-bold">{vehicleStats[hoveredBarIndex].name}</span> สถิติตลอดภารกิจจองสะสม <span className="font-extrabold text-slate-800 font-mono text-sm">{vehicleStats[hoveredBarIndex].bookingCount} ครั้ง</span>
+                  <p className="animate-fade-in text-[#aa4e6e] flex items-center justify-center gap-1.5">
+                    <Car size={13} className="text-[#aa4e6e] shrink-0" />
+                    <span className="font-bold">{vehicleStats[hoveredBarIndex].name}</span> สถิติตลอดภารกิจจองสะสม <span className="font-extrabold text-slate-800 font-mono text-sm">{vehicleStats[hoveredBarIndex].bookingCount} ครั้ง</span>
                   </p>
                 ) : (
-                  <p className="text-slate-400 text-[11px]">💡 ลองเอาเมาส์ชี้แท่งสีชมพูในแผนภูมิ เพื่อวิเคราะห์รายละเอียดรุ่นรถยนต์แยกรายทะเบียน</p>
+                  <p className="text-slate-400 text-[11px] flex items-center justify-center gap-1">
+                    <Lightbulb size={12} className="text-amber-500 shrink-0" />
+                    <span>ลองเอาเมาส์ชี้แท่งสีชมพูในแผนภูมิ เพื่อวิเคราะห์รายละเอียดรุ่นรถยนต์แยกรายทะเบียน</span>
+                  </p>
                 )}
               </div>
             </div>
@@ -1225,8 +1245,9 @@ export default function Dashboard({
               </h2>
               <p className="text-xs text-slate-400 font-medium">คำนวณ and แสดงผลระยะเดินทางสะสมเชิงกราฟจากการลงบันทึกเลขไมล์สุทธิขากลับ</p>
             </div>
-            <span className="text-[10px] bg-[#aa4e6e]/5 border border-[#aa4e6e]/15 text-[#aa4e6e] font-extrabold px-3 py-1 rounded-full whitespace-nowrap self-start sm:self-auto font-sans leading-none">
-              📊 สถิติระยะทางจริง (กม.)
+            <span className="text-[10px] bg-[#aa4e6e]/5 border border-[#aa4e6e]/15 text-[#aa4e6e] font-extrabold px-3 py-1.5 rounded-full whitespace-nowrap self-start sm:self-auto font-sans leading-none flex items-center gap-1">
+              <BarChart3 size={11} className="text-[#aa4e6e]" />
+              <span>สถิติระยะทางจริง (กม.)</span>
             </span>
           </div>
 
@@ -1295,11 +1316,15 @@ export default function Dashboard({
               {/* Hint bar */}
               <div className="h-9 flex items-center justify-center bg-slate-50 border border-slate-200/50 rounded-xl px-4 text-xs font-semibold text-slate-500 font-sans">
                 {hoveredMileageIndex !== null ? (
-                  <p className="animate-fade-in text-[#aa4e6e]">
-                    🔋 <span className="font-bold">{vehicleMileageStats[hoveredMileageIndex].name}</span> ระยะเดินทางสะสมสุทธิ <span className="font-extrabold text-[#aa4e6e] font-mono text-sm">{vehicleMileageStats[hoveredMileageIndex].totalDistance.toLocaleString()} กม.</span>
+                  <p className="animate-fade-in text-[#aa4e6e] flex items-center justify-center gap-1.5">
+                    <Gauge size={13} className="text-[#aa4e6e] shrink-0" />
+                    <span className="font-bold">{vehicleMileageStats[hoveredMileageIndex].name}</span> ระยะเดินทางสะสมสุทธิ <span className="font-extrabold text-[#aa4e6e] font-mono text-sm">{vehicleMileageStats[hoveredMileageIndex].totalDistance.toLocaleString()} กม.</span>
                   </p>
                 ) : (
-                  <p className="text-slate-400 text-[11px]">💡 นำเมาส์วางเหนือแถบสีเพื่อดูรายละเอียดสัญจรเปรียบเทียบในแต่ละแชสซี</p>
+                  <p className="text-slate-400 text-[11px] flex items-center justify-center gap-1">
+                    <Lightbulb size={12} className="text-amber-500 shrink-0" />
+                    <span>นำเมาส์วางเหนือแถบสีเพื่อดูรายละเอียดสัญจรเปรียบเทียบในแต่ละแชสซี</span>
+                  </p>
                 )}
               </div>
             </div>
@@ -1327,8 +1352,9 @@ export default function Dashboard({
               {mileageSummaryGroup.maxVehicle && mileageSummaryGroup.maxVehicle.totalDistance > 0 ? (
                 <div className="bg-[#aa4e6e]/5 border border-[#aa4e6e]/15 rounded-2xl p-5 flex flex-col justify-between h-1/3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-[#aa4e6e] tracking-wider uppercase font-sans">
-                      👑 ยานยนต์ที่ออกสัญจรระยะสูงสุด
+                    <span className="text-[10px] font-bold text-[#aa4e6e] tracking-wider uppercase font-sans flex items-center gap-1">
+                      <TrendingUp size={11} className="text-[#aa4e6e]" />
+                      <span>ยานยนต์ที่ออกสัญจรระยะสูงสุด</span>
                     </span>
                     <span className="text-[10px] font-mono leading-none bg-[#aa4e6e] text-white px-2 py-0.5 rounded font-black">
                       {mileageSummaryGroup.maxVehicle.plateNumber}
@@ -1384,8 +1410,9 @@ export default function Dashboard({
               </h2>
               <p className="text-xs text-slate-400 font-medium font-sans">ภาพรวมวิเคราะห์ประสิทธิภาพ อัตราสิ้นเปลือง และงบประมาณเชื้อเพลิงแยกรายคัน</p>
             </div>
-            <span className="text-[10px] bg-amber-50 border border-amber-200/50 text-amber-805 font-extrabold px-3 py-1 rounded-full whitespace-nowrap self-start sm:self-auto font-sans leading-none">
-              ⛽ สถิติการใช้พลังงาน
+            <span className="text-[10px] bg-amber-50 border border-amber-200/50 text-amber-800 font-extrabold px-3 py-1.5 rounded-full whitespace-nowrap self-start sm:self-auto font-sans leading-none flex items-center gap-1">
+              <Fuel size={11} className="text-amber-600" />
+              <span>สถิติการใช้พลังงาน</span>
             </span>
           </div>
 
@@ -1451,7 +1478,10 @@ export default function Dashboard({
 
             {/* Left Box: Vehicle breakdown (8 cols) */}
             <div className="lg:col-span-8 space-y-4">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide">📊 วิเคราะห์อัตราเติมน้ำมันและประสิทธิภาพการประหยัดแยกรายแชสซี</h3>
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
+                <BarChart3 size={13} className="text-slate-500 shrink-0" />
+                <span>วิเคราะห์อัตราเติมน้ำมันและประสิทธิภาพการประหยัดแยกรายแชสซี</span>
+              </h3>
 
               <div className="bg-slate-50/55 border border-slate-200/45 rounded-2xl p-4 sm:p-5 space-y-4">
                 {fuelSummaryGroup.vehicleFuelStats.length === 0 || fuelSummaryGroup.totalFuelCost === 0 ? (
@@ -1501,7 +1531,8 @@ export default function Dashboard({
                             <div className="space-y-0.5">
                               {vf.fuelLiters > 0 ? (
                                 <div className="text-xs font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-150/40 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                                  <span>🍃 {vf.kmPerLiter.toFixed(1)}</span>
+                                  <Leaf size={11} className="text-emerald-600 shrink-0" />
+                                  <span>{vf.kmPerLiter.toFixed(1)}</span>
                                   <span className="text-[9px] font-medium text-emerald-600">กม. / ลิตร</span>
                                 </div>
                               ) : (
@@ -1524,7 +1555,10 @@ export default function Dashboard({
 
             {/* Right Box: Fuel type breakdown (4 cols) */}
             <div className="lg:col-span-4 space-y-4">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide">🏷️ สัดส่วนประเภทน้ำมันเชื้อเพลิง</h3>
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide flex items-center gap-1.5 border-b border-transparent pb-0.5">
+                <Tag size={12} className="text-slate-500 shrink-0" />
+                <span>สัดส่วนประเภทน้ำมันเชื้อเพลิง</span>
+              </h3>
 
               <div className="bg-slate-50/55 border border-slate-200/45 rounded-2xl p-5 space-y-4 flex flex-col justify-between min-h-[220px]">
                 {fuelSummaryGroup.fuelTypeStats.length === 0 ? (
@@ -1565,7 +1599,7 @@ export default function Dashboard({
                 )}
 
                 <div className="bg-amber-50/50 border border-amber-100 p-2.5 rounded-xl text-[10px] text-amber-900 font-sans leading-relaxed flex items-start gap-1.5">
-                  <span className="shrink-0">💡</span>
+                  <Lightbulb size={12} className="text-amber-500 shrink-0 mt-0.5" />
                   <p><b>ประโยชน์ใช้งาน:</b> ข้อมูลสิ้นเปลืองช่วยปรับรอบบริการเช็กระยะ และจัดสรรวงเงินบัตรน้ำมัน Fleet Card กองกลางได้แม่นยำยิ่งขึ้น</p>
                 </div>
               </div>
@@ -1621,7 +1655,10 @@ export default function Dashboard({
                 </div>
 
                 <div className="bg-slate-50 rounded-xl p-3.5 border border-slate-200/50 text-[10px] text-slate-450 font-bold space-y-1 leading-normal">
-                  <p className="text-[#aa4e6e]">💡 บัญชีสาธิตสำหรับทดสอบงานจอง:</p>
+                  <p className="text-[#aa4e6e] flex items-center gap-1">
+                    <Lightbulb size={12} className="text-amber-500 shrink-0" />
+                    <span>บัญชีสาธิตสำหรับทดสอบงานจอง:</span>
+                  </p>
                   <p>• รหัสผ่าน Admin สำหรับยืนยัน: <span className="underline select-all font-black text-slate-700">admin1234</span></p>
                   <p>• หรือสะดวกข้ามโดยคลิกปุ่มแชร์สิทธิ์ด่วนด้านล่างได้ทันที</p>
                 </div>

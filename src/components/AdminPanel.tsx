@@ -20,7 +20,9 @@ import {
   FileSignature,
   MapPin,
   Route,
-  History
+  History,
+  Calendar,
+  AlertCircle
 } from 'lucide-react';
 import { Vehicle, Driver, Approver, Caretaker, Booking, DepartmentHead } from '../types';
 import ConfirmModal from './ConfirmModal';
@@ -1592,19 +1594,19 @@ export default function AdminPanel({
                       let statusText = '';
                       if (b.status === 'completed') {
                         statusBadgeStyle = 'bg-emerald-50 text-emerald-700 border-emerald-100';
-                        statusText = 'เสร็จภารกิจ 🏁';
+                        statusText = 'เสร็จภารกิจ';
                       } else if (b.status === 'approved') {
                         statusBadgeStyle = 'bg-blue-50 text-blue-700 border-blue-105';
-                        statusText = 'อนุมัติ/รอวิ่ง 🟢';
+                        statusText = 'อนุมัติ/รอวิ่ง';
                       } else if (b.status === 'pending') {
                         statusBadgeStyle = 'bg-amber-50 text-amber-700 border-amber-100';
-                        statusText = 'รออนุมัติ 🟡';
+                        statusText = 'รออนุมัติ';
                       } else if (b.status === 'cancelled') {
                         statusBadgeStyle = 'bg-rose-50 text-rose-700 border-rose-100';
-                        statusText = 'ยกเลิก 🛑';
+                        statusText = 'ยกเลิก';
                       } else if (b.status === 'rejected') {
                         statusBadgeStyle = 'bg-slate-50 text-slate-600 border-slate-205';
-                        statusText = 'ไม่อนุมัติ ❌';
+                        statusText = 'ไม่อนุมัติ';
                       }
 
                       const tripDateFormatted = b.startDate ? new Date(b.startDate).toLocaleDateString('th-TH', {
@@ -1618,8 +1620,9 @@ export default function AdminPanel({
                           {/* วันที่ และ เลขใบอนุญาต */}
                           <td className="p-3 align-middle font-sans whitespace-nowrap">
                             <div className="space-y-1">
-                              <span className="text-[11px] text-slate-400 font-bold block">
-                                📅 {tripDateFormatted}
+                              <span className="text-[11px] text-slate-400 font-bold flex items-center gap-1">
+                                <Calendar size={11} className="text-slate-400 shrink-0" />
+                                <span>{tripDateFormatted}</span>
                               </span>
                               <span className="font-mono text-[10px] font-bold bg-slate-50 border border-slate-200 text-slate-650 px-1.5 py-0.5 rounded block w-fit">
                                 {b.permitNumber}
@@ -1657,8 +1660,9 @@ export default function AdminPanel({
                                   {b.purpose}
                                 </span>
                               )}
-                              <span className="text-[10px] text-slate-400 font-medium block">
-                                👤 จองโดย: {b.requesterName} ({b.department})
+                              <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
+                                <User size={10} className="text-slate-400 shrink-0" />
+                                <span>จองโดย: {b.requesterName} ({b.department})</span>
                               </span>
                             </div>
                           </td>
@@ -1677,8 +1681,9 @@ export default function AdminPanel({
                                   </div>
                                 </div>
                               ) : (
-                                <span className="text-amber-600 text-[11px] font-bold bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded inline-block">
-                                  ⚠️ เสร็จงาน (ยังไม่ระบุไมล์)
+                                <span className="text-amber-600 text-[11px] font-bold bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded inline-flex items-center gap-1">
+                                  <AlertCircle size={11} className="text-amber-500 shrink-0" />
+                                  <span>เสร็จงาน (ยังไม่ระบุไมล์)</span>
                                 </span>
                               )
                             ) : b.status === 'cancelled' || b.status === 'rejected' ? (
@@ -1706,16 +1711,23 @@ export default function AdminPanel({
                                 {matchedDriver ? (
                                   matchedDriver.name
                                 ) : b.driverId === 'self-drive' ? (
-                                  '🚗 ขับรถยนต์ด้วยตนเอง'
+                                  <span className="flex items-center gap-1 text-slate-650">
+                                    <Car size={12} className="text-slate-400 shrink-0" />
+                                    <span>ขับรถยนต์ด้วยตนเอง</span>
+                                  </span>
                                 ) : b.driverId === 'passenger-drive' ? (
-                                  `👥 ผู้ร่วมเดินทางขับ (${b.customDriverName || 'ไม่ระบุชื่อ'})`
+                                  <span className="flex items-center gap-1 text-slate-650">
+                                    <Users size={12} className="text-slate-400 shrink-0" />
+                                    <span>ผู้ร่วมเดินทางขับ ({b.customDriverName || 'ไม่ระบุชื่อ'})</span>
+                                  </span>
                                 ) : (
                                   'รอมอบหมายพนักงาน'
                                 )}
                               </span>
                               {matchedDriver?.phone && (
-                                <span className="text-[11px] text-slate-400 font-mono block">
-                                  📞 {matchedDriver.phone}
+                                <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 mt-0.5">
+                                  <Phone size={10} className="text-slate-400 shrink-0" />
+                                  <span>{matchedDriver.phone}</span>
                                 </span>
                               )}
                             </div>

@@ -9,7 +9,8 @@ import {
   ChevronRight, 
   AlertTriangle,
   Info,
-  Briefcase
+  Briefcase,
+  Users
 } from 'lucide-react';
 import { Booking, Vehicle, Driver } from '../types';
 import { formatThaiDate, isOverlapping, formatTime } from '../utils/bookingUtils';
@@ -153,23 +154,25 @@ export default function Schedules({
         <div className="flex bg-slate-100 p-1 rounded-xl shadow-xs">
           <button
             onClick={() => setViewType('drivers')}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer ${
+            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
               viewType === 'drivers' 
                 ? 'bg-white text-[#aa4e6e] shadow-xs' 
                 : 'text-slate-500 hover:text-slate-850'
             }`}
           >
-            👤 ตารางเวลาคนขับ (5 คน)
+            <User size={13} />
+            <span>ตารางเวลาคนขับ (5 คน)</span>
           </button>
           <button
             onClick={() => setViewType('vehicles')}
-            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer ${
+            className={`px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1.5 ${
               viewType === 'vehicles' 
                 ? 'bg-white text-[#aa4e6e] shadow-xs' 
                 : 'text-slate-500 hover:text-slate-850'
             }`}
           >
-            🚗 ตารางใช้งานรถยนต์ (6 คัน)
+            <Car size={13} />
+            <span>ตารางใช้งานรถยนต์ (6 คัน)</span>
           </button>
         </div>
 
@@ -264,7 +267,7 @@ export default function Schedules({
                   <div className="space-y-1.5 pb-3 border-b border-slate-100">
                     <div className="flex items-center justify-between">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${d.avatarColor}`}>
-                        {d.id === 'self-drive' ? '🚗' : d.id === 'passenger-drive' ? '👥' : d.name.substring(3, 5)}
+                        {d.id === 'self-drive' ? <Car size={14} /> : d.id === 'passenger-drive' ? <Users size={14} /> : d.name.substring(3, 5)}
                       </div>
                       {isConflicting && (
                         <span className="p-1 bg-red-105 text-red-650 rounded-full animate-pulse" title="ตารางเวลาคนขับชนกัน">
@@ -317,9 +320,10 @@ export default function Schedules({
                             </div>
 
                             {/* Assigned car */}
-                            <p className="text-[10px] font-mono font-bold text-slate-705 bg-slate-50 border border-slate-205 px-1 rounded-sm inline-block">
-                              🚗 {vehicle?.plateNumber || '-'}
-                            </p>
+                            <div className="text-[10px] font-mono font-bold text-slate-705 bg-slate-50 border border-slate-205 px-1 py-0.5 rounded-sm inline-flex items-center gap-1">
+                              <Car size={10} className="text-slate-500 shrink-0" />
+                              <span>{vehicle?.plateNumber || '-'}</span>
+                            </div>
                           </div>
                         );
                       })}
@@ -415,9 +419,10 @@ export default function Schedules({
                               <span className="truncate">{b.destination.split(' ')[0]}</span>
                             </div>
 
-                            <p className="text-[10px] text-slate-605 bg-slate-50 border border-slate-200 px-1 rounded-sm inline-block truncate max-w-full font-bold">
-                              👤 {driver?.name || '-'}
-                            </p>
+                            <div className="text-[10px] text-slate-605 bg-slate-50 border border-slate-200 px-1 py-0.5 rounded-sm inline-flex items-center gap-1 truncate max-w-full font-bold">
+                              <User size={10} className="text-slate-500 shrink-0" />
+                              <span>{driver?.name || '-'}</span>
+                            </div>
                           </div>
                         );
                       })}
