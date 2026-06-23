@@ -653,7 +653,7 @@ export default function Dashboard({
                     v.currentStatus === 'busy' 
                       ? 'border-rose-200/60 bg-rose-50/15' 
                       : v.currentStatus === 'maintenance'
-                      ? 'border-amber-205 bg-amber-50/20'
+                      ? 'border-amber-200/60 bg-amber-50/25'
                       : 'border-slate-200 bg-white hover:border-[#aa4e6e]/30 shadow-xs'
                   }`}
                 >

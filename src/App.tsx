@@ -611,283 +611,284 @@ export default function App() {
   }, []);
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans antialiased transition-all duration-300 ${
+    <div className={`min-h-screen flex flex-col md:flex-row font-sans antialiased transition-all duration-300 ${
       sidebarTheme === 'dark' 
         ? 'dark-theme bg-[#0d0e11] text-slate-200' 
-        : 'light-theme bg-[#e0dedf] text-slate-800'
+        : 'light-theme bg-[#f8fafc] text-slate-800'
     }`}>
       
-      {/* Top Professional Header Bar - Hidden during A4 Printing */}
-      <header className="bg-white border-b border-slate-100 shrink-0 sticky top-0 z-40 print:hidden shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-18 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* Desktop Edge-to-Edge Navigation Sidebar - Persistent, Full Height, No gaps */}
+      <aside className={`hidden md:flex flex-col h-screen sticky top-0 shrink-0 border-r transition-all duration-300 select-none print:hidden z-50
+        ${isSidebarCollapsed ? 'w-20' : 'w-60'}
+        ${sidebarTheme === 'dark' 
+          ? 'bg-[#18191c] border-slate-800/80 text-slate-100 shadow-xl' 
+          : 'bg-white border-slate-200/75 text-[#334155] shadow-xs'}
+      `}>
+        <div className="flex flex-col h-full p-4 relative select-none">
           
-          {/* Logo and Thai Agency Name */}
-          <div className="flex items-center gap-3">
-            <img 
-              src={MSDHS_LOGO_BASE64}
-              alt="โลโก้สำนักงาน พมจ.ตรัง"
-              className="w-11 h-11 object-contain shrink-0 filter drop-shadow-xs transition duration-300 hover:scale-105"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            <div className="md:border-l md:border-slate-200/80 md:pl-3.5 py-0.5">
-              <span className="text-[10px] text-[#aa4e6e] font-extrabold block leading-none uppercase tracking-widest font-sans">สำนักงานพมจ.ตรัง</span>
-              <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-normal mt-0.5">
-                ระบบควบคุมและจองใช้รถยนต์ราชการส่วนกลาง
-              </h1>
+          {/* Collapse toggle arrow floating button on the right edge */}
+          <button
+            onClick={toggleSidebarCollapse}
+            className={`absolute top-7 -right-3.5 z-50 w-7 h-7 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 shadow-xs hover:scale-110 active:scale-95
+              ${sidebarTheme === 'dark'
+                ? 'bg-[#18191c] border-slate-700 text-slate-300 hover:bg-[#25262a]'
+                : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+            title={isSidebarCollapsed ? 'ขยายแถบเมนู' : 'ย่อแถบเมนู'}
+          >
+            {isSidebarCollapsed ? <ChevronRight size={14} className="stroke-[3px]" /> : <ChevronLeft size={14} className="stroke-[3px]" />}
+          </button>
+
+          {/* Sidebar Branding Title block */}
+          <div className={`flex items-center gap-3 px-1 py-1 mb-4 shrink-0 transition-all duration-200 ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
+            <div className="w-10 h-10 rounded-xl bg-[#aa4e6e] text-white flex items-center justify-center shadow-xs font-sans shrink-0 transform transition duration-300 hover:rotate-6">
+              <span className="text-base font-extrabold tracking-tight">พม</span>
+            </div>
+            {!isSidebarCollapsed && (
+              <div className="flex flex-col truncate animate-fade-in animate-duration-300">
+                <span className={`text-[#aa4e6e] font-extrabold tracking-tight text-sm`}>พมจ.ตรัง</span>
+                <span className={`text-[10px] font-bold ${sidebarTheme === 'dark' ? 'text-slate-400' : 'text-slate-400'} mt-0.5 tracking-wider`}>ระบบบริการขอใช้รถ</span>
+              </div>
+            )}
+          </div>
+
+          {/* Search Input Filter */}
+          <div className={`mb-3 shrink-0 ${isSidebarCollapsed ? 'flex justify-center' : ''}`}>
+            <div className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition duration-200 border ${
+              sidebarTheme === 'dark' 
+                ? 'bg-[#222326] border-slate-800 text-slate-100' 
+                : 'bg-slate-50 border-slate-100 text-slate-600'
+            }`}>
+              <Search size={15} className="shrink-0 text-slate-400" />
+              {!isSidebarCollapsed && (
+                <input 
+                  type="text" 
+                  placeholder="ค้นหาเมนู..." 
+                  value={sidebarSearch}
+                  onChange={(e) => setSidebarSearch(e.target.value)}
+                  className="bg-transparent border-none outline-none text-xs w-full placeholder-slate-400/80 font-bold focus:ring-0 p-0"
+                />
+              )}
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 justify-center md:justify-end">
-            {/* Quick Access Action Tabs - High Visibility Duo */}
-            <div className="flex items-center gap-1 p-1 bg-slate-50 border border-slate-200/50 rounded-xl shadow-xs shrink-0">
-              <button
-                onClick={handleStartCreateMode}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition duration-200 cursor-pointer select-none ${
-                  activeTab === 'form' && !editingBooking
-                    ? 'bg-[#aa4e6e] text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-white hover:text-[#aa4e6e] hover:shadow-2xs'
-                }`}
-              >
-                <PlusCircle size={14} className={activeTab === 'form' && !editingBooking ? 'text-white' : 'text-[#aa4e6e]'} />
-                <span>เขียนใบขอใช้รถยนต์ใหม่</span>
-              </button>
+          {/* Primary Menu Items List */}
+          <div className="flex flex-col gap-1.5 flex-1 select-none overflow-y-auto pr-0.5" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {[
+              { id: 'dashboard', label: 'หน้าแรก (Dashboard)', icon: <BarChart3 size={17} /> },
+              { id: 'bookings', label: 'คลังใบขอใช้รถ', icon: <FileText size={17} /> },
+              { id: 'form', label: 'เขียนใบขอใช้รถ', icon: <PlusCircle size={17} /> },
+              { id: 'schedules', label: 'ตารางรถและคนขับ', icon: <Calendar size={17} /> },
+              { id: 'mileage', label: 'บันทึกเลขไมล์เดินทาง', icon: <Gauge size={17} /> },
+              { id: 'admin', label: 'ตั้งค่าพาหนะ/คนขับ', icon: <Settings size={17} /> },
+            ]
+            .filter(item => item.label.toLowerCase().includes(sidebarSearch.toLowerCase()))
+            .map(item => {
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id as any);
+                    if (item.id !== 'form') {
+                      setEditingBooking(undefined);
+                    }
+                  }}
+                  className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs md:text-sm font-bold transition duration-200 cursor-pointer select-none w-full shrink-0 ${
+                    isSidebarCollapsed ? 'justify-center font-normal' : 'justify-start'
+                  } ${
+                    isActive
+                      ? 'bg-[#aa4e6e] text-white shadow-md shadow-[#aa4e6e]/15'
+                      : sidebarTheme === 'dark'
+                        ? 'text-slate-400 hover:bg-[#222326] hover:text-[#aa4e6e]'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
+                  }`}
+                  title={item.label}
+                >
+                  <div className="shrink-0 animate-scale-in">
+                    {item.icon}
+                  </div>
+                  {!isSidebarCollapsed && (
+                    <span className="truncate">{item.label}</span>
+                  )}
+                </button>
+              );
+            })}
 
-              <button
-                onClick={() => setActiveTab('mileage')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition duration-200 cursor-pointer select-none ${
-                  activeTab === 'mileage'
-                    ? 'bg-[#aa4e6e] text-white shadow-xs'
-                    : 'text-slate-600 hover:bg-white hover:text-[#aa4e6e] hover:shadow-2xs'
-                }`}
-              >
-                <Gauge size={14} className={activeTab === 'mileage' ? 'text-white' : 'text-[#aa4e6e]'} />
-                <span>บันทึกเลขไมล์ขากลับ</span>
-              </button>
-            </div>
-
-            {/* Status Pills Container - Grouped for Orderliness */}
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Clock Widget */}
-              <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200/50 text-slate-600 rounded-xl text-xs font-medium font-sans">
-                <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse shrink-0"></span>
-                <span className="font-mono whitespace-nowrap">เวลาปัจจุบัน: {currentClock || 'กำลังโหลด...'}</span>
+            {editingBooking && (
+              <div className={`flex items-center gap-2 mt-2 p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs font-semibold shrink-0 ${
+                isSidebarCollapsed ? 'justify-center' : 'justify-start'
+              }`}>
+                <AlertCircle size={14} className="text-amber-500 shrink-0" />
+                {!isSidebarCollapsed && (
+                  <span className="truncate text-amber-500">แก้ไขด่วน #9499</span>
+                )}
               </div>
+            )}
+          </div>
+
+          {/* Footer Admin Action Toggles (Logout alignment) */}
+          <div className={`mt-auto pt-3 border-t ${
+            sidebarTheme === 'dark' ? 'border-slate-800/80' : 'border-slate-100'
+          }`}>
+            {/* User Role / Status Banner */}
+            <div className={`mb-2 p-2.5 rounded-2xl border transition duration-200 shrink-0 ${
+              isAdminLoggedIn
+                ? sidebarTheme === 'dark'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-xs shadow-emerald-900/5'
+                  : 'bg-emerald-50/80 border-emerald-200 text-emerald-800 shadow-2xs shadow-emerald-100/30'
+                : sidebarTheme === 'dark'
+                  ? 'bg-[#222326]/65 border-slate-800 text-slate-400'
+                  : 'bg-slate-50 border-slate-150 text-slate-600 shadow-3xs'
+            }`}>
+              {isSidebarCollapsed ? (
+                <div className="flex justify-center" title={isAdminLoggedIn ? 'สถานะ: แอดมิน (Admin)' : 'สถานะ: ผู้ใช้งานทั่วไป (General)'}>
+                  {isAdminLoggedIn ? (
+                    <div className="relative flex items-center justify-center">
+                      <Shield size={18} className="text-emerald-500" />
+                      <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-white animate-pulse"></span>
+                    </div>
+                  ) : (
+                    <div className="relative flex items-center justify-center">
+                      <User size={18} className="text-slate-400" />
+                      <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-slate-400 border border-white"></span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                    isAdminLoggedIn
+                      ? sidebarTheme === 'dark' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/15 text-emerald-600'
+                      : sidebarTheme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-200/55 text-slate-500'
+                  }`}>
+                    {isAdminLoggedIn ? <Shield size={16} /> : <User size={16} />}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400/80">
+                      ระดับผู้ใช้งาน
+                    </span>
+                    <span className="text-xs font-bold truncate flex items-center gap-1.5 mt-0.5">
+                      {isAdminLoggedIn ? (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          แอดมิน (Admin)
+                        </>
+                      ) : (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                          ผู้ใช้งานทั่วไป
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {isAdminLoggedIn ? (
+              <button
+                onClick={handleAdminLogout}
+                className={`flex items-center gap-3.5 w-full px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition duration-200 hover:bg-rose-500/15 text-[#aa4e6e] ${
+                  isSidebarCollapsed ? 'justify-center' : 'justify-start'
+                } cursor-pointer`}
+                title="ออกจากระบบผู้ดูแล"
+              >
+                <LogOut size={16} className="shrink-0" />
+                {!isSidebarCollapsed && <span className="truncate">ออกจากระบบ Admin</span>}
+              </button>
+            ) : (
+              <button
+                onClick={() => setActiveTab('admin')}
+                className={`flex items-center gap-3.5 w-full px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition duration-200 ${
+                  isSidebarCollapsed ? 'justify-center' : 'justify-start'
+                } ${
+                  sidebarTheme === 'dark'
+                    ? 'text-slate-400 hover:bg-[#222326] hover:text-white'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
+                } cursor-pointer`}
+                title="เข้าสู่ระบบ Admin"
+              >
+                <User size={16} className="shrink-0" />
+                {!isSidebarCollapsed && <span className="truncate">เข้าสู่ระบบ Admin</span>}
+              </button>
+            )}
+
           </div>
 
         </div>
-      </header>
+      </aside>
 
-      {/* Main Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6 print:p-0 print:m-0 print:max-w-full">
+      {/* Main Right-side Area */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         
-        {/* Navigation Sidebar (Vertical collapsible on Desktop, Horizontal ribbon on Mobile) */}
-        <div className={`shrink-0 print:hidden transition-all duration-300 ease-in-out w-full
-          ${isSidebarCollapsed ? 'md:w-20' : 'md:w-60'}
-        `}>
-          
-          {/* Desktop Collapsible Navigation Card */}
-          <div className={`hidden md:flex flex-col h-[calc(100vh-132px)] min-h-[600px] p-4 rounded-3xl shadow-sm border transition-all duration-300 relative sticky top-24 select-none
-            ${sidebarTheme === 'dark' 
-              ? 'bg-[#18191c] border-slate-800/80 text-slate-100 shadow-xl shadow-black/20' 
-              : 'bg-white border-slate-200/75 text-[#334155] shadow-md shadow-slate-100/50'}
-          `}>
+        {/* Top Professional Header Bar - Hidden during A4 Printing */}
+        <header className="bg-white border-b border-slate-150 shrink-0 sticky top-0 z-40 print:hidden shadow-3xs">
+          <div className="w-full px-4 sm:px-6 lg:px-8 min-h-18 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
             
-            {/* Collapse toggle arrow floating button on the right edge */}
-            <button
-              onClick={toggleSidebarCollapse}
-              className={`absolute top-7 -right-3.5 z-50 w-7 h-7 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 shadow-xs hover:scale-110 active:scale-95
-                ${sidebarTheme === 'dark'
-                  ? 'bg-[#18191c] border-slate-700 text-slate-300 hover:bg-[#25262a]'
-                  : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
-              title={isSidebarCollapsed ? 'ขยายแถบเมนู' : 'ย่อแถบเมนู'}
-            >
-              {isSidebarCollapsed ? <ChevronRight size={14} className="stroke-[3px]" /> : <ChevronLeft size={14} className="stroke-[3px]" />}
-            </button>
-
-            {/* Sidebar Branding Title block */}
-            <div className={`flex items-center gap-3 px-1 py-1 mb-4 shrink-0 transition-all duration-200 ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
-              <div className="w-10 h-10 rounded-xl bg-[#aa4e6e] text-white flex items-center justify-center shadow-xs font-sans shrink-0 transform transition duration-300 hover:rotate-6">
-                <span className="text-base font-extrabold tracking-tight">พม</span>
-              </div>
-              {!isSidebarCollapsed && (
-                <div className="flex flex-col truncate animate-fade-in animate-duration-300">
-                  <span className={`text-[#aa4e6e] font-extrabold tracking-tight text-sm`}>พมจ.ตรัง</span>
-                  <span className={`text-[10px] font-bold ${sidebarTheme === 'dark' ? 'text-slate-400' : 'text-slate-400'} mt-0.5 tracking-wider`}>ระบบบริการขอใช้รถ</span>
-                </div>
-              )}
-            </div>
-
-            {/* Search Input Filter */}
-            <div className={`mb-3 shrink-0 ${isSidebarCollapsed ? 'flex justify-center' : ''}`}>
-              <div className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition duration-200 border ${
-                sidebarTheme === 'dark' 
-                  ? 'bg-[#222326] border-slate-800 text-slate-100' 
-                  : 'bg-slate-50 border-slate-100 text-slate-600'
-              }`}>
-                <Search size={15} className="shrink-0 text-slate-400" />
-                {!isSidebarCollapsed && (
-                  <input 
-                    type="text" 
-                    placeholder="ค้นหาเมนู..." 
-                    value={sidebarSearch}
-                    onChange={(e) => setSidebarSearch(e.target.value)}
-                    className="bg-transparent border-none outline-none text-xs w-full placeholder-slate-400/80 font-bold focus:ring-0 p-0"
-                  />
-                )}
+            {/* Logo and Thai Agency Name */}
+            <div className="flex items-center gap-3">
+              <img 
+                src={MSDHS_LOGO_BASE64}
+                alt="โลโก้สำนักงาน พมจ.ตรัง"
+                className="w-11 h-11 object-contain shrink-0 filter drop-shadow-xs transition duration-300 hover:scale-105"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <div className="md:border-l md:border-slate-200/80 md:pl-3.5 py-0.5">
+                <span className="text-[10px] text-[#aa4e6e] font-extrabold block leading-none uppercase tracking-widest font-sans">สำนักงานพมจ.ตรัง</span>
+                <h1 className="text-sm sm:text-base font-black text-slate-900 tracking-tight leading-normal mt-0.5">
+                  ระบบควบคุมและจองใช้รถยนต์ราชการส่วนกลาง
+                </h1>
               </div>
             </div>
 
-            {/* Primary Menu Items List */}
-            <div className="flex flex-col gap-1.5 flex-1 select-none overflow-y-auto pr-0.5" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {[
-                { id: 'dashboard', label: 'หน้าแรก (Dashboard)', icon: <BarChart3 size={17} /> },
-                { id: 'bookings', label: 'คลังใบขอใช้รถ', icon: <FileText size={17} /> },
-                { id: 'form', label: 'เขียนใบขอใช้รถ', icon: <PlusCircle size={17} /> },
-                { id: 'schedules', label: 'ตารางรถและคนขับ', icon: <Calendar size={17} /> },
-                { id: 'mileage', label: 'บันทึกเลขไมล์เดินทาง', icon: <Gauge size={17} /> },
-                { id: 'admin', label: 'ตั้งค่าพาหนะ/คนขับ', icon: <Settings size={17} /> },
-              ]
-              .filter(item => item.label.toLowerCase().includes(sidebarSearch.toLowerCase()))
-              .map(item => {
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveTab(item.id as any);
-                      if (item.id !== 'form') {
-                        setEditingBooking(undefined);
-                      }
-                    }}
-                    className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-xs md:text-sm font-bold transition duration-200 cursor-pointer select-none w-full shrink-0 ${
-                      isSidebarCollapsed ? 'justify-center font-normal' : 'justify-start'
-                    } ${
-                      isActive
-                        ? 'bg-[#aa4e6e] text-white shadow-md shadow-[#aa4e6e]/15'
-                        : sidebarTheme === 'dark'
-                          ? 'text-slate-400 hover:bg-[#222326] hover:text-[#aa4e6e]'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
-                    }`}
-                    title={item.label}
-                  >
-                    <div className="shrink-0 animate-scale-in">
-                      {item.icon}
-                    </div>
-                    {!isSidebarCollapsed && (
-                      <span className="truncate">{item.label}</span>
-                    )}
-                  </button>
-                );
-              })}
-
-              {editingBooking && (
-                <div className={`flex items-center gap-2 mt-2 p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs font-semibold shrink-0 ${
-                  isSidebarCollapsed ? 'justify-center' : 'justify-start'
-                }`}>
-                  <AlertCircle size={14} className="text-amber-500 shrink-0" />
-                  {!isSidebarCollapsed && (
-                    <span className="truncate text-amber-500">แก้ไขด่วน #9499</span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Footer Admin Action Toggles (Logout alignment) */}
-            <div className={`mt-auto pt-3 border-t ${
-              sidebarTheme === 'dark' ? 'border-slate-800/80' : 'border-slate-100'
-            }`}>
-              {/* User Role / Status Banner */}
-              <div className={`mb-2 p-2.5 rounded-2xl border transition duration-200 shrink-0 ${
-                isAdminLoggedIn
-                  ? sidebarTheme === 'dark'
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-xs shadow-emerald-900/5'
-                    : 'bg-emerald-50/80 border-emerald-200 text-emerald-800 shadow-2xs shadow-emerald-100/30'
-                  : sidebarTheme === 'dark'
-                    ? 'bg-[#222326]/65 border-slate-800 text-slate-400'
-                    : 'bg-slate-50 border-slate-150 text-slate-600 shadow-3xs'
-              }`}>
-                {isSidebarCollapsed ? (
-                  <div className="flex justify-center" title={isAdminLoggedIn ? 'สถานะ: แอดมิน (Admin)' : 'สถานะ: ผู้ใช้งานทั่วไป (General)'}>
-                    {isAdminLoggedIn ? (
-                      <div className="relative flex items-center justify-center">
-                        <Shield size={18} className="text-emerald-500" />
-                        <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-white animate-pulse"></span>
-                      </div>
-                    ) : (
-                      <div className="relative flex items-center justify-center">
-                        <User size={18} className="text-slate-400" />
-                        <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-slate-400 border border-white"></span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2.5">
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                      isAdminLoggedIn
-                        ? sidebarTheme === 'dark' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/15 text-emerald-600'
-                        : sidebarTheme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-200/55 text-slate-500'
-                    }`}>
-                      {isAdminLoggedIn ? <Shield size={16} /> : <User size={16} />}
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400/80">
-                        ระดับผู้ใช้งาน
-                      </span>
-                      <span className="text-xs font-bold truncate flex items-center gap-1.5 mt-0.5">
-                        {isAdminLoggedIn ? (
-                          <>
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            แอดมิน (Admin)
-                          </>
-                        ) : (
-                          <>
-                            <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                            ผู้ใช้งานทั่วไป
-                          </>
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {isAdminLoggedIn ? (
+            <div className="flex flex-wrap items-center gap-3 justify-center md:justify-end">
+              {/* Quick Access Action Tabs - High Visibility Duo */}
+              <div className="flex items-center gap-1 p-1 bg-slate-50 border border-slate-200/50 rounded-xl shadow-xs shrink-0">
                 <button
-                  onClick={handleAdminLogout}
-                  className={`flex items-center gap-3.5 w-full px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition duration-200 hover:bg-rose-500/15 text-[#aa4e6e] ${
-                    isSidebarCollapsed ? 'justify-center' : 'justify-start'
-                  } cursor-pointer`}
-                  title="ออกจากระบบผู้ดูแล"
+                  onClick={handleStartCreateMode}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition duration-200 cursor-pointer select-none ${
+                    activeTab === 'form' && !editingBooking
+                      ? 'bg-[#aa4e6e] text-white shadow-xs'
+                      : 'text-slate-600 hover:bg-white hover:text-[#aa4e6e] hover:shadow-2xs'
+                  }`}
                 >
-                  <LogOut size={16} className="shrink-0" />
-                  {!isSidebarCollapsed && <span className="truncate">ออกจากระบบ Admin</span>}
+                  <PlusCircle size={14} className={activeTab === 'form' && !editingBooking ? 'text-white' : 'text-[#aa4e6e]'} />
+                  <span>เขียนใบขอใช้รถยนต์ใหม่</span>
                 </button>
-              ) : (
-                <button
-                  onClick={() => setActiveTab('admin')}
-                  className={`flex items-center gap-3.5 w-full px-3.5 py-2.5 rounded-xl text-xs md:text-sm font-bold transition duration-200 ${
-                    isSidebarCollapsed ? 'justify-center' : 'justify-start'
-                  } ${
-                    sidebarTheme === 'dark'
-                      ? 'text-slate-400 hover:bg-[#222326] hover:text-white'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-[#aa4e6e]'
-                  } cursor-pointer`}
-                  title="เข้าสู่ระบบ Admin"
-                >
-                  <User size={16} className="shrink-0" />
-                  {!isSidebarCollapsed && <span className="truncate">เข้าสู่ระบบ Admin</span>}
-                </button>
-              )}
 
+                <button
+                  onClick={() => setActiveTab('mileage')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition duration-200 cursor-pointer select-none ${
+                    activeTab === 'mileage'
+                      ? 'bg-[#aa4e6e] text-white shadow-xs'
+                      : 'text-slate-600 hover:bg-white hover:text-[#aa4e6e] hover:shadow-2xs'
+                  }`}
+                >
+                  <Gauge size={14} className={activeTab === 'mileage' ? 'text-white' : 'text-[#aa4e6e]'} />
+                  <span>บันทึกเลขไมล์ขากลับ</span>
+                </button>
+              </div>
+
+              {/* Status Pills Container - Grouped for Orderliness */}
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Clock Widget */}
+                <div className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200/50 text-slate-600 rounded-xl text-xs font-medium font-sans">
+                  <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse shrink-0"></span>
+                  <span className="font-mono whitespace-nowrap">เวลาปัจจุบัน: {currentClock || 'กำลังโหลด...'}</span>
+                </div>
+              </div>
             </div>
 
           </div>
+        </header>
 
-          {/* Mobile Horizontal Navigation Ribbon (Scrollable) */}
-          <div className="md:hidden flex flex-col gap-2 w-full">
+        {/* Dynamic Content View Area */}
+        <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6 print:p-0 print:m-0 w-full max-w-5xl mx-auto min-h-0">
+          
+          {/* Mobile Horizontal Navigation Ribbon (Scrollable) - Only visible on smartphones */}
+          <div className="md:hidden flex flex-col gap-2 w-full print:hidden">
             <div className={`p-2 rounded-2xl shadow-xs border flex items-center justify-between transition-all duration-200 ${
               sidebarTheme === 'dark' 
                 ? 'bg-[#18191c] border-slate-800/80 text-white' 
@@ -945,7 +946,6 @@ export default function App() {
             </div>
           </div>
 
-        </div>
 
         {/* Global Floating Toast for successful submissions */}
         {toastMsg && (
@@ -1107,6 +1107,7 @@ export default function App() {
         </div>
       </footer>
 
+      </div>
     </div>
   );
 }
