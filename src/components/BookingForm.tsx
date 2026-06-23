@@ -546,9 +546,9 @@ export default function BookingForm({
   }, [formData.vehicleId, vehicles]);
 
   const selectedDriverObj = useMemo(() => {
-    if (formData.driverId === 'self-drive') return { name: '🚙 ขับรถยนต์ปฏิบัติหน้าที่ด้วยตัวเอง' };
+    if (formData.driverId === 'self-drive') return { name: 'ขับรถยนต์ปฏิบัติหน้าที่ด้วยตัวเอง' };
     if (formData.driverId === 'passenger-drive') {
-      return { name: formData.customDriverName ? `🚙 ผู้ร่วมเดินทางขับเอง (${formData.customDriverName})` : '🚙 ผู้ร่วมเดินทางเป็นผู้ขับขี่' };
+      return { name: formData.customDriverName ? `ผู้ร่วมเดินทางขับเอง (${formData.customDriverName})` : 'ผู้ร่วมเดินทางเป็นผู้ขับขี่' };
     }
     return drivers.find(d => d.id === formData.driverId);
   }, [formData.driverId, formData.customDriverName, drivers]);
@@ -1283,8 +1283,9 @@ export default function BookingForm({
                 {/* รายชื่อผู้เดินทางร่วมเพิ่มเติม 1-13 คน */}
                 {formData.passengersCount > 1 && (
                   <div className="mt-4 pt-4 border-t border-slate-100 animate-fade-in">
-                    <h5 className="text-xs font-bold text-slate-700 flex items-center gap-1.5 mb-2.5">
-                      👥 รายชื่อและตำแหน่งผู้เข้าร่วมเดินทางร่วม ({Math.min(13, formData.passengersCount - 1)} คน)
+                    <h5 className="text-xs font-bold text-slate-705 flex items-center gap-1.5 mb-2.5">
+                      <Users size={14} className="text-[#aa4e6e] shrink-0" />
+                      <span>รายชื่อและตำแหน่งผู้เข้าร่วมเดินทางร่วม ({Math.min(13, formData.passengersCount - 1)} คน)</span>
                     </h5>
                     <div className="space-y-3">
                       {Array.from({ length: Math.min(13, formData.passengersCount - 1) }).map((_, idx) => {
@@ -1525,7 +1526,7 @@ export default function BookingForm({
                         อนุญาตส่วนกลาง
                       </span>
                       <h4 className="text-xs sm:text-[13px] font-extrabold text-slate-800">
-                        🚙 ขับขี่ภารกิจด้วยตนเอง
+                        ขับขี่ภารกิจด้วยตนเอง
                       </h4>
                     </div>
                     <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-purple-50 border border-purple-150">
@@ -1574,7 +1575,7 @@ export default function BookingForm({
                         อนุญาตส่วนกลาง
                       </span>
                       <h4 className="text-xs sm:text-[13px] font-extrabold text-slate-800">
-                        👥 ผู้ร่วมเดินทางเป็นคนขับ
+                        ผู้ร่วมเดินทางเป็นคนขับ
                       </h4>
                     </div>
                     <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-emerald-50 border border-emerald-150">
@@ -2091,11 +2092,11 @@ export default function BookingForm({
                         : 'bg-white text-[#aa4e6e] border-[#aa4e6e]/30 focus:ring-rose-150 focus:border-[#aa4e6e]'
                     }`}
                   >
-                    <option value="pending">⏳ เสนอเสนอแฟ้ม: รอการลงนามอนุมัติ (Pending)</option>
-                    <option value="approved">✅ สมบูรณ์: ได้รับลงนามอนุมัติใบใช้รถ (Approved)</option>
-                    <option value="completed">🚙 สำเร็จแล้ว: เสร็จสิ้นภารกิจและจอดคืนกุญแจ (Completed)</option>
-                    <option value="rejected">❌ ไม่อนุมัติ: เนื่องจากตารางชนภารกิจสำคัญ (Rejected)</option>
-                    <option value="cancelled">🗑️ ยกเลิกการใช้: คลี่คลายหรือเจ้าตัวยกเลิกเอง (Cancelled)</option>
+                    <option value="pending">เสนอเสนอแฟ้ม: รอการลงนามอนุมัติ (Pending)</option>
+                    <option value="approved">สมบูรณ์: ได้รับลงนามอนุมัติใบใช้รถ (Approved)</option>
+                    <option value="completed">สำเร็จแล้ว: เสร็จสิ้นภารกิจและจอดคืนกุญแจ (Completed)</option>
+                    <option value="rejected">ไม่อนุมัติ: เนื่องจากตารางชนภารกิจสำคัญ (Rejected)</option>
+                    <option value="cancelled">ยกเลิกการใช้: คลี่คลายหรือเจ้าตัวยกเลิกเอง (Cancelled)</option>
                   </select>
                 </div>
               </div>
