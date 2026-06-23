@@ -22,7 +22,14 @@ interface MileageTrackerProps {
   bookings: Booking[];
   vehicles: Vehicle[];
   drivers: Driver[];
-  onCompleteBookingWithMileage: (bookingId: string, startMil: number, endMil: number) => void;
+  onCompleteBookingWithMileage: (
+    bookingId: string, 
+    startMil: number, 
+    endMil: number,
+    fuelCost?: number,
+    fuelLiters?: number,
+    fuelType?: string
+  ) => void;
   isAdmin: boolean;
 }
 
@@ -42,6 +49,9 @@ export default function MileageTracker({
   const [editingBookingId, setEditingBookingId] = useState<string | null>(null);
   const [startMilInput, setStartMilInput] = useState('');
   const [endMilInput, setEndMilInput] = useState('');
+  const [fuelCostInput, setFuelCostInput] = useState('');
+  const [fuelLitersInput, setFuelLitersInput] = useState('');
+  const [fuelTypeInput, setFuelTypeInput] = useState('');
   const [inputError, setInputError] = useState('');
 
   // Helper: Find vehicle's latest expected mileage chronologically, supporting out-of-order bookings
@@ -134,6 +144,9 @@ export default function MileageTracker({
       
     setStartMilInput(String(expectedStart));
     setEndMilInput(booking.endMileage !== undefined && booking.endMileage !== null ? String(booking.endMileage) : '');
+    setFuelCostInput(booking.fuelCost !== undefined && booking.fuelCost !== null ? String(booking.fuelCost) : '');
+    setFuelLitersInput(booking.fuelLiters !== undefined && booking.fuelLiters !== null ? String(booking.fuelLiters) : '');
+    setFuelTypeInput(booking.fuelType || '');
     setInputError('');
   };
 
@@ -142,6 +155,9 @@ export default function MileageTracker({
     setEditingBookingId(null);
     setStartMilInput('');
     setEndMilInput('');
+    setFuelCostInput('');
+    setFuelLitersInput('');
+    setFuelTypeInput('');
     setInputError('');
   };
 
@@ -163,7 +179,20 @@ export default function MileageTracker({
       return;
     }
 
-    onCompleteBookingWithMileage(bookingId, startVal, endVal);
+    const fuelCost = fuelCostInput.trim() ? parseFloat(fuelCostInput) : undefined;
+    const fuelLiters = fuelLitersInput.trim() ? parseFloat(fuelLitersInput) : undefined;
+    const fuelType = fuelTypeInput.trim() ? fuelTypeInput : undefined;
+
+    if (fuelCost !== undefined && (isNaN(fuelCost) || fuelCost < 0)) {
+      setInputError('กรุณากรอกระบุค่าน้ำมันให้ถูกต้อง (เป็นตัวเลขมากกว่าหรือเท่ากับ 0)');
+      return;
+    }
+    if (fuelLiters !== undefined && (isNaN(fuelLiters) || fuelLiters < 0)) {
+      setInputError('กรุณากรอกระบุจำนวนลิตรให้ถูกต้อง (เป็นตัวเลขมากกว่าหรือเท่ากับ 0)');
+      return;
+    }
+
+    onCompleteBookingWithMileage(bookingId, startVal, endVal, fuelCost, fuelLiters, fuelType);
     handleCancelEditing();
   };
 
@@ -466,6 +495,25 @@ export default function MileageTracker({
                               <span className="font-mono font-black">{(b.endMileage - b.startMileage).toLocaleString()} กิโลเมตร</span>
                             </div>
                           )}
+
+                          {b.fuelCost !== undefined && b.fuelCost !== null && (
+                            <div className="bg-amber-50 border border-amber-250/50 rounded-xl p-2 px-3 flex flex-wrap items-center gap-1.5 text-xs text-amber-900">
+                              <span className="font-medium">⛽ ค่าน้ำมัน:</span>
+                              <span className="font-mono font-black">{b.fuelCost.toLocaleString()} บาท</span>
+                              {b.fuelLiters !== undefined && b.fuelLiters !== null && b.fuelLiters > 0 && (
+                                <span className="text-[10px] text-slate-500 font-sans font-medium">
+                                  ({b.fuelLiters.toLocaleString()} ลิตร · {(b.fuelCost / b.fuelLiters).toFixed(2)} บาท/ลิตร)
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {b.fuelType && (
+                            <div className="bg-sky-50 border border-sky-200/50 rounded-xl p-2 px-3 flex items-center gap-1 text-xs text-sky-850">
+                              <span className="font-medium">ชนิด:</span>
+                              <span className="font-bold">{b.fuelType}</span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -551,6 +599,72 @@ export default function MileageTracker({
                             <p className="text-[10px] text-slate-400 font-medium font-sans">
                               * ป้อนพารามิเตอร์เลขกิโลเมตรล่าสุดจากมาตรวัดเมื่อเดินทางกลับมาถึงปลายทางเสร็จงานเรียบร้อย
                             </p>
+                          </div>
+                        </div>
+
+                        {/* Fuel Expense Subsection */}
+                        <div className="pt-4 border-t border-dashed border-slate-200">
+                          <h5 className="text-xs font-black text-slate-700 flex items-center gap-1.5 mb-3">
+                            <span>⛽ ข้อมูลการเติมน้ำมันเชื้อเพลิง (ถ้ามี)</span>
+                            <span className="text-[10px] font-normal text-slate-400 leading-none">(เว้นว่างไว้หากไม่มีการเติมในทริปนี้)</span>
+                          </h5>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            {/* Fuel Cost Input */}
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 block">
+                                💰 ค่าน้ำมันเชื้อเพลิง (บาท)
+                              </label>
+                              <input
+                                type="number"
+                                step="any"
+                                value={fuelCostInput}
+                                onChange={(e) => {
+                                  setFuelCostInput(e.target.value);
+                                  if (inputError) setInputError('');
+                                }}
+                                placeholder="เช่น 1200"
+                                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold leading-normal outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500"
+                              />
+                            </div>
+
+                            {/* Fuel Liters Input */}
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 block">
+                                🧪 ปริมาณน้ำมัน (ลิตร)
+                              </label>
+                              <input
+                                type="number"
+                                step="any"
+                                value={fuelLitersInput}
+                                onChange={(e) => {
+                                  setFuelLitersInput(e.target.value);
+                                  if (inputError) setInputError('');
+                                }}
+                                placeholder="เช่น 35.5"
+                                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-mono font-bold leading-normal outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500"
+                              />
+                            </div>
+
+                            {/* Fuel Type Dropdown */}
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-bold text-slate-600 block">
+                                🏷️ ชนิดน้ำมันเชื้อเพลิง
+                              </label>
+                              <select
+                                value={fuelTypeInput}
+                                onChange={(e) => setFuelTypeInput(e.target.value)}
+                                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 font-medium"
+                              >
+                                <option value="">-- เลือกชนิดน้ำมัน --</option>
+                                <option value="ดีเซล B7">ดีเซล B7</option>
+                                <option value="ดีเซลหมุนเร็ว">ดีเซลหมุนเร็ว</option>
+                                <option value="แก๊สโซฮอล์ 95">แก๊สโซฮอล์ 95</option>
+                                <option value="แก๊สโซฮอล์ 91">แก๊สโซฮอล์ 91</option>
+                                <option value="แก๊สโซฮอล์ E20">แก๊สโซฮอล์ E20</option>
+                                <option value="ประเภทอื่นๆ/บัตร Fleet Card">อื่นๆ / Fleet Card</option>
+                              </select>
+                            </div>
                           </div>
                         </div>
 

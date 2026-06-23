@@ -56,6 +56,9 @@
         "remarks": { "type": "string" },
         "startMileage": { "type": "integer" },
         "endMileage": { "type": "integer" },
+        "fuelCost": { "type": "number" },
+        "fuelLiters": { "type": "number" },
+        "fuelType": { "type": "string" },
         "createdAt": { "type": "string" }
       },
       "required": [

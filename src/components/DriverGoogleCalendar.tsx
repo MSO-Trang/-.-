@@ -26,7 +26,14 @@ interface DriverGoogleCalendarProps {
   onEditBooking?: (booking: Booking) => void;
   onPrintBooking?: (booking: Booking) => void;
   onUpdateStatus?: (bookingId: string, status: 'pending' | 'approved' | 'completed' | 'cancelled' | 'rejected') => void;
-  onCompleteBookingWithMileage?: (bookingId: string, startMil: number, endMil: number) => void;
+  onCompleteBookingWithMileage?: (
+    bookingId: string, 
+    startMil: number, 
+    endMil: number,
+    fuelCost?: number,
+    fuelLiters?: number,
+    fuelType?: string
+  ) => void;
 }
 
 export default function DriverGoogleCalendar({

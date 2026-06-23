@@ -414,14 +414,24 @@ export default function App() {
     }
   };
 
-  const handleCompleteBookingWithMileage = async (bookingId: string, startMil: number, endMil: number) => {
+  const handleCompleteBookingWithMileage = async (
+    bookingId: string, 
+    startMil: number, 
+    endMil: number,
+    fuelCost?: number,
+    fuelLiters?: number,
+    fuelType?: string
+  ) => {
     const b = bookings.find(b => b.id === bookingId);
     if (!b) return;
     const updated = { 
       ...b, 
       status: 'completed' as const, 
       startMileage: startMil, 
-      endMileage: endMil 
+      endMileage: endMil,
+      fuelCost: fuelCost !== undefined ? fuelCost : (b.fuelCost ?? undefined),
+      fuelLiters: fuelLiters !== undefined ? fuelLiters : (b.fuelLiters ?? undefined),
+      fuelType: fuelType !== undefined ? fuelType : (b.fuelType ?? undefined)
     };
     try {
       await saveBookingToFirestore(updated);

@@ -49,6 +49,9 @@ export interface Booking {
   remarks?: string;
   startMileage?: number;
   endMileage?: number;
+  fuelCost?: number;
+  fuelLiters?: number;
+  fuelType?: string;
   createdAt: string;
 }
 

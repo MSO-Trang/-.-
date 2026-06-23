@@ -31,7 +31,14 @@ interface BookingListProps {
   onAddNew: () => void;
   isAdmin?: boolean;
   onDeleteBooking?: (bookingId: string) => void;
-  onCompleteBookingWithMileage?: (bookingId: string, startMil: number, endMil: number) => void;
+  onCompleteBookingWithMileage?: (
+    bookingId: string, 
+    startMil: number, 
+    endMil: number,
+    fuelCost?: number,
+    fuelLiters?: number,
+    fuelType?: string
+  ) => void;
   googleUser?: any;
   googleToken?: string | null;
   onGoogleSignIn?: () => Promise<string | null>;

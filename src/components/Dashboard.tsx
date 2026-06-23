@@ -13,7 +13,8 @@ import {
   TrendingUp,
   FileCheck2,
   CheckCircle2,
-  Lock
+  Lock,
+  Gauge
 } from 'lucide-react';
 import { Booking, Vehicle, Driver } from '../types';
 import { formatThaiDate, translateVehicleType } from '../utils/bookingUtils';
@@ -30,7 +31,14 @@ interface DashboardProps {
   onAdminLogin?: () => void;
   onUpdateStatus?: (bookingId: string, status: 'pending' | 'approved' | 'completed' | 'cancelled' | 'rejected') => void;
   onEditBooking?: (booking: Booking) => void;
-  onCompleteBookingWithMileage?: (bookingId: string, startMil: number, endMil: number) => void;
+  onCompleteBookingWithMileage?: (
+    bookingId: string, 
+    startMil: number, 
+    endMil: number,
+    fuelCost?: number,
+    fuelLiters?: number,
+    fuelType?: string
+  ) => void;
 }
 
 export default function Dashboard({ 
@@ -264,6 +272,94 @@ export default function Dashboard({
       activeCount
     };
   }, [vehicleMileageStats]);
+
+  // Fuel Analytics reports and statistics system
+  const fuelSummaryGroup = useMemo(() => {
+    let totalFuelCost = 0;
+    let totalFuelLiters = 0;
+    let tripsWithRefuel = 0;
+
+    // Fuel breakdown by vehicle
+    const vehicleFuel: { [key: string]: { cost: number; liters: number; count: number } } = {};
+    // Fuel breakdown by type
+    const typeFuel: { [key: string]: { cost: number; liters: number; count: number } } = {};
+
+    filteredBookingsForStats.forEach(b => {
+      if (b.status === 'completed') {
+        const cost = b.fuelCost !== undefined && b.fuelCost !== null ? Number(b.fuelCost) : 0;
+        const ltr = b.fuelLiters !== undefined && b.fuelLiters !== null ? Number(b.fuelLiters) : 0;
+        const type = b.fuelType || 'ไม่ระบุประเภท';
+
+        if (cost > 0) {
+          totalFuelCost += cost;
+          tripsWithRefuel += 1;
+
+          // Track by vehicle
+          if (!vehicleFuel[b.vehicleId]) {
+            vehicleFuel[b.vehicleId] = { cost: 0, liters: 0, count: 0 };
+          }
+          vehicleFuel[b.vehicleId].cost += cost;
+          vehicleFuel[b.vehicleId].count += 1;
+
+          // Track by type
+          if (!typeFuel[type]) {
+            typeFuel[type] = { cost: 0, liters: 0, count: 0 };
+          }
+          typeFuel[type].cost += cost;
+          typeFuel[type].count += 1;
+        }
+
+        if (ltr > 0) {
+          totalFuelLiters += ltr;
+          if (vehicleFuel[b.vehicleId]) {
+            vehicleFuel[b.vehicleId].liters += ltr;
+          }
+          if (typeFuel[type]) {
+            typeFuel[type].liters += ltr;
+          }
+        }
+      }
+    });
+
+    // Compute vehicle stats
+    const vehicleFuelStats = vehicles.map(v => {
+      const fuel = vehicleFuel[v.id] || { cost: 0, liters: 0, count: 0 };
+      const vDistance = vehicleMileageStats.find(vStat => vStat.id === v.id)?.totalDistance || 0;
+      
+      return {
+        id: v.id,
+        name: v.name,
+        plateNumber: v.plateNumber,
+        fuelCost: fuel.cost,
+        fuelLiters: fuel.liters,
+        refuelCount: fuel.count,
+        kmTravelled: vDistance,
+        // Average km/liter
+        kmPerLiter: fuel.liters > 0 ? (vDistance / fuel.liters) : 0,
+        // Average baht/km
+        bahtPerKm: vDistance > 0 ? (fuel.cost / vDistance) : 0
+      };
+    }).sort((a, b) => b.fuelCost - a.fuelCost);
+
+    // Compute type stats
+    const fuelTypeStats = Object.keys(typeFuel).map(typeName => {
+      return {
+        name: typeName,
+        cost: typeFuel[typeName].cost,
+        liters: typeFuel[typeName].liters,
+        count: typeFuel[typeName].count
+      };
+    }).sort((a, b) => b.cost - a.cost);
+
+    return {
+      totalFuelCost,
+      totalFuelLiters,
+      tripsWithRefuel,
+      vehicleFuelStats,
+      fuelTypeStats,
+      averageFuelPrice: totalFuelLiters > 0 ? (totalFuelCost / totalFuelLiters) : 0
+    };
+  }, [filteredBookingsForStats, vehicles, vehicleMileageStats]);
 
   // Identify status of each vehicle for "Today"
   const vehiclesWithTodayStatus = useMemo(() => {
@@ -571,194 +667,136 @@ export default function Dashboard({
           </button>
         </div>
 
-        {/* Free Driver Availability Notification Card */}
-        <motion.div 
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-emerald-50/40 border border-emerald-200/50 rounded-2xl p-5 md:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 font-sans"
-          id="free-drivers-alert-card"
-        >
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-emerald-100/60 text-emerald-800 rounded-xl shrink-0 mt-0.5">
-              <ShieldCheck size={22} className="stroke-[2.25]" />
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="p-1 px-2 bg-emerald-700 text-white font-extrabold text-[9px] rounded-md tracking-wider leading-none uppercase">
-                  การแจ้งเตือนพนักงานขับรถพร้อมรับภารกิจ
-                </span>
-                <span className="text-[10px] bg-emerald-100/40 px-2 py-0.5 rounded-full text-emerald-850 font-bold font-sans">
-                  สแตนบายวันนี้
-                </span>
-              </div>
-              <h3 className="text-sm md:text-base font-extrabold text-slate-900 leading-tight">
-                {freeDrivers.length > 0 
-                  ? `มีพนักงานขับรถ ${freeDrivers.length} ท่าน สแตนบายพร้อมรับภารกิจใหม่` 
-                  : 'ไม่มีพนักงานขับรถว่างในขณะนี้ (พนักงานทุกคนปฏิบัติหน้าที่เต็มอัตรา)'}
-              </h3>
-              <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
-                {freeDrivers.length > 0 
-                  ? 'รายชื่อด้านล่างไม่มีเที่ยวตารางจองออกสัญจรในชั่วโมงนี้ สามารถสั่งการด่วนเพื่อมอบหมายพัสดุหรือออกบริการสังคมเพิ่มเติมได้' 
-                  : 'เจ้าหน้าที่พนักงานขับรถราชการส่วนกลางทั้งหมดประจำสำนักงาน พมจ.ตรัง กำลังสัญจรอยู่ระหว่างปฏิบัติราชการแล้ว'}
-              </p>
-            </div>
-          </div>
-
-          {/* Available Driver badges */}
-          {freeDrivers.length > 0 ? (
-            <div className="flex flex-wrap gap-2 md:max-w-md lg:max-w-lg shrink-0">
-              {freeDrivers.map(fd => (
-                <div 
-                  key={fd.id}
-                  className="inline-flex items-center gap-2 bg-white border border-emerald-200/60 hover:shadow-2xs px-3 py-1.5 rounded-xl transition cursor-default"
-                  title={`เบอร์ติดต่อพนักงาน: ${fd.phone}`}
-                >
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[9px] text-white ${fd.avatarColor}`}>
-                    {fd.name.replace('นาย', '').charAt(0)}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xs font-bold text-slate-800 leading-none">{fd.name}</span>
-                    <span className="text-[9px] text-slate-400 font-sans tracking-wide leading-none mt-0.5">{fd.phone}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="sm:self-start md:self-auto shrink-0">
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold bg-rose-50 border border-rose-100 text-[#aa4e6e] px-3 py-1 rounded-full font-mono uppercase">
-                ⚠️ NO_DRIVERS_AVAILABLE
-              </span>
-            </div>
-          )}
-        </motion.div>
-
         {/* Main Grid: Vehicles & Drivers Today */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Vehicles Section (7 cols) */}
           <div className="lg:col-span-7 bg-white border border-slate-200/70 rounded-2xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <Car className="text-[#aa4e6e]" size={18} />
                 <h2 className="text-base font-bold text-slate-900">ทะเบียนรถยนต์ราชการส่วนกลาง (6 คัน)</h2>
               </div>
-              <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-sans">อัปเดตอัตโนมัติ</span>
+              <span className="text-[11px] font-medium text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full font-sans">อัปเดตอัตโนมัติ</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col divide-y divide-slate-100/85">
               {vehiclesWithTodayStatus.map((v) => (
                 <div 
                   key={v.id} 
-                  className={`border rounded-xl p-4 transition duration-150 relative overflow-hidden flex flex-col justify-between h-40 ${
-                    v.currentStatus === 'busy' 
-                      ? 'border-rose-200/60 bg-rose-50/15' 
-                      : v.currentStatus === 'maintenance'
-                      ? 'border-amber-200/60 bg-amber-50/25'
-                      : 'border-slate-200 bg-white hover:border-[#aa4e6e]/30 shadow-xs'
-                  }`}
+                  className="py-3 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs first:pt-0 last:pb-0"
                 >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md border border-slate-200">
-                        {v.plateNumber}
-                      </span>
-                      
-                      {v.currentStatus === 'busy' && (
-                        <span className="text-xs font-semibold px-2.5 py-0.5 bg-rose-50 text-[#aa4e6e] rounded-full flex items-center gap-1 border border-rose-100 font-sans">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#aa4e6e] animate-pulse"></span>
-                          ปฏิบัติราชการ
-                        </span>
-                      )}
-
-                      {v.currentStatus === 'maintenance' && (
-                        <span className="text-xs font-semibold px-2.5 py-0.5 bg-amber-50 text-amber-800 rounded-full flex items-center gap-1 border border-amber-200/70 font-sans">
-                          <AlertCircle size={11} className="text-amber-600" />
-                          ซ่อมบำรุง
-                        </span>
-                      )}
-
-                      {v.currentStatus === 'available' && (
-                        <span className="text-xs font-semibold px-2.5 py-0.5 bg-emerald-50 text-emerald-700 rounded-full flex items-center gap-1 border border-emerald-100/60 font-sans">
-                          <ShieldCheck size={11} className="text-emerald-600" />
-                          ว่างปฏิบัติงาน
-                        </span>
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <div className="mt-1 shrink-0">
+                      {v.currentStatus === 'busy' ? (
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#aa4e6e] animate-pulse" title="ปฏิบัติราชการ" />
+                      ) : v.currentStatus === 'maintenance' ? (
+                        <div className="w-2.5 h-2.5 rounded-full bg-amber-500" title="ซ่อมบำรุง" />
+                      ) : (
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" title="ว่างปฏิบัติงาน" />
                       )}
                     </div>
 
-                    <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{v.name}</h4>
-                    <p className="text-xs text-slate-400 mt-1">ประเภท: {translateVehicleType(v.type)} (รองรับ {v.capacity} ที่นั่ง)</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-xs bg-slate-105 text-slate-705 px-1.5 py-0.5 rounded border border-slate-200/60 shrink-0">
+                          {v.plateNumber}
+                        </span>
+                        <h4 className="font-bold text-slate-900 truncate">{v.name}</h4>
+                        <span className="text-[10px] text-slate-400 font-medium font-sans">
+                          ({translateVehicleType(v.type)} · {v.capacity} ที่นั่ง)
+                        </span>
+                      </div>
+                      
+                      {/* Current assignment details below */}
+                      <div className="mt-1 flex items-center gap-1.5 text-slate-500 text-[11px] flex-wrap">
+                        {v.currentStatus === 'busy' && v.activeBooking ? (
+                          <span 
+                            onClick={() => onSelectBooking(v.activeBooking!)}
+                            className="flex items-center gap-1 text-[#aa4e6e] font-bold cursor-pointer hover:underline"
+                          >
+                            <MapPin size={11} className="shrink-0" />
+                            <span className="truncate">จุดหมาย: {v.activeBooking.destination} ({v.activeBooking.requesterName})</span>
+                          </span>
+                        ) : v.currentStatus === 'maintenance' ? (
+                          <span className="text-amber-600 font-semibold flex items-center gap-1">
+                            <AlertCircle size={11} className="shrink-0" />
+                            <span>อยู่ระหว่างซ่อมบำรุงประจำสัปดาห์</span>
+                          </span>
+                        ) : (
+                          <span className="text-emerald-600/80 font-bold flex items-center gap-0.5">
+                            <ShieldCheck size={11} className="shrink-0 text-emerald-500" />
+                            <span>พร้อมออกปฏิบัติภารกิจส่วนกลาง</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100">
+                  <div className="shrink-0 flex items-center justify-between md:justify-end gap-2 w-full md:w-auto mt-1 md:mt-0 pt-2 md:pt-0 border-t border-dashed border-slate-100 md:border-none">
+                    <span className="md:hidden text-[10px] text-slate-400 font-medium">สถานะพาหนะ:</span>
                     {v.currentStatus === 'busy' && v.activeBooking ? (
-                      <div 
+                      <button 
                         onClick={() => onSelectBooking(v.activeBooking!)}
-                        className="cursor-pointer group flex items-center justify-between hover:text-[#aa4e6e] transition font-sans"
+                        className="px-2.5 py-1 bg-rose-50 text-[#aa4e6e] hover:bg-rose-100/70 font-bold rounded-lg border border-rose-100/65 transition cursor-pointer text-[10px]"
                       >
-                        <div className="flex items-center gap-1.5 text-xs text-slate-600 truncate mr-2">
-                          <MapPin size={12} className="text-[#aa4e6e] shrink-0" />
-                          <span className="font-medium truncate text-[11px]">{v.activeBooking.destination}</span>
-                        </div>
-                        <ChevronRight size={12} className="text-slate-400 group-hover:translate-x-1 transition shrink-0" />
-                      </div>
+                        ดูใบอนุญาต
+                      </button>
+                    ) : v.currentStatus === 'maintenance' ? (
+                      <span className="text-[10px] bg-amber-50 text-amber-800 font-extrabold px-2.5 py-0.5 rounded-full border border-amber-200/50">
+                        ซ่อมบำรุง
+                      </span>
                     ) : (
-                      <p className="text-xs text-slate-400 flex items-center gap-1 font-sans">
-                        <ShieldCheck size={12} className="text-emerald-500" />
-                        พร้อมรับภารกิจใหม่
-                      </p>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-100/60">
+                        พร้อมใช้งาน
+                      </span>
                     )}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
+ 
           {/* Drivers Section (5 cols) */}
           <div className="lg:col-span-5 bg-white border border-slate-200/70 rounded-2xl p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <User className="text-[#aa4e6e]" size={18} />
                 <h2 className="text-base font-bold text-slate-900">พนักงานขับรถ (5 คน)</h2>
               </div>
-              <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-sans">วันนี้</span>
+              <span className="text-[11px] font-medium text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full font-sans">วันนี้</span>
             </div>
-
-            <div className="space-y-3">
+ 
+            <div className="flex flex-col divide-y divide-slate-100/85">
               {driversWithTodayStatus.map((d) => (
                 <div 
                   key={d.id}
-                  className={`flex items-center justify-between p-3 border rounded-xl transition ${
-                    d.currentStatus === 'busy' 
-                      ? 'border-rose-200/60 bg-rose-50/15' 
-                      : d.currentStatus === 'off'
-                      ? 'border-slate-200 bg-slate-50 text-slate-400'
-                      : 'border-slate-200 bg-white hover:border-[#aa4e6e]/30 shadow-xs'
-                  }`}
+                  className="py-3.5 flex items-center justify-between gap-3 text-xs first:pt-0 last:pb-0"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${d.avatarColor}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 text-white ${d.avatarColor}`}>
                       {d.name.replace('นาย', '').charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-bold text-xs md:text-sm text-slate-900 truncate">{d.name}</h4>
-                      <p className="text-xs text-slate-400 truncate font-mono">{d.phone}</p>
+                      <h4 className="font-bold text-slate-900 truncate text-xs md:text-sm">{d.name}</h4>
+                      <p className="text-[10px] text-slate-400 font-mono mt-0.5 font-sans">{d.phone}</p>
                     </div>
                   </div>
-
+ 
                   <div className="flex items-center gap-2 shrink-0">
                     {d.currentStatus === 'busy' && d.activeBooking ? (
                       <button
                         onClick={() => onSelectBooking(d.activeBooking!)}
-                        className="px-2.5 py-1 text-[11px] font-semibold bg-rose-50 hover:bg-rose-100/70 text-[#aa4e6e] rounded-lg transition whitespace-nowrap border border-rose-100 font-sans cursor-pointer"
+                        className="px-2.5 py-1 text-[10px] font-bold bg-rose-50 hover:bg-rose-100/70 text-[#aa4e6e] rounded-lg border border-rose-100/65 transition cursor-pointer"
                       >
                         ติดภารกิจ
                       </button>
                     ) : d.currentStatus === 'off' ? (
-                      <span className="px-2.5 py-1 text-[11px] font-semibold bg-slate-100 text-slate-500 rounded-lg whitespace-nowrap font-sans">
+                      <span className="px-2.5 py-1 text-[10px] font-bold bg-slate-100 border border-slate-200/55 text-slate-500 rounded-full">
                         ลาพักผ่อน
                       </span>
                     ) : (
-                      <span className="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-700 rounded-lg whitespace-nowrap border border-emerald-100 font-sans">
+                      <span className="px-2.5 py-1 text-[10px] font-bold bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100/60">
                         สแตนบาย
                       </span>
                     )}
@@ -767,7 +805,6 @@ export default function Dashboard({
               ))}
             </div>
           </div>
-
         </div>
       </div>
 
@@ -1335,6 +1372,207 @@ export default function Dashboard({
 
           </div> {/* Closes Grid grid-cols-1 lg:grid-cols-12 */}
         </div> {/* Closes Vehicle Mileage Distance Analytics Card */}
+
+        {/* Fuel Expense & Consumption Analytics Row */}
+        <div className="bg-white border border-slate-200/70 rounded-2xl p-6 shadow-xs space-y-6">
+          {/* Section Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
+            <div className="space-y-1">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Gauge size={18} className="text-amber-600" />
+                <span>สถิติการสิ้นเปลืองและรายงานค่าน้ำมันเชื้อเพลิง (Fuel Analytics)</span>
+              </h2>
+              <p className="text-xs text-slate-400 font-medium font-sans">ภาพรวมวิเคราะห์ประสิทธิภาพ อัตราสิ้นเปลือง และงบประมาณเชื้อเพลิงแยกรายคัน</p>
+            </div>
+            <span className="text-[10px] bg-amber-50 border border-amber-200/50 text-amber-805 font-extrabold px-3 py-1 rounded-full whitespace-nowrap self-start sm:self-auto font-sans leading-none">
+              ⛽ สถิติการใช้พลังงาน
+            </span>
+          </div>
+
+          {/* Quick Core KPIs */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Total Fuel Cost */}
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-4 flex flex-col justify-between font-sans">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">ค่าน้ำมันสะสมทั้งหมด</span>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-mono font-black text-slate-800">
+                  {fuelSummaryGroup.totalFuelCost.toLocaleString()}
+                </span>
+                <span className="text-xs font-bold text-slate-500">บาท</span>
+              </div>
+              <span className="text-[9px] text-slate-450 mt-1 font-sans">
+                จากบันทึกการเติมน้ำมัน {fuelSummaryGroup.tripsWithRefuel} เที่ยว
+              </span>
+            </div>
+
+            {/* Total Liters */}
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-4 flex flex-col justify-between font-sans">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">จำนวนลิตรที่เติมรวม</span>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-mono font-black text-slate-800">
+                  {fuelSummaryGroup.totalFuelLiters.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 1 })}
+                </span>
+                <span className="text-xs font-bold text-slate-500">ลิตร</span>
+              </div>
+              <span className="text-[9px] text-slate-450 mt-1 font-sans">ปริมาตรรวมเชื้อเพลิงสำรอง</span>
+            </div>
+
+            {/* Avg Fuel Price */}
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-4 flex flex-col justify-between font-sans">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">ราคาเฉลี่ยต่อลิตร</span>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-mono font-black text-slate-800">
+                  {fuelSummaryGroup.averageFuelPrice > 0 ? fuelSummaryGroup.averageFuelPrice.toFixed(2) : '-'}
+                </span>
+                <span className="text-xs font-bold text-slate-500">บาท / ลิตร</span>
+              </div>
+              <span className="text-[9px] text-slate-450 mt-1 font-sans">คำนวณเฉลี่ยถ่วงน้ำหนัก</span>
+            </div>
+
+            {/* Average Economy */}
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-4 flex flex-col justify-between font-sans">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">อัตราการวิ่งเฉลี่ย</span>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-xl sm:text-2xl font-mono font-black text-emerald-700">
+                  {(() => {
+                    const totalKmWithRefuel = fuelSummaryGroup.vehicleFuelStats.reduce((sum, item) => sum + (item.fuelLiters > 0 ? item.kmTravelled : 0), 0);
+                    const totalLiters = fuelSummaryGroup.totalFuelLiters;
+                    return totalLiters > 0 ? (totalKmWithRefuel / totalLiters).toFixed(1) : '-';
+                  })()}
+                </span>
+                <span className="text-xs font-bold text-emerald-800">กม. / ลิตร</span>
+              </div>
+              <span className="text-[9px] text-slate-450 mt-1 font-sans">ประสิทธิภาพภาพรวมทุกคัน</span>
+            </div>
+          </div>
+
+          {/* Detailed Lists Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            {/* Left Box: Vehicle breakdown (8 cols) */}
+            <div className="lg:col-span-8 space-y-4">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide">📊 วิเคราะห์อัตราเติมน้ำมันและประสิทธิภาพการประหยัดแยกรายแชสซี</h3>
+
+              <div className="bg-slate-50/55 border border-slate-200/45 rounded-2xl p-4 sm:p-5 space-y-4">
+                {fuelSummaryGroup.vehicleFuelStats.length === 0 || fuelSummaryGroup.totalFuelCost === 0 ? (
+                  <div className="py-12 text-center text-slate-400 space-y-2">
+                    <p className="text-xs font-bold text-slate-500">ยังไม่มีข้อมูลการเติมน้ำมันบันทึกในระบบในช่วงที่กำหนด</p>
+                    <p className="text-[11px] text-slate-450">ค่าน้ำมัน อัตราสิ้นเปลืองเฉลี่ย และสถิติเชิงลึกจะปรากฏที่นี่ทันทีที่มีผู้ดูแลระบบลงบันทึกในแท็บ 'บันทึกเลขไมล์'</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100">
+                    {fuelSummaryGroup.vehicleFuelStats.map((vf) => {
+                      const maxCost = Math.max(...fuelSummaryGroup.vehicleFuelStats.map(s => s.fuelCost), 1);
+                      const costPercentage = (vf.fuelCost / maxCost) * 100;
+                      const hasFuel = vf.fuelCost > 0;
+
+                      return (
+                        <div key={vf.id} className="py-3.5 first:pt-0 last:pb-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                          {/* Left info: Plate, Name */}
+                          <div className="md:w-1/3 flex items-center gap-2">
+                            <span className="text-[10px] font-mono leading-none bg-slate-100 border border-slate-200 px-2 py-1 rounded text-slate-700 font-bold shrink-0">
+                              {vf.plateNumber}
+                            </span>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-extrabold text-slate-800 truncate" title={vf.name}>{vf.name}</h4>
+                              <p className="text-[10px] text-slate-400 font-sans mt-0.5">เติมน้ำมัน {vf.refuelCount} ครั้ง ({vf.fuelLiters.toLocaleString(undefined, {maximumFractionDigits:1})} ลิตร)</p>
+                            </div>
+                          </div>
+
+                          {/* Middle: Progress bar + distance info */}
+                          <div className="flex-1 space-y-1">
+                            <div className="flex justify-between items-center text-[10px] text-slate-400 font-sans">
+                              <span>งบน้ำมันสะสม</span>
+                              <span className="font-mono font-bold text-slate-600">{vf.fuelCost.toLocaleString()} บาท</span>
+                            </div>
+                            <div className="w-full h-2 bg-slate-150 rounded-full overflow-hidden">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${costPercentage}%` }}
+                                transition={{ duration: 0.6 }}
+                                className={`h-full rounded-full ${hasFuel ? 'bg-amber-500' : 'bg-slate-300'}`}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Right: Economy performance stats */}
+                          <div className="md:w-36 text-right shrink-0 flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 border-t md:border-t-0 border-slate-100 pt-2 md:pt-0 pl-1 md:pl-0">
+                            <div className="text-[10px] text-slate-400 md:hidden font-bold">ประสิทธิภาพ:</div>
+                            <div className="space-y-0.5">
+                              {vf.fuelLiters > 0 ? (
+                                <div className="text-xs font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-150/40 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                                  <span>🍃 {vf.kmPerLiter.toFixed(1)}</span>
+                                  <span className="text-[9px] font-medium text-emerald-600">กม. / ลิตร</span>
+                                </div>
+                              ) : (
+                                <div className="text-[10px] text-slate-400 font-sans font-medium">ไม่มีข้อมูลลิตร</div>
+                              )}
+                              {vf.kmTravelled > 0 && vf.fuelCost > 0 && (
+                                <div className="text-[10px] font-mono font-bold text-slate-500">
+                                  เฉลี่ย {(vf.fuelCost / vf.kmTravelled).toFixed(2)} บาท/กม.
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Box: Fuel type breakdown (4 cols) */}
+            <div className="lg:col-span-4 space-y-4">
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide">🏷️ สัดส่วนประเภทน้ำมันเชื้อเพลิง</h3>
+
+              <div className="bg-slate-50/55 border border-slate-200/45 rounded-2xl p-5 space-y-4 flex flex-col justify-between min-h-[220px]">
+                {fuelSummaryGroup.fuelTypeStats.length === 0 ? (
+                  <div className="my-auto text-center text-slate-400 py-6">
+                    <p className="text-[11px] font-medium">ยังไม่มีสัดส่วนสารกรองน้ำมัน</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4 my-auto">
+                    {fuelSummaryGroup.fuelTypeStats.map((type) => {
+                      const totalCost = fuelSummaryGroup.totalFuelCost || 1;
+                      const percent = (type.cost / totalCost) * 100;
+
+                      return (
+                        <div key={type.name} className="space-y-1.5">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="font-extrabold text-slate-700 flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                              {type.name}
+                            </span>
+                            <span className="font-mono font-bold text-slate-800">
+                              {type.cost.toLocaleString()} บาท ({Math.round(percent)}%)
+                            </span>
+                          </div>
+
+                          <div className="w-full h-1.5 bg-slate-250 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-indigo-600 rounded-full animate-all" 
+                              style={{ width: `${percent}%` }}
+                            />
+                          </div>
+                          <p className="text-[10px] text-slate-400 font-medium pl-3.5 font-sans">
+                            เติมเฉลี่ย {type.liters > 0 ? (type.cost / type.liters).toFixed(2) : '0'} บาท/ลิตร · รวม {type.count} ครั้ง
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="bg-amber-50/50 border border-amber-100 p-2.5 rounded-xl text-[10px] text-amber-900 font-sans leading-relaxed flex items-start gap-1.5">
+                  <span className="shrink-0">💡</span>
+                  <p><b>ประโยชน์ใช้งาน:</b> ข้อมูลสิ้นเปลืองช่วยปรับรอบบริการเช็กระยะ และจัดสรรวงเงินบัตรน้ำมัน Fleet Card กองกลางได้แม่นยำยิ่งขึ้น</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div> {/* Closes #analytics-dashboard-group parent container wrapper */}
 
       {/* QUICK ADMIN APPROVAL MODAL */}
