@@ -14,7 +14,10 @@ import {
   Plus,
   Info,
   Car,
-  Phone
+  Phone,
+  Edit,
+  X,
+  Printer
 } from 'lucide-react';
 import { Booking, Driver, Vehicle } from '../types';
 import { formatThaiDate, formatTime } from '../utils/bookingUtils';
@@ -1358,7 +1361,7 @@ export default function DriverGoogleCalendar({
                       }}
                       className="w-full py-1 bg-[#a22055] hover:bg-[#8e1d4b] text-white rounded-lg font-bold text-[10px] cursor-pointer text-center block"
                     >
-                      บันทึกเสร็จงาน 🏁
+                      บันทึกเสร็จงาน
                     </button>
                   </div>
                 )}
@@ -1366,8 +1369,8 @@ export default function DriverGoogleCalendar({
                 {/* Show recorded mileage details if completed */}
                 {selectedEvent.status === 'completed' && selectedEvent.startMileage !== undefined && (
                   <div className="bg-emerald-50/50 border border-emerald-100/75 rounded-xl p-2 space-y-0.5">
-                    <span className="inline-flex px-1 bg-emerald-600 text-white text-[8px] font-black uppercase tracking-wider">
-                      ⏱️ ระยะทางไมล์รวม
+                    <span className="inline-flex px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-black uppercase tracking-wider">
+                      ระยะทางไมล์รวม
                     </span>
                     <div className="flex justify-between text-[10px] font-medium pt-1">
                       <span className="text-slate-500">เริ่มต้น:</span>
@@ -1389,7 +1392,7 @@ export default function DriverGoogleCalendar({
                 {/* Action buttons section */}
                 <div className="pt-2 border-t border-slate-100 space-y-1">
                   <div className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">
-                    {isAdmin ? '🛡️ แผงควบคุมผู้ดูแลระบบ (Admin Controls)' : '📋 ชุมชนผู้ใช้งาน (User Actions)'}
+                    {isAdmin ? 'แผงควบคุมผู้ดูแลระบบ (Admin Controls)' : 'การทำงานคำขอ (User Actions)'}
                   </div>
                   
                   {isAdmin ? (
@@ -1407,7 +1410,8 @@ export default function DriverGoogleCalendar({
                             : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
                         }`}
                       >
-                        <span>✅ อนุมัติใบใช้รถ</span>
+                        <Check size={12} className="shrink-0" />
+                        <span>อนุมัติใบใช้รถ</span>
                       </button>
 
                       <button
@@ -1418,7 +1422,8 @@ export default function DriverGoogleCalendar({
                         }}
                         className="w-full py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg font-bold text-[10.5px] flex items-center justify-center gap-1 cursor-pointer"
                       >
-                        <span>✏️ แก้ไขคำขอ</span>
+                        <Edit size={11} className="shrink-0" />
+                        <span>แก้ไขคำขอ</span>
                       </button>
 
                       <button
@@ -1434,7 +1439,8 @@ export default function DriverGoogleCalendar({
                             : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
                         }`}
                       >
-                        <span>❌ ยกเลิก/ไม่อนุมัติ</span>
+                        <X size={12} className="shrink-0" />
+                        <span>ยกเลิก/ไม่อนุมัติ</span>
                       </button>
 
                       <button
@@ -1445,7 +1451,8 @@ export default function DriverGoogleCalendar({
                         }}
                         className="w-full py-1 bg-blue-50 hover:bg-blue-105 text-[#1a73e8] border border-blue-200 rounded-lg font-bold text-[10.5px] flex items-center justify-center gap-1 cursor-pointer"
                       >
-                        <span>🖨️ พิมพ์ใบขอใช้รถ</span>
+                        <Printer size={12} className="shrink-0" />
+                        <span>พิมพ์ใบขอใช้รถ</span>
                       </button>
                     </div>
                   ) : (
@@ -1458,7 +1465,8 @@ export default function DriverGoogleCalendar({
                         }}
                         className="w-full py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg font-bold text-[10px] flex items-center justify-center gap-1 cursor-pointer"
                       >
-                        <span>✏️ แก้ไข</span>
+                        <Edit size={11} className="shrink-0" />
+                        <span>แก้ไข</span>
                       </button>
 
                       <button
@@ -1474,7 +1482,8 @@ export default function DriverGoogleCalendar({
                             : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
                         }`}
                       >
-                        <span>❌ ยกเลิก</span>
+                        <X size={12} className="shrink-0" />
+                        <span>ยกเลิก</span>
                       </button>
 
                       <button
@@ -1485,7 +1494,8 @@ export default function DriverGoogleCalendar({
                         }}
                         className="w-full py-1 bg-blue-50 hover:bg-[#1a73e8]/10 text-[#1a73e8] border border-blue-200 rounded-lg font-bold text-[10px] flex items-center justify-center gap-0.5 cursor-pointer"
                       >
-                        <span>🖨️ พิมพ์</span>
+                        <Printer size={11} className="shrink-0" />
+                        <span>พิมพ์</span>
                       </button>
                     </div>
                   )}

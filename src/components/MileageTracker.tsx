@@ -17,7 +17,8 @@ import {
   Fuel,
   Coins,
   Droplet,
-  Tag
+  Tag,
+  Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Booking, Vehicle, Driver } from '../types';
@@ -316,7 +317,8 @@ export default function MileageTracker({
                 : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
           >
-            <span>⏳ ค้างลงบันทึกเลขไมล์</span>
+            <Clock size={14} className={activeSubTab === 'pending' ? 'text-[#aa4e6e]' : 'text-slate-400'} />
+            <span>ค้างลงบันทึกเลขไมล์</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold leading-none ${
               activeSubTab === 'pending' ? 'bg-pink-100 text-[#aa4e6e]' : 'bg-slate-100 text-slate-500'
             }`}>
@@ -335,7 +337,8 @@ export default function MileageTracker({
                 : 'border-transparent text-slate-400 hover:text-slate-600'
             }`}
           >
-            <span>✅ บันทึกเสร็จเรียบร้อย</span>
+            <CheckCircle2 size={14} className={activeSubTab === 'completed' ? 'text-emerald-600' : 'text-slate-400'} />
+            <span>บันทึกเสร็จเรียบร้อย</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold leading-none ${
               activeSubTab === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
             }`}>

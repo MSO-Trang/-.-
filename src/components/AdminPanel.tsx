@@ -1504,7 +1504,7 @@ export default function AdminPanel({
                   onChange={(e) => setTripVehicleFilter(e.target.value)}
                   className="w-full bg-slate-50 border border-pink-100 hover:border-pink-300 rounded-lg p-2 focus:bg-white outline-none font-sans font-semibold text-slate-700 h-9"
                 >
-                  <option value="all">🚙 แสดงรถรถยนต์ราชการทุกคัน</option>
+                  <option value="all">แสดงรถรถยนต์ราชการทุกคัน</option>
                   {vehicles.map(v => (
                     <option key={v.id} value={v.id}>
                       {v.plateNumber} - {v.name}
