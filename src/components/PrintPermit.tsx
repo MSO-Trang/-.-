@@ -525,11 +525,11 @@ export default function PrintPermit({
                     </p>
                     <p className="flex items-center overflow-hidden w-full mt-1">
                       <span className="shrink-0">ว.ด.ป.</span>
-                      <span className="text-slate-400 ml-1 select-none overflow-hidden whitespace-nowrap flex-grow">................................................</span>
+                      <span className="text-slate-400 ml-1 select-none overflow-hidden whitespace-nowrap flex-grow">........................................................................................................................</span>
                     </p>
                     <p className="flex items-center overflow-hidden w-full mt-1">
                       <span className="shrink-0">เวลา</span>
-                      <span className="text-slate-400 ml-1 select-none overflow-hidden whitespace-nowrap flex-grow">................................................</span>
+                      <span className="text-slate-400 ml-1 select-none overflow-hidden whitespace-nowrap flex-grow">........................................................................................................................</span>
                     </p>
                   </div>
 
