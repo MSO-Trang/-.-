@@ -904,7 +904,7 @@ export default function App() {
         </header>
 
         {/* Dynamic Content View Area */}
-        <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 flex flex-col gap-6 print:p-0 print:m-0 w-full max-w-5xl mx-auto min-h-0">
+        <main className="flex-1 py-8 px-4 sm:px-8 lg:px-10 flex flex-col gap-8 print:p-0 print:m-0 w-full max-w-7xl mx-auto min-h-0">
           
           {/* Mobile Horizontal Navigation Ribbon (Scrollable) - Only visible on smartphones */}
           <div className="md:hidden flex flex-col gap-2 w-full print:hidden">

@@ -905,7 +905,7 @@ export default function BookingForm({
   return (
     <div 
       ref={formRef}
-      className="bg-[#fcfdff] border border-slate-100 rounded-3xl p-4 sm:p-6 md:p-8 shadow-md space-y-8 max-w-5xl mx-auto font-sans" 
+      className="bg-[#fcfdff] border border-slate-100 rounded-3xl p-5 sm:p-7 md:p-9 shadow-md space-y-8 max-w-7xl w-full mx-auto font-sans" 
       id="booking-form"
     >
       {/* Form Header */}
